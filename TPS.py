@@ -1,0 +1,1158 @@
+# TPS:         Triple population synthesis.
+##              computes the evolution of a population of given triples   
+##              given any initial conditions (M, q, m, A, a, E, e, i, G, g, O, o).
+## Options:   --M_max    upper limit for the inner primary mass [100 Msun]
+##            --M_min    lower limit for the inner primary mass [0.1 Msun]
+##            --M_distr  mass function option: 
+lib_inner_primary_mass_distr = {0: "Kroupa", #default
+                            1: "Scalo",
+                            2: "Miller & Scalo",
+                            3: "Salpeter",
+                            4: "Logarithmically flat",
+                            5: "Eggleton",
+                            6: "Kroupa for massive stars M>0.5 powerlaw with exp=-2.3",}
+##            --Q_max    upper limit for the inner mass ratio [1.]
+##            --Q_min    lower limit for the inner mass ratio [0.]
+##            --Q_distr  inner mass ratio option: 
+lib_inner_mass_ratio_distr = {0: "Uniform distribution", #default
+                            1: "Kroupa IMF",}
+##            --q_max    upper limit for the outer mass ratio [1.]
+##            --q_min    lower limit for the mass of the outer star [0.]
+##            --q_distr  outer mass ratio option: 
+lib_outer_mass_ratio_distr = {0: "Uniform distribution", #default
+                            1: "Kroupa IMF",}
+##            --A_max    upper limit for the inner semi-major axis [5e6 RSun]
+##            --A_min    lower limit for the inner semi-major axis [5]
+##            --A_distr  inner semi-major axcis option: 
+lib_inner_semi_distr = {0: "Log Uniform distribution", #default
+                   1: "Constant semi-major axis",
+                   2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
+                   3: "Lognormal mu = 10^3.5d, sigma = 2.3",
+                   4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
+                   5: "Sana et al. 2012",}
+##            --a_max    upper limit for the outer semi-major axis [5e6 RSun]
+##            --a_min    lower limit for the outer semi-major axis [5 RSun]
+##            --a_distr  outer semi-major axis option: 
+lib_outer_semi_distr = {0: "Log Uniform distribution", #default
+                   1: "Constant semi-major axis",
+                   2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
+                   3: "Lognormal mu = 10^3.5d, sigma = 2.3",
+                   4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
+                   5: "Sana et al. 2012",}
+##            --E_max    upper limit for the inner eccentricity [1.]
+##            --E_min    lower limit for the inner eccentricity [0.]
+##            --E_distr  inner eccentricity option: 
+lib_inner_ecc_distr = {0: "Thermal", #default
+                 1: "Constant eccentricity",
+                 2: "Sana et al. 2012 e^-0.45", #-> close binaries
+                 3: "Flat distribution",
+                 4: "Powerlaw e^0.5",}                                    
+##            --e_max    upper limit for the outer eccentricity [1.]
+##            --e_min    lower limit for the outer eccentricity [0.]
+##            --e_distr  outer eccentricity option: 
+lib_outer_ecc_distr = {0: "Thermal", #default
+                 1: "Constant eccentricity",
+                 2: "Sana et al. 2012 e^-0.45", #-> close binaries
+                 3: "Flat distribution",
+                 4: "Powerlaw e^0.5",}     
+##            --i_max    upper limit for the relative inclination [pi]
+##            --i_min    lower limit for the relative inclination [0]
+##            --i_distr  relative inclination option: 
+lib_incl_distr = {0: "Circular uniform distribution", #default
+                 1: "Constant inclination",}     
+##            --G_max    upper limit for the inner argument of pericenter [pi]
+##            --G_min    lower limit for the inner argument of pericenter [-pi]
+##            --G_distr  inner argument of pericenter option: r
+lib_inner_aop_distr = {0: "Uniform distribution", #default
+                 1: "Constant argument of pericenter",}     
+##            --g_max    upper limit for the outer argument of pericenter [pi]
+##            --g_min    lower limit for the outer argument of pericenter [-pi]
+##            --g_distr  outer argument of pericenter option: 
+lib_outer_aop_distr = {0: "Uniform distribution", #default
+                 1: "Constant argument of pericenter",}     
+##             outer longitude of ascending nodes = inner - pi               
+##            --O_max    upper limit for the inner longitude of ascending node [pi]
+##            --O_min    lower limit for the inner longitude of ascending node [-pi]
+##            --O_distr  inner longitude of ascending node option: 
+lib_inner_loan_distr = {0: "Circular niform distribution", 
+                 1: "Constant longitude of ascending nodes",} #default
+##            -T or -t   binary end time. [13500 Myr]
+##            -z         metallicity of stars  [0.02 Solar] 
+##            -n         number of triples to be simulated.  [1]
+##            -N         number of initial triple.  [0]
+##            --stop_at_merger                  stopping condition at merger [True]
+##            --stop_at_disintegrated           stopping condition at disintegration [True]
+##            --stop_at_triple_mass_transfer    stopping condition at mass transfer in outer binary [True]
+##            --stop_at_collision               stopping condition at collision [True]
+##            --stop_at_dynamical_instability   stopping condition at dynamical instability [True]
+##            --stop_at_semisecular_regime      stopping condition at semisecular regime [False]
+##            --stop_at_mass_transfer           stopping condition at mass transfer [False]
+lib_SN_kick_distr = {0: "No kick",
+                    1: "Hobbs", #Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
+                    2: "Hobbs + momentum rescaling", 
+                    3: "Arzoumanian", #Arzoumanian ea 2002, 568, 289
+                    4: "Arzoumanian + momentum rescaling",
+                    5: "Hansen", #Hansen & Phinney 1997, 291, 569
+                    6: "Hansen + momentum rescaling",
+                    7: "Paczynski", #Paczynski 1990, 348, 485
+                    8: "Paczynski + momentum rescaling",
+                    9: "Verbunt", #Verbunt, Igoshev & Cator, 2017, 608, 57
+                    10: "Verbunt + momentum rescaling",} #default
+
+         
+#not implemented yet
+##            -s         random seed
+
+
+import TRES as TRES
+
+from amuse.units.optparse import OptionParser
+from amuse.units import units, constants
+from amuse.support.console import set_printing_strategy
+import numpy as np
+from scipy.interpolate import interp1d
+
+from amuse.ic.kroupa import new_kroupa_mass_distribution
+from amuse.ic.scalo import new_scalo_mass_distribution
+from amuse.ic.millerscalo import new_miller_scalo_mass_distribution
+from amuse.ic.salpeter import new_salpeter_mass_distribution
+from amuse.ic.flatimf import new_flat_mass_distribution
+
+precision = 1.e-10 
+min_mass = 0.08 |units.MSun # for primary stars
+absolute_min_mass = 0.008|units.MSun #  for secondaries and tertiaries
+absolute_max_mass = 100 |units.MSun
+REPORT = False 
+REPORT_USER_WARNINGS = False 
+stop_at_init_mass_transfer = True
+
+def flat_distr(lower, upper):
+    return np.random.uniform(lower, upper)
+
+def log_flat_distr(lower, upper):
+    lower_RSun = lower.value_in(units.RSun)
+    upper_RSun = upper.value_in(units.RSun)
+    x= np.random.uniform(np.log10(lower_RSun), np.log10(upper_RSun))
+    return (10**x)|units.RSun 
+    
+def eggleton_mass_distr(lower_mass, upper_mass):
+    turnover_mass = 0.3|units.MSun
+    power = 0.85
+    
+    y_max = (upper_mass/turnover_mass) **(1/power)
+    upper = y_max / (1+y_max)
+    y_min = (lower_mass/turnover_mass) **(1/power)
+    lower = y_min / (1+y_min)
+
+    x = np.random.uniform(lower, upper)
+    y=turnover_mass * (x/(1-x))**power
+    return turnover_mass * (x/(1-x))**power
+
+def powerlaw_distr(m_min, m_max, slope):    
+    if slope == -1 or slope == 0:
+        return 'slope of powerlap distribution incorrect'
+        exit(1)
+    slope1 = slope + 1
+    factor = (pow(m_max / m_min, slope1) - 1.0 )
+    x = np.random.uniform(0,1)
+    return m_min * (1.0 + factor*x) ** (1.0 / slope1)
+
+class Generate_initial_triple:
+    #-------
+    #setup stellar system
+    def __init__(self, inner_primary_mass_max, inner_primary_mass_min, 
+                        inner_secondary_mass_min, outer_mass_min, outer_mass_max,
+                        inner_mass_ratio_max, inner_mass_ratio_min, 
+                        outer_mass_ratio_max, outer_mass_ratio_min, 
+                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
+                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
+                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
+                        inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
+                        incl_max, incl_min,
+                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
+                        inner_loan_max, inner_loan_min, 
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
+                        inner_aop_distr, outer_aop_distr, inner_loan_distr):
+                        
+                        if inner_primary_mass_distr == 5:
+                            mass_convergence = False
+                            while mass_convergence == False:
+                                mass_convergence = self.generate_mass_and_semi_eggleton(inner_primary_mass_max, inner_primary_mass_min,        
+                                inner_secondary_mass_min,outer_mass_min, outer_mass_max,
+                                inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min)                            
+    
+                            #Does not use boolean inner/outer _semi_latus_rectum_ min/max
+                            self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                            self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                                
+
+                        else:    
+                            self.generate_mass(inner_primary_mass_max, inner_primary_mass_min, 
+                                inner_secondary_mass_min,outer_mass_min,outer_mass_max,
+                                inner_mass_ratio_max, inner_mass_ratio_min,
+                                outer_mass_ratio_max, outer_mass_ratio_min, 
+                                inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr)
+                                
+
+                            orbit_convergence = False
+                            while orbit_convergence == False:
+                                orbit_convergence =  self.generate_semi_and_ecc(inner_semi_max, inner_semi_min, 
+                                    outer_semi_max, outer_semi_min,
+                                    inner_semi_distr,  outer_semi_distr,
+                                    inner_semi_latus_rectum_min, outer_semi_latus_rectum_min, 
+                                    inner_semi_latus_rectum_max, outer_semi_latus_rectum_max, 
+                                    inner_ecc_max, inner_ecc_min, 
+                                    outer_ecc_max, outer_ecc_min,
+                                    inner_ecc_distr, outer_ecc_distr)
+
+
+                        self.generate_incl(incl_max, incl_min, incl_distr)
+
+                        self.generate_aop(inner_aop_max, inner_aop_min, 
+                            outer_aop_max, outer_aop_min,
+                            inner_aop_distr, outer_aop_distr)
+
+                        self.generate_loan(inner_loan_max, inner_loan_min, inner_loan_distr)
+
+    #-------                        
+    def generate_mass(self, inner_primary_mass_max, inner_primary_mass_min, 
+                        inner_secondary_mass_min,outer_mass_min, outer_mass_max,
+                        inner_mass_ratio_max, inner_mass_ratio_min,
+                        outer_mass_ratio_max, outer_mass_ratio_min,  
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr):
+        if REPORT:
+            print('generate_mass')
+
+        if inner_primary_mass_max == inner_primary_mass_min:
+            self.inner_primary_mass = inner_primary_mass_min
+        else:
+            if inner_primary_mass_distr == 1: #Scalo 1986
+                self.inner_primary_mass= new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                while self.inner_primary_mass < inner_primary_mass_min:
+                        self.inner_primary_mass = new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+            elif inner_primary_mass_distr == 2:#Miller & Scale 1979
+                self.inner_primary_mass= new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                while self.inner_primary_mass < inner_primary_mass_min:
+                        self.inner_primary_mass = new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+            elif inner_primary_mass_distr == 3: #Salpeter with slope 2.35
+                self.inner_primary_mass= new_salpeter_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
+            elif inner_primary_mass_distr == 4: # Flat in log space
+                self.inner_primary_mass= new_flat_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
+            elif inner_primary_mass_distr == 5: # Eggleton 2009, 399, 1471, Salpeter-like with turnover at low masses
+                self.inner_primary_mass= eggleton_mass_distr(inner_primary_mass_min, inner_primary_mass_max)
+            elif inner_primary_mass_distr == 6: #Salpeter with slope 2.3 -> Kroupa for M>0.5
+                self.inner_primary_mass = powerlaw_distr(inner_primary_mass_min, inner_primary_mass_max, -2.3)
+            else: #Kroupa 2001
+                self.inner_primary_mass = new_kroupa_mass_distribution(1, mass_min = inner_primary_mass_min, mass_max = inner_primary_mass_max)[0]
+
+
+        if inner_mass_ratio_max == inner_mass_ratio_min:
+            inner_mass_ratio = inner_mass_ratio_min
+            self.inner_secondary_mass = inner_mass_ratio * self.inner_primary_mass
+        else: 
+            if inner_mass_ratio_distr == 1:# Kroupa 2001 
+                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass_max)[0]
+            else: # flat distribution  
+               inner_mass_ratio = flat_distr(max(inner_mass_ratio_min, inner_secondary_mass_min / self.inner_primary_mass), inner_mass_ratio_max)
+               self.inner_secondary_mass = inner_mass_ratio * self.inner_primary_mass        
+       
+
+
+        if outer_mass_ratio_max == outer_mass_ratio_min:
+            outer_mass_ratio = outer_mass_ratio_min
+            self.outer_mass = outer_mass_ratio * (self.inner_primary_mass + self.inner_secondary_mass)
+        else: 
+            if outer_mass_ratio_distr == 1:# Kroupa 2001 
+                self.outer_mass = new_kroupa_mass_distribution(1, mass_min=outer_mass_min, mass_max=outer_mass_max)[0]
+            else: # flat distribution
+               inner_mass_tot = self.inner_primary_mass + self.inner_secondary_mass
+               outer_mass_ratio = flat_distr(max(outer_mass_ratio_min,outer_mass_min/inner_mass_tot), min(outer_mass_ratio_max, outer_mass_max/inner_mass_tot))
+               self.outer_mass = outer_mass_ratio * inner_mass_tot
+
+
+
+    def generate_semi_and_ecc(self, 
+                        inner_semi_max_orig, inner_semi_min_orig, 
+                        outer_semi_max_orig, outer_semi_min_orig,
+                        inner_semi_distr,  outer_semi_distr,
+                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min, 
+                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max, 
+                        inner_ecc_max, inner_ecc_min, 
+                        outer_ecc_max, outer_ecc_min,
+                        inner_ecc_distr, outer_ecc_distr):
+        if REPORT:
+            print('generate_semi_and_ecc')
+                        
+        self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+        self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+
+        inner_semi_min = inner_semi_min_orig
+        if inner_semi_latus_rectum_min:
+            inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
+        outer_semi_min = outer_semi_min_orig 
+        if outer_semi_latus_rectum_min:
+            outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
+
+        inner_semi_max = inner_semi_max_orig
+        if inner_semi_latus_rectum_max:
+            inner_semi_max = inner_semi_max_orig /(1-self.inner_ecc**2)                       
+        outer_semi_max = outer_semi_max_orig 
+        if outer_semi_latus_rectum_max:
+            outer_semi_max = outer_semi_max_orig /(1-self.outer_ecc**2)                       
+
+            
+                        
+        if inner_semi_max == inner_semi_min:
+            self.inner_semi = inner_semi_min
+        else:
+            if inner_semi_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_semi: unambiguous choice of constant semi-major axis')
+                    print('--A_min option to set the value of the semi-major axis in the inner binary')                
+                self.inner_semi = inner_semi_min
+            elif inner_semi_distr == 2: #Tokovinin Lognormal mu=10^5.5d, sigma=2.3
+                self.inner_semi = 0.|units.RSun
+                while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   inner_semi_min = inner_semi_min_orig
+                   if inner_semi_latus_rectum_min:
+                       inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
+
+                   logP = np.random.normal(5, 2.3, 1)
+                   P = (10**logP[0])|units.day
+                   self.inner_semi = ((P/2./np.pi)**2 * constants.G* (self.inner_primary_mass + self.inner_secondary_mass))**(1./3.)  
+                   if logP < -0.3 or logP > 10:#truncation of Gaussian wings
+                        self.inner_semi = 0.|units.RSun
+            elif inner_semi_distr == 3: #Lognormal mu=10^3.5d, sigma=2.3
+                self.inner_semi = 0.|units.RSun
+                while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   inner_semi_min = inner_semi_min_orig
+                   if inner_semi_latus_rectum_min:
+                       inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
+                   inner_semi_max = inner_semi_max_orig
+                   if inner_semi_latus_rectum_max:
+                       inner_semi_max = inner_semi_max_orig /(1-self.inner_ecc**2)                       
+
+                   logP = np.random.normal(5, 2.3, 1)
+                   P = (10**logP[0])|units.day
+                   self.inner_semi = ((P/2./np.pi)**2 * constants.G* (self.inner_primary_mass + self.inner_secondary_mass))**(1./3.)  
+                   if logP < -0.3 or logP > 10:#truncation of Gaussian wings
+                        self.inner_semi = 0.|units.RSun
+            elif inner_semi_distr == 4: #Rizzuto et al 2013, 436, 1694, Lognormal mu=10^0.95AU, sigma=1.35 
+                self.inner_semi = 0.|units.RSun
+                while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   inner_semi_min = inner_semi_min_orig
+                   if inner_semi_latus_rectum_min:
+                       inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
+                   inner_semi_max = inner_semi_max_orig
+                   if inner_semi_latus_rectum_max:
+                       inner_semi_max = inner_semi_max_orig /(1-self.inner_ecc**2)                       
+
+                   logAU = np.random.normal(0.95, 1.35, 1)
+                   self.inner_semi = (10**logAU[0])|units.AU
+                   if self.inner_semi < 5|units.RSun or self.inner_semi > 5e8|units.RSun:#truncation of Gaussian wings
+                        self.inner_semi = 0.|units.RSun
+
+            elif inner_semi_distr == 5: #Sana
+               self.inner_semi = 0.|units.RSun
+               # (logP)^-0.55
+               while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):               
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   inner_semi_min = inner_semi_min_orig
+                   if inner_semi_latus_rectum_min:
+                       inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
+                   inner_semi_max = inner_semi_max_orig
+                   if inner_semi_latus_rectum_max:
+                       inner_semi_max = inner_semi_max_orig /(1-self.inner_ecc**2)                       
+
+                   random_nr = flat_distr(0, 1)
+                   logP_min = 0.15
+                   logP_max = 8.5
+                   c_s = (logP_max**0.45 - logP_min**0.45)
+                   logP = (random_nr*c_s +logP_min**0.45)**(1./0.45)
+                   P0 = 10**logP|units.day
+                   M_inner = self.inner_primary_mass + self.inner_secondary_mass
+                   self.inner_semi = ((P0/2./np.pi)**2 * M_inner*constants.G ) ** (1./3.)                
+            else: # log flat distribution
+                maximal_semi = min(inner_semi_max, outer_semi_max)
+                if inner_semi_min > maximal_semi: #possible for extreme eccentricities
+                    return False
+                self.inner_semi = log_flat_distr(inner_semi_min, maximal_semi)
+                        
+        
+                        
+        if outer_semi_max == outer_semi_min:
+            self.outer_semi = outer_semi_min
+        else:
+            if outer_semi_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_semi: unambiguous choise of constant semi-major axis')
+                    print('--a_min option to set the value of the semi-major axis in the outer binary')                
+                self.outer_semi = outer_semi_min
+            elif outer_semi_distr == 2: #Tokovinin Lognormal mu=10^5.5d, sigma=2.3
+                self.outer_semi = 0.|units.RSun
+                while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
+                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                    outer_semi_min = outer_semi_min_orig
+                    if outer_semi_latus_rectum_min:
+                       outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
+                    outer_semi_max = outer_semi_max_orig
+                    if outer_semi_latus_rectum_max:
+                       outer_semi_max = outer_semi_max_orig /(1-self.outer_ecc**2)                       
+
+                    logP_out = np.random.normal(5, 2.3, 1)
+                    P_out = (10**logP_out[0])|units.day
+                    self.outer_semi = ((P_out/2./np.pi)**2 * constants.G* (self.inner_primary_mass + self.inner_secondary_mass + self.outer_mass))**(1./3.)                    
+                    if logP_out < -0.3 or logP_out > 10:#truncation of Gaussian wings
+                        self.outer_semi = 0.|units.RSun
+                    if logP_out < 3: # no bifurcation
+                        self.outer_semi = 0.|units.RSun
+
+            elif outer_semi_distr == 3: #Lognormal mu=10^3.5d, sigma=2.3
+                self.outer_semi = 0.|units.RSun
+                while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
+                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                    outer_semi_min = outer_semi_min_orig
+                    if outer_semi_latus_rectum_min:
+                       outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
+                    outer_semi_max = outer_semi_max_orig
+                    if outer_semi_latus_rectum_max:
+                       outer_semi_max = outer_semi_max_orig /(1-self.outer_ecc**2)                       
+
+                    logP_out = np.random.normal(5, 2.3, 1)
+                    P_out = (10**logP_out[0])|units.day
+                    self.outer_semi = ((P_out/2./np.pi)**2 * constants.G* (self.inner_primary_mass + self.inner_secondary_mass + self.outer_mass))**(1./3.)                    
+                    if logP_out < -0.3 or logP_out > 10:#truncation of Gaussian wings
+                        self.outer_semi = 0.|units.RSun
+                    if logP_out < 3: # no bifurcation
+                        self.outer_semi = 0.|units.RSun
+                            
+            elif outer_semi_distr == 4: #Rizzuto et al 2013, 436, 1694, Lognormal mu=10^0.95AU, sigma=1.35 
+                self.outer_semi = 0.|units.RSun
+                while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
+                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                   outer_semi_min = outer_semi_min_orig
+                   if outer_semi_latus_rectum_min:
+                       outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
+                   outer_semi_max = outer_semi_max_orig
+                   if outer_semi_latus_rectum_max:
+                       outer_semi_max = outer_semi_max_orig /(1-self.outer_ecc**2)                       
+
+                   logAU = np.random.normal(0.95, 1.35, 1)
+                   self.outer_semi = (10**logAU[0])|units.AU
+                   if self.outer_semi < 5|units.RSun or self.outer_semi > 5e8|units.RSun:#truncation of Gaussian wings
+                        self.outer_semi = 0.|units.RSun
+
+            elif outer_semi_distr == 5: #Sana
+               self.outer_semi = 0.|units.RSun
+               # (logP)^-0.55
+               while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
+                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                   outer_semi_min = outer_semi_min_orig
+                   if outer_semi_latus_rectum_min:
+                       outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
+                   outer_semi_max = outer_semi_max_orig
+                   if outer_semi_latus_rectum_max:
+                       outer_semi_max = outer_semi_max_orig /(1-self.outer_ecc**2)                       
+
+                   random_nr = flat_distr(0, 1)
+                   logP_min = 0.15
+                   logP_max = 8.5
+                   c_s = (logP_max**0.45 - logP_min**0.45)
+                   logP = (random_nr*c_s +logP_min**0.45)**(1./0.45)
+                   P0 = 10**logP|units.day
+                   mass_tot = self.inner_primary_mass + self.inner_secondary_mass + self.outer_mass
+                   self.outer_semi = ((P0/2./np.pi)**2 * mass_tot*constants.G) ** (1./3.)                
+                                                         
+            else: # log flat distribution
+                if outer_semi_min > outer_semi_max: #possible for extreme eccentricities
+                    return False
+                self.outer_semi = log_flat_distr(outer_semi_min, outer_semi_max)
+                       
+                     
+        if inner_semi_distr == outer_semi_distr and inner_semi_min_orig == outer_semi_min_orig and inner_semi_max == outer_semi_max and self.outer_semi < self.inner_semi and inner_ecc_distr == outer_ecc_distr and inner_ecc_min == outer_ecc_min and inner_ecc_max == outer_ecc_max:
+            swap = self.outer_semi
+            self.outer_semi = self.inner_semi
+            self.inner_semi = swap
+            swap = self.outer_ecc
+            self.outer_ecc = self.inner_ecc
+            self.inner_ecc = swap
+            return True
+        elif self.outer_semi < self.inner_semi:
+            return False
+        return True
+
+
+    def generate_ecc_1d(self, ecc_max, ecc_min, ecc_distr):
+        if REPORT:
+            print('generate_ecc_1d')
+                        
+        if ecc_max == ecc_min:
+            return ecc_min
+        else:
+            if ecc_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_ecc: unambiguous choise of constant eccentricity')
+                    print('--E_min and --e_min option to set the value of the eccentricity')                
+                return ecc_min
+            elif ecc_distr == 2: #Sana
+                return powerlaw_distr(ecc_min+precision, ecc_max, -0.45)
+            elif ecc_distr == 3: #flat distribution
+                return flat_distr(ecc_min, ecc_max)
+            elif ecc_distr == 4: #Powerlaw
+                return powerlaw_distr(ecc_min+precision, ecc_max, 0.5)
+            else: #Thermal distribution
+                 return np.sqrt(np.random.uniform(ecc_min, ecc_max))
+                 
+      
+
+
+    def generate_incl(self, incl_max, incl_min, incl_distr):
+        if REPORT:
+            print('generate_incl')
+        if incl_max == incl_min:
+            self.incl = incl_min           
+        else:
+            if incl_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_incl: unambiguous choise of constant relative inclination')
+                    print('--i_min option to set the value of the relative inclination in the inner triple')                
+                self.incl = incl_min
+            else: #Circular uniform distribution 
+                 self.incl = np.arccos(np.random.uniform(np.cos(incl_min), np.cos(incl_max)))
+                 
+    def generate_aop(self,
+                        inner_aop_max, inner_aop_min, 
+                        outer_aop_max, outer_aop_min,
+                        inner_aop_distr, outer_aop_distr):
+        if REPORT:
+            print('generate_aop')
+
+        if inner_aop_max == inner_aop_min:
+            self.inner_aop = inner_aop_min
+        else:
+            if inner_aop_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_aop: unambiguous choise of constant argument of pericenter')
+                    print('--G_min option to set the value of the argument of pericenter of the inner binary')                
+                self.inner_aop = inner_aop_min
+            else: #Uniform distribution 
+                 self.inner_aop = np.random.uniform(inner_aop_min, inner_aop_max)
+                     
+                 
+        if outer_aop_max == outer_aop_min:
+            self.outer_aop = outer_aop_min
+        else:
+            if outer_aop_distr == 1: #Constant 
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_aop: unambiguous choise of constant argument of pericenter')
+                    print('--g_min option to set the value of the argument of pericenter of the outer binary')                
+                self.outer_aop = outer_aop_min
+            else: #Uniform distribution 
+                 self.outer_aop = np.random.uniform(outer_aop_min, outer_aop_max)
+                
+
+    def generate_loan(self, inner_loan_max, inner_loan_min, inner_loan_distr):                                
+        if REPORT:
+            print('generate_loan')
+
+        if inner_loan_max == inner_loan_min:
+            self.inner_loan = inner_loan_min
+        else:
+            if inner_loan_distr == 0: #Circular uniform distribution
+                self.inner_loan = np.arccos(np.random.uniform(np.cos(inner_loan_min), np.cos(inner_loan_max)))
+            else: #Constant
+                if REPORT_USER_WARNINGS:
+                    print('TPS::generate_loan: unambiguous choise of constant longitude of ascending nodes')
+                    print('--O_min option to set the value of the argument of pericenter of the inner binary')                
+                self.inner_loan = inner_loan_min
+                    
+
+#-------
+
+# Eggleton 2009, 399, 1471
+    def generate_mass_and_semi_eggleton(self, inner_primary_mass_max, inner_primary_mass_min,  
+                        inner_secondary_mass_min,outer_mass_min,outer_mass_max,
+                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min):
+        if REPORT:
+            print('generate_mass_and_semi_eggleton')
+        U0_mass = [0., .01, .09, .32, 1., 3.2, 11, 32, np.inf]#solar mass
+        U0_l0 = [0.40, 0.40, 0.40, 0.40, 0.50, 0.75, 0.88, 0.94, 0.96]
+        U0_l1 = [0.18, 0.18, 0.18, 0.18, 0.18, 0.18, 0.20, 0.60, 0.80]
+        U0_l2 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.20, 0.33, 0.82, 0.90]
+        U0_l3 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+              
+        Mt = eggleton_mass_distr(min_mass, absolute_max_mass)
+        U = np.random.uniform(0, 1)
+        f_l0 = interp1d (U0_mass, U0_l0)
+        U0 = f_l0(Mt.value_in(units.MSun)) #messy, but otherwise cluster crashes    
+
+        while U >= U0:
+            U = np.random.uniform(0, 1)
+            f_l0 = interp1d (U0_mass, U0_l0)
+            U0 = f_l0(Mt.value_in(units.MSun))     
+        
+        if U < U0:
+            V = np.random.uniform(0, 1)
+            P0 = 1.e5 * V**2 / (1-V)**2.5 |units.day
+            while P0 > 1e10|units.day:             
+                V = np.random.uniform(0, 1)
+                P0 = 1.e5 * V**2 / (1-V)**2.5|units.day
+
+            x_p = np.random.uniform(0, 1)
+            if P0 > 25|units.day or x_p > 0.25: 
+                Q0 = ( (U0-U)/U0 )**0.8
+            else:
+                Q0 = 0.9+0.09*(U0-U)/U0 
+            if Q0 < 0.01:
+                Q0 = 0.01                                
+                
+            M1 = Mt / (1+Q0)
+            M2 = M1 * Q0
+            f_l1 = interp1d(U0_mass, U0_l1)
+            
+            U1 = np.random.uniform(0, 1)
+            U1_0 = f_l1(M1.value_in(units.MSun))     
+            U2 = np.random.uniform(0, 1)
+            U2_0 = f_l1(M2.value_in(units.MSun))
+            
+            #M1 bifurcutas and M2 not
+            if U1< U1_0 and U2>=U2_0:
+                M_bin = M1  
+                U_bin = U1 
+                U0_bin = U1_0
+                M_comp = M2
+            #M2 bifurcutas and M1 not
+            elif U1>= U1_0 and U2<U2_0:
+                M_bin = M2
+                U_bin = U2
+                U0_bin = U2_0
+                M_comp = M1
+            else: #two bifurcations -> higher order multiplicity
+#                print(U1, U1_0, U2, U2_0)
+#                exit(1)
+                 return False
+                
+            V_bin = np.random.uniform(0, 1)
+            P_bin = 0.2 * P0 * 10**(-5*V_bin)
+
+            x_pb = np.random.uniform(0, 1)
+            if P_bin > 25|units.day or x_pb > 0.25: 
+                Q_bin = ( (U0_bin-U_bin)/U0_bin )**0.8
+            else:
+                Q_bin = 0.9+0.09*(U0_bin-U_bin)/U0_bin 
+            if Q_bin < 0.01:
+                Q_bin = 0.01                                
+
+            M1_bin = M_bin / (1+Q_bin)
+            M2_bin = M1_bin * Q_bin
+
+            self.inner_primary_mass = M1_bin
+            self.inner_secondary_mass = M2_bin
+            self.outer_mass = M_comp
+            
+            self.inner_semi = ((P_bin/2./np.pi)**2 * M_bin*constants.G ) ** (1./3.)
+            self.outer_semi = ((P0/2./np.pi)**2 * Mt*constants.G ) ** (1./3.)
+
+            if self.inner_primary_mass < inner_primary_mass_min or self.inner_primary_mass > inner_primary_mass_max:
+                return False 
+            if self.inner_secondary_mass < inner_secondary_mass_min:
+                return False
+            if self.outer_mass < outer_mass_min or self.outer_mass > outer_mass_max:
+                return False
+            if self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max:
+                return False
+            if self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max:
+                return False                         
+
+            return True
+        else:
+            print('not possible')
+            exit(1)
+
+                 
+
+#-------
+        
+#-------
+    def print_triple(self):
+        print('\nTriple - ')
+        print('m =', self.inner_primary_mass, self.inner_secondary_mass, self.outer_mass)
+        print('a =', self.inner_semi, self.outer_semi)
+        print('e =', self.inner_ecc, self.outer_ecc)
+        print('i =', self.incl)
+        print('g =', self.inner_aop, self.outer_aop)
+        print('o =', self.inner_loan, self.inner_loan -np.pi)
+
+#        print( triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, )
+#        print( triple_system.inner_semi, triple_system.outer_semi,)
+#        print( triple_system.inner_ecc, triple_system.outer_ecc,)
+#        print( triple_system.incl,)
+#        print( triple_system.inner_aop, triple_system.outer_aop,)
+#        print( triple_system.inner_loan, triple_system.inner_loan -np.pi)
+#        print(' ')
+        
+#-------
+
+#-------
+
+def evolve_model(inner_primary_mass_max, inner_primary_mass_min, 
+                        inner_secondary_mass_min,outer_mass_min,outer_mass_max,
+                        inner_mass_ratio_max, inner_mass_ratio_min, 
+                        outer_mass_ratio_max, outer_mass_ratio_min, 
+                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
+                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
+                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
+                        inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
+                        incl_max, incl_min,
+                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
+                        inner_loan_max, inner_loan_min, 
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
+                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                                                                      
+                        metallicity, tend, number, initial_number, seed,
+                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
+                        stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,
+                        stop_at_mass_transfer, stop_at_SN,
+                        SN_kick_distr, file_name, file_type):
+
+
+    i_n = 0
+    nr_ids = 0 #number of systems that is dynamically unstable at initialisation
+    nr_iss = 0 #number of systems that is dynamically unstable at initialisation
+    nr_imt = 0 #number of systems that has mass transfer at initialisation
+    nr_cp = 0 #number of systems with incorrect parameters
+    while i_n < number:
+        triple_system = Generate_initial_triple(inner_primary_mass_max, inner_primary_mass_min, 
+                    inner_secondary_mass_min, outer_mass_min, outer_mass_max,
+                    inner_mass_ratio_max, inner_mass_ratio_min, 
+                    outer_mass_ratio_max, outer_mass_ratio_min, 
+                    inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
+                    inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
+                    inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
+                    inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
+                    incl_max, incl_min,
+                    inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
+                    inner_loan_max, inner_loan_min, 
+                    inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                    inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
+                    inner_aop_distr, outer_aop_distr, inner_loan_distr)
+                
+        if REPORT:
+           triple_system.print_triple()
+
+
+
+        if (min_mass > triple_system.inner_primary_mass) or (min_mass > triple_system.inner_secondary_mass) or (min_mass > triple_system.outer_mass):
+                if REPORT:
+                    print('non-star included: ', triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass)
+                continue
+
+        number_of_system = initial_number + i_n
+        if REPORT:
+            print('number of system = ', number_of_system)
+            
+        tr = None
+        tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                    inner_secondary_mass = triple_system.inner_secondary_mass, 
+                    outer_mass = triple_system.outer_mass, 
+                    inner_semimajor_axis = triple_system.inner_semi, 
+                    outer_semimajor_axis = triple_system.outer_semi, 
+                    inner_eccentricity = triple_system.inner_ecc, 
+                    outer_eccentricity = triple_system.outer_ecc, 
+                    relative_inclination = triple_system.incl, 
+                    inner_argument_of_pericenter = triple_system.inner_aop, 
+                    outer_argument_of_pericenter = triple_system.outer_aop, 
+                    inner_longitude_of_ascending_node = triple_system.inner_loan, 
+                    SN_kick_distr = SN_kick_distr,                     
+                    metallicity = metallicity, tend = tend, number = number_of_system, 
+                    stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
+                    stop_at_triple_mass_transfer = stop_at_triple_mass_transfer, 
+                    stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
+                    stop_at_dynamical_instability = stop_at_dynamical_instability, 
+                    stop_at_semisecular_regime = stop_at_semisecular_regime, stop_at_mass_transfer = stop_at_mass_transfer, 
+                    stop_at_init_mass_transfer = stop_at_init_mass_transfer, stop_at_SN = stop_at_SN,
+                    file_name = file_name, file_type = file_type)                        
+
+        if tr.triple.correct_params == False:
+            nr_cp += 1
+        elif tr.triple.semisecular_regime_at_initialisation == True:
+            nr_iss +=1
+        elif tr.triple.dynamical_instability_at_initialisation == True:
+            nr_ids +=1
+        elif tr.triple.mass_transfer_at_initialisation == True:
+            nr_imt +=1
+        else:
+            i_n += 1            
+
+    if REPORT:
+      print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
+
+
+
+def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
+                        inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
+                        inner_mass_ratio_max, inner_mass_ratio_min, 
+                        outer_mass_ratio_max, outer_mass_ratio_min, 
+                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
+                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
+                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
+                        inner_ecc_max, inner_ecc_min,  outer_ecc_max, outer_ecc_min, 
+                        incl_max, incl_min,
+                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
+                        inner_loan_max, inner_loan_min, 
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
+                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
+                        metallicity, tend, number, initial_number, seed,
+                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
+                        stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,
+                        stop_at_mass_transfer, stop_at_SN,
+                        SN_kick_distr, file_name, file_type):
+
+    print('Based on the following distributions:')        
+    print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
+    print('Inner mass ratio: \t',               inner_mass_ratio_distr, ' ',lib_inner_mass_ratio_distr[inner_mass_ratio_distr] )        
+    print('Outer mass ratio: \t',               outer_mass_ratio_distr, ' ',lib_outer_mass_ratio_distr[outer_mass_ratio_distr] )        
+    print('Inner semi-major axis: \t',          inner_semi_distr, ' ',lib_inner_semi_distr[inner_semi_distr] )        
+    print('Outer semi-major axis: \t',          outer_semi_distr, ' ',lib_outer_semi_distr[outer_semi_distr] )        
+    print('Inner eccentricity: \t',             inner_ecc_distr, ' ',lib_inner_ecc_distr[inner_ecc_distr] )        
+    print('Outer eccentricity: \t',             outer_ecc_distr, ' ',lib_outer_ecc_distr[outer_ecc_distr] )        
+    print('Inclination: \t\t',                  incl_distr, ' ',lib_incl_distr[incl_distr] )        
+    print('Inner aop: \t\t',                    inner_aop_distr, ' ',lib_inner_aop_distr[inner_aop_distr] )        
+    print('Outer aop: \t\t',                    outer_aop_distr, ' ',lib_outer_aop_distr[outer_aop_distr] )        
+    print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
+    print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
+    print('\n\n')
+
+def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min, 
+                        inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
+                        inner_mass_ratio_max, inner_mass_ratio_min, 
+                        outer_mass_ratio_max, outer_mass_ratio_min, 
+                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
+                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
+                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
+                        inner_ecc_max, inner_ecc_min,  outer_ecc_max, outer_ecc_min, 
+                        incl_max, incl_min,
+                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
+                        inner_loan_max, inner_loan_min, 
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
+                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
+                        metallicity, tend, number, initial_number, seed,
+                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
+                        stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,
+                        stop_at_mass_transfer, stop_at_SN,
+                        SN_kick_distr, file_name, file_type):
+
+    if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
+        print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
+        exit(1)
+        
+    if (inner_primary_mass_max < inner_primary_mass_min):
+        print('error: maximum inner primary mass smaller than minimum in primary mass')
+        exit(1)
+
+
+    if (inner_secondary_mass_min < absolute_min_mass) :
+        print('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+        exit(1)
+    if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
+        print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+        exit(1)
+
+        
+    if (inner_mass_ratio_min < 0.) or (inner_mass_ratio_max > 1.):
+        print('error: inner mass ratio not in allowed range')
+        exit(1)
+        
+    if (inner_mass_ratio_max < inner_mass_ratio_min):
+        print('error: maximum inner mass ratio smaller than minimum mass ratio')
+        exit(1)
+
+
+    if (outer_mass_ratio_min < 0.) or (outer_mass_ratio_max > 1.):
+        print('error: outer mass ratio not in allowed range')
+        exit(1)
+        
+    if (outer_mass_ratio_max < outer_mass_ratio_min):
+        print('error: maximum outer mass ratio smaller than minimum mass ratio')
+        exit(1)
+        
+        
+
+    if (inner_semi_min < 5.|units.RSun):
+        print('error: inner separation not in allowed range >5 RSun')
+        exit(1)
+
+    if (outer_semi_min < 5.|units.RSun):
+        print('error: outer separation not in allowed range >5 RSun')
+        exit(1)
+        
+    if (inner_semi_max < inner_semi_min):
+        print('error: maximum inner separation smaller than minimum in separation')
+        exit(1)
+
+    if (outer_semi_max < outer_semi_min):
+        print('error: maximum outer separation smaller than minimum outer separation')
+        exit(1)
+        
+    if (inner_semi_min > outer_semi_max):
+        print('error: maximum outer separation smaller than minimum inner separation - no overlap for inner and outer orbit')
+        exit(1)
+        
+        
+
+
+    if (inner_ecc_min < 0.) or (inner_ecc_max > 1.):
+        print('error: inner eccentricity not in allowed range [0,1]')
+        exit(1)
+
+    if (outer_ecc_min < 0.) or (outer_ecc_max > 1.):
+        print('error: outer eccentricity not in allowed range [0,1]')
+        exit(1)
+
+    if (inner_ecc_max < inner_ecc_min):
+        print('error: maximum inner eccentricity smaller than minimum ecc')
+        exit(1)
+
+    if (outer_ecc_max < outer_ecc_min):
+        print('error: maximum outer eccentricity smaller than minimum ecc')
+        exit(1)
+
+
+    if (incl_min < 0.) or (incl_max > np.pi):
+        print('error: relative inclination not in allowed range [0, pi]')
+        exit(1)
+
+    if (incl_max < incl_min):
+        print('error: maximum relative inclination smaller than minimum relative inclination')
+        exit(1)
+
+
+
+    if (inner_aop_min < -np.pi) or (inner_aop_max > np.pi):
+        print('error: inner argument of pericenter not in allowed range [-pi,pi]')
+        exit(1)
+
+    if (outer_aop_min < -np.pi) or (outer_aop_max > np.pi):
+        print('error: outer argument of pericenter not in allowed range [-pi,pi]')
+        exit(1)
+
+    if (inner_aop_max < inner_aop_min):
+        print('error: maximum inner argument of pericenter smaller than minimum argument of pericenter')
+        exit(1)
+
+    if (outer_aop_max < outer_aop_min):
+        print('error: maximum outer argument of pericenter smaller than minimum argument of pericenter')
+        exit(1)
+
+
+    if (inner_loan_min < -1*np.pi) or (inner_loan_max > np.pi):
+        print('error: inner longitude of ascending node not in allowed range [-pi,pi]')
+        exit(1)
+
+    if (inner_loan_max < inner_loan_min):
+        print('error: maximum inner longitude of ascending node smaller than minimum argument of pericenter')
+        exit(1)
+
+    if (number < 1):
+        print('Requested number of systems < 1')
+        exit(1)
+
+    if (initial_number < 0):
+        print('Initial number of system < 0')
+        exit(1)
+
+
+def parse_arguments():
+    parser = OptionParser()
+    parser.add_option("--M_min", unit=units.MSun, 
+                      dest="inner_primary_mass_min", type="float", default = 1.|units.MSun,
+                      help="minimum of inner primary mass [%default]")
+    parser.add_option("--M_max", unit=units.MSun, 
+                      dest="inner_primary_mass_max", type="float", default = absolute_max_mass,
+                      help="maximum of inner primary mass [%default]")
+    parser.add_option("--M_distr", dest="inner_primary_mass_distr", type="int", default = 0,
+                      help="inner primary mass distribution [Kroupa]")
+
+    parser.add_option("--m_min", unit=units.MSun, 
+                      dest="inner_secondary_mass_min", type="float", default = absolute_min_mass,
+                      help="minimum of inner secondary mass [%default]")
+    parser.add_option("--l_min", unit=units.MSun, 
+                      dest="outer_mass_min", type="float", default = absolute_min_mass,
+                      help="minimum of outer mass [%default]")
+    parser.add_option("--l_max", unit=units.MSun, 
+                      dest="outer_mass_max", type="float", default = absolute_max_mass,
+                      help="maximum of outer mass [%default]")
+                      
+    parser.add_option("--Q_max", dest="inner_mass_ratio_max", type="float", default = 1.0,
+                      help="maximum of inner mass ratio [%default]")
+    parser.add_option("--Q_min", dest="inner_mass_ratio_min", type="float", default = 0.,
+                      help="minimum of inner mass ratio [%default]")
+    parser.add_option("--Q_distr", dest="inner_mass_ratio_distr", type="int", default = 0,
+                      help="inner mass ratio distribution [Flat]")
+
+    parser.add_option("--q_max", dest="outer_mass_ratio_max", type="float", default = 1.0,
+                      help="maximum of outer mass ratio [%default]")
+    parser.add_option("--q_min", dest="outer_mass_ratio_min", type="float", default = 0.,
+                      help="minimum of outer mass ratio [%default]")
+    parser.add_option("--q_distr", dest="outer_mass_ratio_distr", type="int", default = 0,
+                      help="outer mass ratio distribution [Flat]")
+
+    parser.add_option("--A_min", unit=units.RSun,
+                      dest="inner_semi_min", type="float", 
+                      default = 5|units.RSun,
+                      help="minimum of inner semi major axis [%default]")
+    parser.add_option("--A_max", unit=units.RSun,
+                      dest="inner_semi_max", type="float", 
+                      default = 5e6|units.RSun,
+                      help="maximum of inner semi major axis [%default]")
+    parser.add_option("--A_distr", dest="inner_semi_distr", type="int", default = 0,
+                      help="inner semimajor axis distribution [logFlat]")
+
+    parser.add_option("--a_min", unit=units.RSun,
+                      dest="outer_semi_min", type="float", 
+                      default = 5|units.RSun,
+                      help="minimum of outer semi major axis [%default]")
+    parser.add_option("--a_max", unit=units.RSun,
+                      dest="outer_semi_max", type="float", 
+                      default = 5e6|units.RSun,
+                      help="maximum of outer semi major axis [%default]")
+    parser.add_option("--a_distr", dest="outer_semi_distr", type="int", default = 0,
+                      help="outer semimajor axis distribution [logFlat]")
+
+    parser.add_option("--Ar_min", dest="inner_semi_latus_rectum_min", action="store_true", default = False, 
+                      help="minimum inner semi latus rectrum  [%default] %unit")
+    parser.add_option("--ar_min", dest="outer_semi_latus_rectum_min", action="store_true", default = False, 
+                      help="minimum outer semi latus rectrum  [%default] %unit")
+    parser.add_option("--Ar_max", dest="inner_semi_latus_rectum_max", action="store_true", default = False, 
+                      help="maximum inner semi latus rectrum  [%default] %unit")
+    parser.add_option("--ar_max", dest="outer_semi_latus_rectum_max", action="store_true", default = False, 
+                      help="maximum outer semi latus rectrum  [%default] %unit")
+
+    parser.add_option("--E_min",
+                      dest="inner_ecc_min", type="float", default = 0.,
+                      help="minimum of inner eccentricity [%default]")
+    parser.add_option("--E_max",
+                      dest="inner_ecc_max", type="float", default = 1.0,
+                      help="maximum of inner eccentricity [%default]")
+    parser.add_option("--E_distr", dest="inner_ecc_distr", type="int", default = 0,
+                      help="inner eccentricity distribution [Thermal]")
+
+    parser.add_option("--e_min",
+                      dest="outer_ecc_min", type="float", default = 0.,
+                      help="minimum of outer eccentricity [%default]")
+    parser.add_option("--e_max",
+                      dest="outer_ecc_max", type="float", default = 1.,
+                      help="maximum of outer eccentricity [%default]")
+    parser.add_option("--e_distr", dest="outer_ecc_distr", type="int", default = 0,
+                      help="outer eccentricity distribution [Thermal]")
+                      
+                      
+    parser.add_option("--i_min, --I_min",
+                      dest="incl_min", type="float", default = 0.0,
+                      help="minimum of relative inclination [rad] [%default]")
+    parser.add_option("--i_max, --I_max",
+                      dest="incl_max", type="float", default = np.pi,
+                      help="maximum of relative inclination [rad] [%default]")
+    parser.add_option("--i_distr, --I_distr", dest="incl_distr", type="int", default = 0,
+                      help="relative inclination distribution [Circular uniform]")
+
+                      
+    parser.add_option("--G_min",
+                      dest="inner_aop_min", type="float", default = -np.pi,
+                      help="minimum of inner argument of pericenter [rad] [%default]")
+    parser.add_option("--G_max",
+                      dest="inner_aop_max", type="float", default = np.pi,
+                      help="maximum of inner argument of pericenter [rad] [%default]")
+    parser.add_option("--G_distr", dest="inner_aop_distr", type="int", default = 0,
+                      help="inner argument of pericenter distribution [Uniform]")
+
+    parser.add_option("--g_min",
+                      dest="outer_aop_min", type="float", default = -np.pi,
+                      help="minimum of outer argument of pericenter [rad] [%default]")
+    parser.add_option("--g_max",
+                      dest="outer_aop_max", type="float", default = np.pi,
+                      help="maximum of outer argument of pericenter [rad] [%default]")
+    parser.add_option("--g_distr", dest="outer_aop_distr", type="int", default = 0,
+                      help="outer argument of pericenter distribution [Uniform]")
+                      
+    parser.add_option("--O_min",
+                      dest="inner_loan_min", type="float", default = -np.pi,
+                      help="minimum of inner longitude of ascending node [rad] [%default]")
+    parser.add_option("--O_max",
+                      dest="inner_loan_max", type="float", default = np.pi,
+                      help="maximum of inner longitude of ascending node [rad] [%default]")
+    parser.add_option("--O_distr", dest="inner_loan_distr", type="int", default = 1,
+                      help="inner longitude of ascending node distribution [Constant]")
+
+    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 10,
+                      help="which supernova kick distribution [%default]")                      
+
+    parser.add_option("-z", unit=units.none, 
+                      dest="metallicity", type="float", default = 0.02|units.none,
+                      help="metallicity [%default] %unit")                     
+    parser.add_option("-t", "-T", unit=units.Myr, 
+                      dest="tend", type="float", default = 13500|units.Myr,
+                      help="end time [%default] %unit")
+    parser.add_option("-n", dest="number", type="int", default = 10,
+                      help="number of systems [%default]")
+    parser.add_option("-N", dest="initial_number", type="int", default = 0,
+                      help="number of initial system [%default]")
+    parser.add_option("-s", unit=units.none, 
+                      dest="seed", type="float", default = 0.|units.none,
+                      help="seed [%default] %unit")
+#    int actual_seed = srandinter(input_seed);
+
+    parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
+                      help="stop at merger [%default] %unit")
+    parser.add_option("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
+                      help="stop at disintegrated [%default] %unit")
+    parser.add_option("--no_stop_at_triple_mass_transfer", dest="stop_at_triple_mass_transfer", action="store_false", default = True,
+                      help="stop at triple mass transfer [%default] %unit")
+    parser.add_option("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
+                      help="stop at collision in inner binary[%default] %unit")
+    parser.add_option("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
+                      help="stop at collision in outer binary[%default] %unit")
+    parser.add_option("--no_stop_at_dynamical_instability", dest="stop_at_dynamical_instability", action="store_false", default = True,
+                      help="stop at dynamical instability [%default] %unit")
+    parser.add_option("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
+                      help="stop at semisecular regime [%default] %unit")
+    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
+                      help="stop at mass transfer [%default] %unit")
+    parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
+                      help="stop at supernova [%default] %unit")
+                      
+                      
+    parser.add_option("-f", dest="file_name", type ="string", default = "TRES.hdf",#"TRES.txt"
+                      help="file name[%default]")
+    parser.add_option("-F", dest="file_type", type ="string", default = "hdf5",#"txt"
+                      help="file type[%default]")
+
+
+
+    options, args = parser.parse_args()
+    return options.__dict__
+
+
+
+if __name__ == '__main__':
+    options = parse_arguments()
+    set_printing_strategy("custom", 
+                          preferred_units = [units.MSun, units.RSun, units.Myr], 
+                          precision = 11, prefix = "", 
+                          separator = " [", suffix = "]")
+
+    test_initial_parameters(**options)
+    print_distr(**options)
+    evolve_model(**options)
+
+
+
