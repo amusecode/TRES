@@ -1997,7 +1997,7 @@ def extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2
             exit(-1)
 
     ### mass variation parameters ###
-#    star1_is_donor = star2_is_donor = star3_is_donor = False
+    star1_is_donor = star2_is_donor = star3_is_donor = False
     inner_mass_transfer_rate = outer_mass_transfer_rate = 0.0 | units.MSun/units.yr
     inner_accretion_efficiency_wind_child1_to_child2 = inner_accretion_efficiency_wind_child2_to_child1 = 0.0
     outer_accretion_efficiency_wind_child1_to_child2 = outer_accretion_efficiency_wind_child2_to_child1 = 0.0
