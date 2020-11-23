@@ -6,7 +6,7 @@
 ##              given any initial conditions (M, m, l, A, a, E, e, i, G, g, O, o, T, z).
  
 from amuse.community.seba.interface import SeBa
-from interactions import *
+from binary import *
 from tidal_friction_constant import *
 
 import os, sys
@@ -1366,10 +1366,8 @@ class Triple_Class:
 #                print('donor time:',  self.determine_time_step_stable_mt())
 
         #tides - ADD ALSO DURING MT
-        time_step_tides = np.inf |units.Myr 
-        if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:    
-            time_step_tides = self.determine_time_step_tides()  
-	                
+        time_step_tides = self.determine_time_step_tides()  
+                
         if REPORT_DT or REPORT_DEBUG:
             print('time:', time_step_max, time_step_stellar_code, time_step_wind, time_step_radius_change, time_step_tides)
 
@@ -2129,6 +2127,7 @@ class Triple_Class:
                 self.update_stellar_parameters()     
          
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
+                print('try ',   successfull_step, nr_unsuccessfull, star_unsuccessfull)
                 while successfull_step == False:
                     successfull_step, nr_unsuccessfull, star_unsuccessfull = self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
 
@@ -2550,20 +2549,9 @@ def plot_function(triple):
     plt.savefig('plots/orbit/spin_time_'+generic_name+'.pdf')
     plt.show()
 
-
-
-#        ms = 1|units.MSun
-#        rs = 1|units.AU
-#        J2 = ms**3 * rs * constants.G
-#        J = np.sqrt(J2)
-#        print(J)  #2.9071938904e+11 [RSun**2 * MSun * Myr**-1]       
-
-#        rs = 1|units.RSun
-#        print(J)  #19822565357. [RSun**2 * MSun * Myr**-1]   
-        
-    constants_Jorb = 2.9071938904e+11 #[RSun**2 * MSun * Myr**-1]
-    J_orb2 = m1_array**2 * m2_array**2 / (m1_array+m2_array) * a_in_array_AU * ( 1-e_in_array**2)
-    J_orb = np.sqrt(J_orb2)*constants_Jorb
+ 
+    J_orb2 = m1_array**2 * m2_array**2 / (m1_array+m2_array) * a_in_array_AU * ( 1-e_in_array**2) #*G
+    J_orb = np.sqrt(J_orb2)
     J_spin1 =  spin1_array * moi1_array
     J_spin2 =  spin2_array * moi2_array
     J_spin3 =  spin3_array * moi3_array
@@ -2585,24 +2573,6 @@ def plot_function(triple):
     plt.ylabel('$J spin$')
     plt.savefig('plots/orbit/Jspin_time_'+generic_name+'.pdf')
     plt.show()
-	
-
-    plt.plot(times_array_Myr, J_orb)
-    plt.plot(times_array_Myr,J_orb, '.')
-    plt.plot(times_array_Myr,J_spin1)
-    plt.plot(times_array_Myr,J_spin1, '.')
-    plt.plot(times_array_Myr,J_spin2)
-    plt.plot(times_array_Myr,J_spin2, '.')
-    plt.plot(times_array_Myr,J_spin3)
-    plt.plot(times_array_Myr,J_spin3, '.')
-    plt.xlabel('$t/\mathrm{Myr}$')
-    plt.ylabel('$J spin$')
-    plt.savefig('plots/orbit/Js_time_'+generic_name+'.pdf')
-    plt.show()
-
-
-	
-	
       
     plt.semilogy(times_array_Myr,moi1_array)
     plt.semilogy(times_array_Myr,moi1_array, '.')
