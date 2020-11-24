@@ -6,7 +6,7 @@
 ##              given any initial conditions (M, m, l, A, a, E, e, i, G, g, O, o, T, z).
  
 from amuse.community.seba.interface import SeBa
-from binary import *
+from interactions import *
 from tidal_friction_constant import *
 
 import os, sys
