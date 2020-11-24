@@ -2127,7 +2127,6 @@ class Triple_Class:
                 self.update_stellar_parameters()     
          
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
-                print('try ',   successfull_step, nr_unsuccessfull, star_unsuccessfull)
                 while successfull_step == False:
                     successfull_step, nr_unsuccessfull, star_unsuccessfull = self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
 
