@@ -41,8 +41,8 @@ error_dm = 0.05
 #maximum_radius_change_factor = 0.005
 error_dr = 0.05 #0.01
 minimum_time_step = 1.e-9 |units.Myr
-min_mass = 0.08 |units.MSun # for stars
-absolute_min_mass = 0.008|units.MSun # AMUSE can't handle planets -> also for secondaries and tertiaries
+# min_mass = 0.08 |units.MSun # for stars
+# absolute_min_mass = 0.008|units.MSun # AMUSE can't handle planets -> also for secondaries and tertiaries
 max_mass = 100 |units.MSun
 maximum_time_step_factor = 100.
 maximum_time_step_factor_after_stable_mt = 5. 
@@ -345,17 +345,17 @@ class Triple_Class:
             inner_longitude_of_ascending_node):
             
 
-        if max(inner_primary_mass, outer_mass) > max_mass:  
-            print(inner_primary_mass, inner_secondary_mass, outer_mass)
-            print('should be within:', min_mass, '-', max_mass)
-            print('error: masses not in allowed range')
-            return False, 0,0
+#         if max(inner_primary_mass, outer_mass) > max_mass:  
+#             print(inner_primary_mass, inner_secondary_mass, outer_mass)
+#             print('should be within:', min_mass, '-', max_mass)
+#             print('error: masses not in allowed range')
+#             return False, 0,0
                         
-        if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:  
-            print(inner_primary_mass, inner_secondary_mass, outer_mass)
-            print('should be at least above:', absolute_min_mass)
-            print('error: masses not in allowed range')
-            return False, 0,0
+#         if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:  
+#             print(inner_primary_mass, inner_secondary_mass, outer_mass)
+#             print('should be at least above:', absolute_min_mass)
+#             print('error: masses not in allowed range')
+#             return False, 0,0
 
         if inner_semimajor_axis >= outer_semimajor_axis:
             print('error input parameters, should be:')
@@ -798,7 +798,14 @@ class Triple_Class:
 #            return 0.143 
             #based on Claret & Gimenez 1992, 96, 225 the value should be smaller, try:
             return 0.05
-        else:
+        elif star.stellar_type in [18]|units.stellar_type:#planet
+            #based on Brooke & Olle 1955, for n=3 polytrope
+            return 0.0144            
+        elif star.stellar_type in [19]|units.stellar_type:#bd
+            #based on Brooke & Olle 1955, for n=3 polytrope
+            return 0.0144            
+ 
+	else:
             print('apsidal motion constant: stellar_type unknown')
             print(star.stellar_type)
             exit(2)
