@@ -801,10 +801,9 @@ class Triple_Class:
         elif star.stellar_type in [18]|units.stellar_type:#planet
             #based on Brooke & Olle 1955, for n=3 polytrope
             return 0.0144            
-        elif star.stellar_type in [19]|units.stellar_type:#bd
+	elif star.stellar_type in [19]|units.stellar_type:#bd
             #based on Brooke & Olle 1955, for n=3 polytrope
-            return 0.0144            
- 
+            return 0.0144
 	else:
             print('apsidal motion constant: stellar_type unknown')
             print(star.stellar_type)
