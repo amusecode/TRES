@@ -858,16 +858,16 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
     if (inner_primary_mass_max < inner_primary_mass_min):
         print('error: maximum inner primary mass smaller than minimum in primary mass')
         exit(1)
-
-
+    
 #     if (inner_secondary_mass_min < absolute_min_mass) :
 #         print('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
 #         exit(1)
 #     if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
 #         print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
 #         exit(1)
-
-      if (outer_mass_max > absolute_max_mass) :
+    
+    
+    if (outer_mass_max > absolute_max_mass) :
         print('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
         exit(1)
 
