@@ -120,7 +120,7 @@ from amuse.ic.flatimf import new_flat_mass_distribution
 
 precision = 1.e-10 
 min_mass = 0.08 |units.MSun # for primary stars
-absolute_min_mass = 0.008|units.MSun #  for secondaries and tertiaries
+absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
 absolute_max_mass = 100 |units.MSun
 REPORT = False 
 REPORT_USER_WARNINGS = False 
@@ -580,7 +580,10 @@ class Generate_initial_triple:
         if REPORT:
             print('generate_mass_and_semi_eggleton')
         U0_mass = [0., .01, .09, .32, 1., 3.2, 11, 32, np.inf]#solar mass
-        U0_l0 = [0.40, 0.40, 0.40, 0.40, 0.50, 0.75, 0.88, 0.94, 0.96]        U0_l1 = [0.18, 0.18, 0.18, 0.18, 0.18, 0.18, 0.20, 0.60, 0.80]        U0_l2 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.20, 0.33, 0.82, 0.90]        U0_l3 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+        U0_l0 = [0.40, 0.40, 0.40, 0.40, 0.50, 0.75, 0.88, 0.94, 0.96]
+        U0_l1 = [0.18, 0.18, 0.18, 0.18, 0.18, 0.18, 0.20, 0.60, 0.80]
+        U0_l2 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.20, 0.33, 0.82, 0.90]
+        U0_l3 = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
               
         Mt = eggleton_mass_distr(min_mass, absolute_max_mass)
         U = np.random.uniform(0, 1)
@@ -857,11 +860,15 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
         exit(1)
 
 
-    if (inner_secondary_mass_min < absolute_min_mass) :
-        print('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
-        exit(1)
-    if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
-        print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+#     if (inner_secondary_mass_min < absolute_min_mass) :
+#         print('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+#         exit(1)
+#     if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
+#         print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+#         exit(1)
+
+      if (outer_mass_max > absolute_max_mass) :
+        print('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
         exit(1)
 
         
