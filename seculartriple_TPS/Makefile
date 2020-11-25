@@ -1,5 +1,5 @@
-ifndef AMUSE_DIR
-    AMUSE_DIR=~/Development/amuse
+ifeq ($(origin AMUSE_DIR), undefined)
+  AMUSE_DIR := $(shell amusifier --get-amuse-dir)
 endif
 
 CODE_GENERATOR = $(AMUSE_DIR)/build.py
