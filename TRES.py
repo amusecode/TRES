@@ -279,7 +279,7 @@ class Triple_Class:
         self.channel_from_stellar = self.stellar_code.particles.new_channel_to(stars)
         self.channel_to_stellar = stars.new_channel_to(self.stellar_code.particles)
 #        self.channel_from_stellar.copy()
-        self.channel_from_stellar.copy_attributes(["age", "mass","envelope_mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"
+        self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"
 
     def setup_secular_code(self, triple_set):
         self.secular_code = SecularTriple()
@@ -1003,7 +1003,6 @@ class Triple_Class:
             print(star.radius, )
             print(star.core_mass, )
             print(star.core_radius,)
-            print(star.envelope_mass,)
             print(star.convective_envelope_mass,)
             print(star.convective_envelope_radius,)
             print(star.luminosity,)
@@ -1884,7 +1883,7 @@ class Triple_Class:
         self.stellar_code.evolve_model(self.triple.time)
         
 #                    self.channel_from_stellar.copy()
-        self.channel_from_stellar.copy_attributes(["age", "mass","envelope_mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
+        self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
 #        self.triple.child2.child1.radius = 3.75|units.RSun 
         self.update_stellar_parameters()          
                 
@@ -1920,7 +1919,7 @@ class Triple_Class:
             if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
                 print('\n\ntime:', self.triple.time, self.has_donor())
             self.stellar_code.evolve_model(self.triple.time)
-            self.channel_from_stellar.copy_attributes(["age", "mass","envelope_mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
+            self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
             self.update_stellar_parameters()              
             self.check_for_RLOF()                    
                     
@@ -2131,7 +2130,7 @@ class Triple_Class:
                     print('Stellar evolution')
 
                 self.stellar_code.evolve_model(self.triple.time)
-                self.channel_from_stellar.copy_attributes(["age", "mass","envelope_mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate", "temperature"]) #"gyration_radius_sq"  
+                self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate", "temperature"]) #"gyration_radius_sq"  
                 self.update_stellar_parameters()     
          
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
@@ -2153,7 +2152,7 @@ class Triple_Class:
                     print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
 
                     self.stellar_code.particles.recall_memory_one_step()
-                    self.channel_from_stellar.copy_attributes(["age", "mass","envelope_mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
+                    self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
 #                    self.triple.child2.child1.radius = 3.75|units.RSun 
                     self.update_stellar_parameters()                              
                     self.refresh_memory()                     
