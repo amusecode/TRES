@@ -1,8 +1,8 @@
-# TrES
+# TRES
 Triple evolution Simulation package
 
 ### Description
-TrES is a numerical framework for simulating hierarchical triple systems. 
+TRES is a numerical framework for simulating hierarchical triple systems. 
 Mass transfer from one star to another and the consequential effect to the orbital dynamics is realized via heuristic recipes.
 These  recipes  are combined with  three-body  dynamics and stellar evolution inluding their mutual influences. 
 
