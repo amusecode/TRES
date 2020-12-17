@@ -21,7 +21,10 @@ This document contains the following parts:
 ## Compilation
 
 TRES can be compiled with its Makefile as following:
-in the home directory: make 
+
+```
+make 
+```
 
 ## Simple examples of runs
 
@@ -34,14 +37,17 @@ inner and outer orbital separation a=200 & 20000 Solar radii,
 metallicity z=0.001, 
 and time T=10 Myrs,  you need to run:
 
+```
 python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 20000 -z 0.001 -T 10 
-(assuming AMUSE is loaded in your python)
+```
+assuming AMUSE is loaded in your python. 
 
 ### Input parameters 
 
 The full list of possible input parameters is:
 
-        parameter                               unit / default                  
+```
+        parameter                               unit / default
 -M      inner_primary_mass                      in Solar mass
 -m      inner secondary mass                    in Solar mass 
 -l      outer mass                              in Solar mass
@@ -86,7 +92,7 @@ action items                    add these to:
 --no_stop_at_mass_transfer      avoid stopping the simulation at the onset of mass transfer 
 --stop_at_semisecular_regime    to stop the simulation if the sytem is in the semi secular regime
 --stop_at_SN                    to stop the simulation when a supernova occurs
-
+```
 
 
 ### Multiple systems with specified parameters
@@ -115,7 +121,7 @@ TBD
 
 ## References
 
-See the following publications: [Toonen etal 2016](https://ui.adsabs.harvard.edu/abs/2016ComAC...3....6T/abstract) for more details.
+See the following publication: [Toonen et al 2016](https://ui.adsabs.harvard.edu/abs/2016ComAC...3....6T/abstract) for more details.
 
 
 
