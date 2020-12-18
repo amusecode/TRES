@@ -80,13 +80,15 @@ lib_inner_loan_distr = {0: "Circular niform distribution",
 ##            -z         metallicity of stars  [0.02 Solar] 
 ##            -n         number of triples to be simulated.  [1]
 ##            -N         number of initial triple.  [0]
-##            --stop_at_merger                  stopping condition at merger [True]
-##            --stop_at_disintegrated           stopping condition at disintegration [True]
-##            --stop_at_triple_mass_transfer    stopping condition at mass transfer in outer binary [True]
-##            --stop_at_collision               stopping condition at collision [True]
-##            --stop_at_dynamical_instability   stopping condition at dynamical instability [True]
-##            --stop_at_semisecular_regime      stopping condition at semisecular regime [False]
-##            --stop_at_mass_transfer           stopping condition at mass transfer [False]
+##            --no_stop_at_merger                  stopping condition at merger 
+##            --no_stop_at_disintegrated           stopping condition at disintegration 
+##            --no_stop_at_triple_mass_transfer    stopping condition at mass transfer in outer binary 
+##            --no_stop_at_inner_collision         stopping condition at collision in inner binary 
+##            --no_stop_at_outer_collision         stopping condition at collision involving tertiary star 
+##            --no_stop_at_dynamical_instability   stopping condition at dynamical instability 
+##            --stop_at_semisecular_regime         stopping condition at semisecular regime 
+##            --no_stop_at_mass_transfer           stopping condition at mass transfer 
+##            --stop_at_SN                         stopping condition at supernova 
 lib_SN_kick_distr = {0: "No kick",
                     1: "Hobbs", #Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
                     2: "Hobbs + momentum rescaling", 
