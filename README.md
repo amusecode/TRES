@@ -12,9 +12,9 @@ This document contains the following parts:
 
 [Simple examples](#Simple-examples-of-runs)
 
-[Understanding the SeBa output](#Understanding-the-SeBa-output)
+[Understanding the TRES output](#Understanding-the-TRES-output)
 
-[Reducing the SeBa output](#Reducing-the-SeBa-output)
+[Reducing the TRES output](#Reducing-the-TRES-output)
 
 [References](#References)
 
