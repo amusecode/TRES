@@ -234,7 +234,7 @@ TBD
 
 ## Reducing the TRES output
 
-TBD
+TBD rdc_TRES.py
 
 ## References
 
