@@ -1,5 +1,5 @@
 # TRES
-Triple evolution Simulation package
+TRiple Evolution Simulation 
 
 ### Description
 TRES is a numerical framework for simulating hierarchical triple systems. 
@@ -63,7 +63,7 @@ The full list of possible input parameters is:
 -O      inner longitude of ascending node       in rad
     (outer longitude of ascending nodes = inner - pi)               
 -z      metallicity                             default = 0.02 (Solar)
--t, -T  end time                                Myr
+-t, -T  end time                                in Myr
 -N, -n  integer number asigned to the triple    default = 0
 
 
@@ -75,15 +75,15 @@ The full list of possible input parameters is:
         options:
         0:  No kick 
         1:  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
-        2:  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  scaled down for bh
+        2:  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  scaled down for bh by mass
         3:  Arzoumanian ea 2002, 568, 289
-        4:  Arzoumanian ea 2002, 568, 289 scaled down for bh
+        4:  Arzoumanian ea 2002, 568, 289 scaled down for bh by mass
         5:  Hansen & Phinney 1997, 291, 569
-        6:  Hansen & Phinney 1997, 291, 569 scaled down for bh
+        6:  Hansen & Phinney 1997, 291, 569 scaled down for bh by mass
         7:  Paczynski 1990, 348, 485
-        8:  Paczynski 1990, 348, 485 scaled down for bh
+        8:  Paczynski 1990, 348, 485 scaled down for bh by mass
         9:  Verbunt, Igoshev & Cator, 2017, 608, 57
-        10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh #default
+        10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh by mass 
 
 action items                    add these to:
 --no_stop_at_merger             avoid stopping the simulation after a merger
@@ -194,9 +194,9 @@ The full list of options is [default]:
         1: "Constant longitude of ascending nodes", #default
         (outer longitude of ascending nodes = inner - pi)             
 -T or -t   binary end time. [13500 Myr]
--z         metallicity of stars  [0.02 Solar] 
--n         number of triples to be simulated.  [1]
--N         number of initial triple.  [0]
+-z         metallicity of stars  [0.02 (Solar)] 
+-n         number of triples to be simulated  [1]
+-N         number of initial triple  [0]
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:
@@ -224,17 +224,24 @@ action items                    add these to:
 ```
 
 
-
-
 ## Understanding the TRES output
 
-Normally TRES adds the evolution history of individual triples in the TRES.hdf file. Every line represents a moment in the evolution of the triple when something interesting happened, for example one of the star transitions from the main-sequence to the hertzsprung gap, or mass transfer starts or stops. The meaning of the columns is defined below. 
+Normally TRES adds the evolution history of individual triples in the TRES.hdf file. Every snapshot represents a moment in the evolution of the triple when something interesting happened, for example one of the star transitions from the main-sequence to the hertzsprung gap, or mass transfer starts or stops. 
 
-TBD
 
 ## Reducing the TRES output
 
-TBD rdc_TRES.py
+The python script rdc_TRES.py reduce the TRES hdf output to a txt file keeping only selected parameters. These can be adjusted to your liking in the function rdc(). Currently there are 6 lines for every snapshot. The columns represent:
+General information on the system: 
+Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular
+Orbital information (inner binary | outer binary) :
+Line 2: 'bs:', binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
+        | binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
+Stellar information (primary | secondary | tertiary)
+Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
+        | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
+        | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
+
 
 ## References
 
