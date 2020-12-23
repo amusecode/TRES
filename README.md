@@ -22,10 +22,13 @@ This document contains the following parts:
 
 ## Compilation
 
-TRES can be compiled with its Makefile as following:
+TRES needs to be compiled with its Makefile as following:
 
 ```
+
+cd seculartriple_TPS
 make 
+
 ```
 
 ## Simple examples of runs
@@ -40,7 +43,9 @@ metallicity z=0.001,
 and time T=10 Myrs,  you need to run:
 
 ```
+
 python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 20000 -z 0.001 -T 10 
+
 ```
 assuming AMUSE is loaded in your python. 
 
@@ -93,6 +98,7 @@ action items                    add these to:
 --no_stop_at_mass_transfer      avoid stopping the simulation at the onset of mass transfer 
 --stop_at_semisecular_regime    to stop the simulation if the sytem is in the semi secular regime
 --stop_at_SN                    to stop the simulation when a supernova occurs
+
 ```
 
 
@@ -100,6 +106,7 @@ action items                    add these to:
 
 If you need to follow the triple evolution for multiple systems with parameters which are already specified you can start TRES multiple times, e.g.
 ```
+
 python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 20000 -z 0.001 -T 10 
 python TRES.py -M 1.5 -m 1 -l 0.6 -E 0.1 -e 0.5 -A 50 -a 20000 -z 0.001 -T 10 
 python TRES.py -M 1.5 -m 1 -l 0.05 -E 0.1 -e 0.5 -A 50 -a 20000 -z 0.02 -T 10 
@@ -111,6 +118,7 @@ This is probably not handy for more than 5 systems. Although this can be added i
 ### Random population
 A random population can be generated with TPS.py with a Monte Carlo based approach, e.g. 
 ```
+
 python TPS.py -n 5 
 python TPS.py -n 10 --M_max 5 --M_min 4  --M_distr 0 --A_max 2000 --A_min 200 --A_distr 2
 
@@ -118,6 +126,7 @@ python TPS.py -n 10 --M_max 5 --M_min 4  --M_distr 0 --A_max 2000 --A_min 200 --
 
 The full list of options is [default]:
 ```
+
 --M_max    upper limit for the inner primary mass [100 Msun]
 --M_min    lower limit for the inner primary mass [0.1 Msun]
 --M_distr  mass function option: 
