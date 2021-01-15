@@ -23,7 +23,8 @@ import numpy as np
 
 REPORT_USER_WARNINGS = True
 
-REPORT_DEBUG = False
+REPORT_DEBUG = True
+dir_plots = ''
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
 REPORT_TRIPLE_EVOLUTION = False 
@@ -1447,7 +1448,6 @@ class Triple_Class:
 
 
 
-
 #        else:
             #during run-up towards mass transfer 
 #            close_to_RLOF_bool, ratio_rad_rlof, time_step_close_to_mt = self.close_to_RLOF()     
@@ -2461,7 +2461,7 @@ def plot_function(triple):
     plot_a_in.set_ylabel('$a_\mathrm{in}$')
     figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
 
-    plt.savefig('plots/orbit/TPS_inner_orbit'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'TPS_inner_orbit'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2472,7 +2472,7 @@ def plot_function(triple):
     plt.xlim(0,t_max_Myr)
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$e_\mathrm{in}$')
-    plt.savefig('plots/orbit/e_in_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'e_in_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2483,7 +2483,7 @@ def plot_function(triple):
     plt.xlim(0,t_max_Myr)
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$e_\mathrm{in}$')
-    plt.savefig('plots/orbit/e_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'e_time_'+generic_name+'.pdf')
     plt.show()
 
     plt.plot(times_array_Myr,g_in_array)
@@ -2493,7 +2493,7 @@ def plot_function(triple):
     plt.xlim(0,t_max_Myr)
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$g_\mathrm{in}$')
-    plt.savefig('plots/orbit/g_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'g_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2504,7 +2504,7 @@ def plot_function(triple):
     plt.xlim(0,t_max_Myr)
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$o_\mathrm{in}$')
-    plt.savefig('plots/orbit/o_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'o_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2517,7 +2517,7 @@ def plot_function(triple):
     
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$a_\mathrm{in}$')
-    plt.savefig('plots/orbit/semi_in_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'semi_in_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2552,7 +2552,7 @@ def plot_function(triple):
     
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$spin$')
-    plt.savefig('plots/orbit/spin_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'spin_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2578,7 +2578,7 @@ def plot_function(triple):
     plt.plot(times_array_Myr,J_orb, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$J orbit$')
-    plt.savefig('plots/orbit/Jorbit_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'Jorbit_time_'+generic_name+'.pdf')
     plt.show()
 
     plt.plot(times_array_Myr,J_spin1)
@@ -2589,7 +2589,7 @@ def plot_function(triple):
     plt.plot(times_array_Myr,J_spin3, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$J spin$')
-    plt.savefig('plots/orbit/Jspin_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'Jspin_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2603,7 +2603,7 @@ def plot_function(triple):
     plt.plot(times_array_Myr,J_spin3, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$J spin$')
-    plt.savefig('plots/orbit/Js_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'Js_time_'+generic_name+'.pdf')
     plt.show()
 
     plt.semilogy(times_array_Myr,moi1_array)
@@ -2614,7 +2614,7 @@ def plot_function(triple):
     plt.semilogy(times_array_Myr,moi3_array, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$moi$')
-    plt.savefig('plots/orbit/moment_of_inertia_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'moment_of_inertia_time_'+generic_name+'.pdf')
     plt.show()
 
     
@@ -2627,7 +2627,7 @@ def plot_function(triple):
     plt.semilogy(times_array_Myr,r3_array, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$radius$')
-    plt.savefig('plots/orbit/radius_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'radius_time_'+generic_name+'.pdf')
     plt.show()
     
     dr1_array =r1_array[1:]-r1_array[:-1]
@@ -2645,7 +2645,7 @@ def plot_function(triple):
     plt.semilogy(times_array_Myr[1:], dr3_array/dt_array*-1., 'r*')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$dr/dt$')
-    plt.savefig('plots/orbit/drdt_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'drdt_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2662,7 +2662,7 @@ def plot_function(triple):
     plt.semilogy(times_array_Myr[1:], -1.*dr3_array/r3_array[1:], 'r*')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$dr/r$')
-    plt.savefig('plots/orbit/dr_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'dr_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2679,7 +2679,7 @@ def plot_function(triple):
     plt.plot(times_array_Myr[1:], m3_array[1:], '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$mass$')
-    plt.savefig('plots/orbit/mass_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'mass_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2691,7 +2691,7 @@ def plot_function(triple):
 #    plt.semilogy(times_array_Myr[1:], dm3_array/dt_array, '.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$dm/dt$')
-#    plt.savefig('plots/orbit/dmdt_time_'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'dmdt_time_'+generic_name+'.pdf')
 #    plt.show()
 #
 #    plt.semilogy(times_array_Myr[1:], dm1_array/m1_array[1:])
@@ -2702,7 +2702,7 @@ def plot_function(triple):
 #    plt.semilogy(times_array_Myr[1:], dm3_array/m3_array[1:], '.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$dm/m$')
-#    plt.savefig('plots/orbit/dm_time_'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'dm_time_'+generic_name+'.pdf')
 #    plt.show()
 
  
@@ -2714,7 +2714,7 @@ def plot_function(triple):
     plt.semilogy(times_array_Myr[1:], dt_array, '.')
     plt.xlabel('$t/\mathrm{Myr}$')
     plt.ylabel('$dt$')
-    plt.savefig('plots/orbit/dt_time_'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'dt_time_'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2731,14 +2731,14 @@ def plot_function(triple):
 #    plt.plot(times_array_Myr[1:], a_in_array_AU[:-1]*Mtot[:-1]/Mtot[1:], '.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$a_\mathrm{in}$')
-#    plt.savefig('plots/orbit/semi_inner_wind'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_inner_wind'+generic_name+'.pdf')
 #    plt.show()
 #    
 #    plt.plot(times_array_Myr, a_in_array_AU[0]*Mtot[0]/Mtot/a_in_array_AU)
 #    plt.plot(times_array_Myr, a_in_array_AU[0]*Mtot[0]/Mtot/a_in_array_AU, '.')
 #    plt.ylabel('$relative error a_\mathrm{in}$')
 #    plt.xlabel('$t/\mathrm{Myr}$')
-#    plt.savefig('plots/orbit/semi_inner_rel_wind'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_inner_rel_wind'+generic_name+'.pdf')
 #    plt.show()
 
 
@@ -2751,14 +2751,14 @@ def plot_function(triple):
 #    plt.plot(times_array_Myr[1:], a_in_array_AU[:-1]*(m1_array[:-1]*m2_array[:-1]/m1_array[1:]/m2_array[1:])**2, 'r.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$a_\mathrm{in}$')
-#    plt.savefig('plots/orbit/semi_inner_cons_mt'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_inner_cons_mt'+generic_name+'.pdf')
 #    plt.show()
 #    
 #    plt.plot(times_array_Myr, a_in_array_AU[0]*(m1_array[0]*m2_array[0]/m1_array/m2_array)**2/a_in_array_AU)
 #    plt.plot(times_array_Myr, a_in_array_AU[0]*(m1_array[0]*m2_array[0]/m1_array/m2_array)**2/a_in_array_AU, '.')
 #    plt.ylabel('$relative error a_\mathrm{in}$')
 #    plt.xlabel('$t/\mathrm{Myr}$')
-#    plt.savefig('plots/orbit/semi_inner_rel_cons_mt'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_inner_rel_cons_mt'+generic_name+'.pdf')
 #    plt.show()
 
 
@@ -2841,7 +2841,7 @@ def plot_function(triple):
     plot_a_out.set_ylabel('$a_\mathrm{out}$')
 
     figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
-    plt.savefig('plots/orbit/TPS_outer_orbit'+generic_name+'.pdf')
+    plt.savefig('dir_plots'+'TPS_outer_orbit'+generic_name+'.pdf')
     plt.show()
 
 
@@ -2850,7 +2850,7 @@ def plot_function(triple):
 #    plt.xlim(0,t_max_Myr)
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$e_\mathrm{out}$')
-#    plt.savefig('plots/orbit/e_out_time_'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'e_out_time_'+generic_name+'.pdf')
 #    plt.show()
 
 
@@ -2863,14 +2863,14 @@ def plot_function(triple):
 #    plt.plot(times_array_Myr[1:], a_out_array_AU[:-1]*Mtott[:-1]/Mtott[1:], '.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$a_\mathrm{out}$')
-#    plt.savefig('plots/orbit/semi_outer_wind'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_outer_wind'+generic_name+'.pdf')
 #    plt.show()
 #
 #    plt.plot(times_array_Myr, a_out_array_AU[0]*Mtott[0]/Mtott/a_out_array_AU)
 #    plt.plot(times_array_Myr, a_out_array_AU[0]*Mtott[0]/Mtott/a_out_array_AU, '.')
 #    plt.ylabel('$relative error a_\mathrm{out}$')
 #    plt.xlabel('$t/\mathrm{Myr}$')
-#    plt.savefig('plots/orbit/semi_outer_rel_wind'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_outer_rel_wind'+generic_name+'.pdf')
 #    plt.show()
 #
 #    m_in_array = m1_array+m2_array
@@ -2882,14 +2882,14 @@ def plot_function(triple):
 #    plt.plot(times_array_Myr[1:], a_out_array_AU[:-1]*(m_in_array[:-1]*m3_array[:-1]/m_in_array[1:]/m3_array[1:])**2, 'r.')
 #    plt.xlabel('$t/\mathrm{Myr}$')
 #    plt.ylabel('$a_\mathrm{out}$')
-#    plt.savefig('plots/orbit/semi_outer_cons_mt'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_outer_cons_mt'+generic_name+'.pdf')
 #    plt.show()
 #
 #    plt.plot(times_array_Myr, a_out_array_AU[0]*(m_in_array[0]*m3_array[0]/m_in_array/m3_array)**2/a_out_array_AU)
 #    plt.plot(times_array_Myr, a_out_array_AU[0]*(m_in_array[0]*m3_array[0]/m_in_array/m3_array)**2/a_out_array_AU, '.')
 #    plt.ylabel('$relative error a_\mathrm{out}$')
 #    plt.xlabel('$t/\mathrm{Myr}$')
-#    plt.savefig('plots/orbit/semi_outer_rel_cons_mt'+generic_name+'.pdf')
+#    plt.savefig('dir_plots'+'semi_outer_rel_cons_mt'+generic_name+'.pdf')
 #    plt.show()
 #
 
