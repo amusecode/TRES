@@ -23,7 +23,7 @@ import numpy as np
 
 REPORT_USER_WARNINGS = True
 
-REPORT_DEBUG = True
+REPORT_DEBUG = False
 dir_plots = ''
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
