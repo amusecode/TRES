@@ -16,7 +16,7 @@ This document contains the following parts:
 
 [Reducing the TRES output](#Reducing-the-TRES-output)
 
-[TRES development team](#TRES development team)
+[TRES development team](#TRES-development-team)
 
 [References](#References)
 
@@ -258,27 +258,45 @@ Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, cor
 ## TRES development team
 Members of the TRES development team are recommended to work on their own fork on github. To set this up:
 
-( 0) After installing AMUSE and downloading TRES)
+0) After installing AMUSE and downloading TRES
 1) First create a fork. Can be done easily on the github webinterface. 
-2) Now we have to set up the links to the TRES main repository and the forked one:
-2a) "git clone git@github.com:amusecode/TRES.git"
- will be know as ‘origin’
-2b) "git remote add (name) git@github.com:(name)/SeBa.git"
- will be known as ‘name’
+
+2) Now we have to set up links to the official TRES repository and the forked one. Clone the official TRES repository, which will be know as ‘origin’
+```
+git clone git@github.com:amusecode/TRES.git
+```
+And add a link to your forked repository, which will be known as ‘name’
+```
+git remote add (name) git@github.com:(name)/TRES.git
+```
+
 
 Example of workflow:
-1) git checkout -b (branch)
+1) Good practise to work on a new branch
+```
+git checkout -b (branch)
+```
 2) pull all updates from ‘origin’ to current branch
-"git pull origin main"
+```
+git pull origin main
+```
 3) pull all updates from your forked to current branch
-"git pull (name) main"
+```
+git pull (name) main
+```
 4) make the desired changes to TRES
-"git add / git commit
-git checkout main / git merge (branch)/ git branch -d (branch)"
+```
+git add / git commit
+git checkout main / git merge (branch)/ git branch -d (branch)
+```
 5) push changes to your own fork and follow that branch
-"git push --set-upstream (name) (branch) "
-6) If so desired, push changes to the main TRES repository
-"git push origin main"
+```
+git push --set-upstream (name) (branch) 
+```
+6) If so desired, push changes to the official TRES repository
+```
+git push origin main
+```
 
 
 Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
