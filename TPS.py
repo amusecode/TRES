@@ -720,7 +720,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,
                         stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type):
+                        SN_kick_distr, file_name, file_type, dir_plots):
 
 
     i_n = 0
@@ -778,7 +778,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                     stop_at_dynamical_instability = stop_at_dynamical_instability, 
                     stop_at_semisecular_regime = stop_at_semisecular_regime, stop_at_mass_transfer = stop_at_mass_transfer, 
                     stop_at_init_mass_transfer = stop_at_init_mass_transfer, stop_at_SN = stop_at_SN,
-                    file_name = file_name, file_type = file_type)                        
+                    file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
         if tr.triple.correct_params == False:
             nr_cp += 1
@@ -815,7 +815,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,
                         stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type):
+                        SN_kick_distr, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
     print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
@@ -851,7 +851,7 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,
                         stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type):
+                        SN_kick_distr, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
         print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
@@ -1141,6 +1141,8 @@ def parse_arguments():
                       help="file name[%default]")
     parser.add_option("-F", dest="file_type", type ="string", default = "hdf5",#"txt"
                       help="file type[%default]")
+    parser.add_option("--dir_plots", dest="dir_plots", type ="string", default = "",#"txt"
+                      help="directory for plots for debugging mode [%default]")
 
 
 
