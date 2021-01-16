@@ -178,16 +178,16 @@ class Triple_Class:
             stop_at_semisecular_regime,stop_at_mass_transfer,stop_at_init_mass_transfer, stop_at_SN):
 
         if stop_at_disintegrated == False:
-            print('stop_at_disintegrated = False not possible yet, implementation is missing') 
+            print('stop_at_disintegrated = False not possible yet. After the disintegration of the triple, further evolution can be done with SeBa directly. ') 
             exit(1)
         if stop_at_triple_mass_transfer == False:
-            print('stop_at_triple_mass_transfer = False not possible yet, implementation is missing' )
+            print('stop_at_triple_mass_transfer = False not possible yet. Methodology is as of yet non-existent.' )
             exit(1)
         if stop_at_outer_collision == False:
-            print('stop_at_outer_collision = False not possible yet, implementation is missing' )
+            print('stop_at_outer_collision = False not possible. Non-hierarchical triples can not be simulated using the secular equations as used in TRES. Further evolution should be done by other means, e.g. one of the N-body codes implemented in AMUSE.' )
             exit(1)
         if stop_at_dynamical_instability == False:
-            print('stop_at_dynamical_instability = False not possible') 
+            print('stop_at_dynamical_instability = False not possible. Unstable triples can not be simulated using the secular equations as used in TRES. Further evolution should be done by other means, e.g. one of the N-body codes implemented in AMUSE.') 
             exit(1)
 
                             
