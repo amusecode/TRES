@@ -19,6 +19,7 @@ const_common_envelope_efficiency_gamma = 1.75
 
 stellar_types_compact_objects = [10,11,12,13,14]|units.stellar_type
 stellar_types_giants = [2,3,4,5,6,8,9]|units.stellar_type
+stellar_types_planetary_objects = [18,19]|units.stellar_type # planets & brown dwarfs
 #q_crit = 3.
 #q_crit_giants_conv_env = 0.9
 nucleair_efficiency = 0.007 # nuc. energy production eff, Delta E = 0.007 Mc^2
@@ -82,6 +83,8 @@ def stellar_evolution_timescale(star):
         return (0.1 * star.mass * nucleair_efficiency * constants.c**2 / star.luminosity).in_(units.Gyr)
     elif star.stellar_type in stellar_types_compact_objects:
         return np.inf|units.Myr 
+    elif star.stellar_type in stellar_types_planetary_objects:
+        return np.inf|units.Myr 
     else:        
         return 0.1*star.age
 
@@ -93,6 +96,9 @@ def nuclear_evolution_timescale(star):
         
     if star.stellar_type in [0,1,7]|units.stellar_type:
         return (0.1 * star.mass * nucleair_efficiency * constants.c**2 / star.luminosity).in_(units.Gyr)
+    elif star.stellar_type in stellar_types_planetary_objects:
+        print('nuclear evolution timescale for planetary objects requested')
+        return np.inf|units.Myr         
     else: #t_nuc ~ delta t * R/ delta R, other prescription gave long timescales in SeBa which destables the mass transfer
         if star.time_derivative_of_radius <= (quantities.zero+numerical_error**2)|units.RSun/units.yr:
         #when star is shrinking
@@ -104,6 +110,9 @@ def nuclear_evolution_timescale(star):
         return t_nuc
 
 def kelvin_helmholds_timescale(star):
+    if star.stellar_type in stellar_types_planetary_objects:
+        print('thermal evolution timescale for planetary objects requested')
+
     if REPORT_FUNCTION_NAMES:
         print("KH timescale:", (constants.G*star.mass**2/star.radius/star.luminosity).in_(units.Myr))
     return constants.G*star.mass**2/star.radius/star.luminosity
