@@ -24,7 +24,9 @@ This document contains the following parts:
 
 ## Compilation
 
-TRES needs to be compiled with its Makefile as following:
+TRES makes use of the Astrophysical Multipurpose Software Environment (AMUSE) See https://amusecode.github.io/ for how to install AMUSE. 
+
+After compiling AMUSE, TRES needs to be compiled by means of it Makefile as following:
 
 ```
 
