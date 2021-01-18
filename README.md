@@ -78,6 +78,8 @@ The full list of possible input parameters is:
 
 -f      name of output file                     default = TRES
 -F      type of output file (hdf5/txt)          default = hdf5
+--dir_plots   directory for plots for debugging default = "" (current directory)
+        mode  (aka REPORT_DEBUG == True)
 
 
 --SN_kick_distr   supernova kick distribution   default = 10
