@@ -269,7 +269,7 @@ Members of the TRES development team are recommended to work on their own fork o
 ```
 git clone git@github.com:(name)/TRES.git
 ```
-And add a link to the official TRES repository (upstream), which will be known as upstream
+And add a link to the official TRES repository, which will be known as upstream
 ```
 git remote add upstream git@github.com:amusecode/TRES.git
 ```
