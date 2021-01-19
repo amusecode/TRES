@@ -265,13 +265,17 @@ Members of the TRES development team are recommended to work on their own fork o
 0) After installing AMUSE and downloading TRES
 1) First create a fork. Can be done easily on the github webinterface. 
 
-2) Now we have to set up links to the official TRES repository and the forked one. Clone the official TRES repository, which will be know as ‘origin’
+2) Now we have to set up links to the official TRES repository and the forked one. Clone the forked TRES repository, which will be know as ‘origin’
 ```
-git clone git@github.com:amusecode/TRES.git
+git clone git@github.com:(name)/TRES.git
 ```
-And add a link to your forked repository, which will be known as ‘name’
+And add a link to the official TRES repository (upstream), which will be known as upstream
 ```
-git remote add (name) git@github.com:(name)/TRES.git
+git remote add upstream git@github.com:amusecode/TRES.git
+```
+Also to list the current configured remote repositories for your fork:
+```
+git remove -v
 ```
 
 
@@ -284,9 +288,9 @@ git checkout -b (branch)
 ```
 git pull origin main
 ```
-3) pull all updates from your forked to current branch
+3) pull all updates from upstream to current branch
 ```
-git pull (name) main
+git pull upstream main
 ```
 4) make the desired changes to TRES
 ```
@@ -295,11 +299,11 @@ git checkout main / git merge (branch)/ git branch -d (branch)
 ```
 5) push changes to your own fork and follow that branch
 ```
-git push --set-upstream (name) (branch) 
+git push origin main
 ```
 6) If so desired, push changes to the official TRES repository
 ```
-git push origin main
+git push --set-upstream upstream (branch) 
 ```
 
 
