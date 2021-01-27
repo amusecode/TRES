@@ -25,6 +25,7 @@ This document contains the following parts:
 ## Compilation
 
 TRES makes use of the Astrophysical Multipurpose Software Environment (AMUSE) See https://amusecode.github.io/ for how to install AMUSE. 
+Note that for standard TRES usage, the only necessary community code to install is SeBa. 
 
 After compiling AMUSE, TRES needs to be compiled by means of it Makefile as following:
 
