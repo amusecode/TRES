@@ -1372,8 +1372,9 @@ class Triple_Class:
 
         #tides - ADD ALSO DURING MT
         time_step_tides = np.inf |units.Myr 
-        if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:    
-            time_step_tides = self.determine_time_step_tides()  	
+	#interesting alternative, slows down code 
+#         if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:    
+#             time_step_tides = self.determine_time_step_tides()  	
                 
         if REPORT_DT or REPORT_DEBUG:
             print('time:', time_step_max, time_step_stellar_code, time_step_wind, time_step_radius_change, time_step_tides)
