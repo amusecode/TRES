@@ -2161,10 +2161,6 @@ class Triple_Class:
                     #resetting is_donor in determine_time_step                                    
                     continue
 
-                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached':
-                    print('done')
-                    break
-                
                                          
                 if self.check_stopping_conditions_stellar()==False:
                     print('stopping conditions stellar')
