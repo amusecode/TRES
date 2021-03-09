@@ -2421,14 +2421,45 @@ def plot_function(triple, dir_plots):
     
     generic_name = 'M'+str(m1_array[0]) + '_m'+str(m2_array[0]) +'_n'+str(m3_array[0]) + '_a'+str(a_in_array_AU[0]) + '_A'+str(a_out_array_AU[0]) + '_e'+str(e_in_array[0]) + '_E'+str(e_out_array[0]) + '_i'+str(i_relative_array[0]/np.pi*180.0) + '_g'+str(g_in_array[0]) + '_G'+str(g_out_array[0]) + '_o'+str(o_in_array[0]) + '_O'+str(o_out_array[0]) + '_t'+str(t_max_Myr) + '_maxdr'+str(triple.maximum_radius_change_factor)+'_edr'+str(error_dr)
 
-    f = open(generic_name+'.txt','w')
-    for i in range(len(times_array_Myr)):
-        f.write( str(times_array_Myr[i]) + '\t'+str(e_in_array[i]) + '\t'+ str(a_in_array_AU[i]) + '\t')
-        f.write(str(e_out_array[i]) + '\t' + str(a_out_array_AU[i]) + '\t')
-        f.write(str(i_relative_array[i]/np.pi*180.0) + '\t' )
-        f.write(str(r1_array[i]) + '\t' + str(r2_array[i]) + '\t' + str(r3_array[i]) + '\t')
-        f.write('\n')
-    f.close()
+
+    figure = plt.figure(figsize=(10,13))
+    N_subplots = 4
+    
+    plot_e = figure.add_subplot(N_subplots,1,1)
+    plot_i_relative = figure.add_subplot(N_subplots,1,2)
+    plot_a_in = figure.add_subplot(N_subplots,1,3)
+    plot_a_out = figure.add_subplot(N_subplots,1,4)
+    
+    plot_e.plot(times_array_Myr,e_in_array)
+    plot_e.plot(times_array_Myr,e_out_array)
+    plot_e.set_xlim(0,t_max_Myr)
+    plot_e.set_xlabel('$t/\mathrm{Myr}$')
+    plot_e.set_ylabel('$e_\mathrm{in}$')
+    
+    plot_i_relative.plot(times_array_Myr,i_relative_array*180.0/np.pi)
+    plot_i_relative.set_xlim(0,t_max_Myr)
+    plot_i_relative.set_ylim(0.9*min(i_relative_array*180.0/np.pi),1.1*max(i_relative_array*180.0/np.pi))
+    plot_i_relative.set_xlabel('$t/\mathrm{Myr}$')
+    plot_i_relative.set_ylabel('$i_\mathrm{relative} ({}^\circ)$')
+    
+    plot_a_in.plot(times_array_Myr,a_in_array_AU)
+    plot_a_in.set_xlabel('$t/\mathrm{Myr}$')
+    plot_a_in.set_ylabel('$a_\mathrm{in}$')
+
+    plot_a_out.plot(times_array_Myr,a_out_array_AU)
+    plot_a_out.set_xlabel('$t/\mathrm{Myr}$')
+    plot_a_out.set_ylabel('$a_\mathrm{out}$')
+    
+    figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
+    plt.savefig(dir_plots+'TRES_'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
+
+
+
+
+
+
 
 
     figure = plt.figure(figsize=(10,13))
@@ -2460,7 +2491,7 @@ def plot_function(triple, dir_plots):
     plot_a_in.set_ylabel('$a_\mathrm{in}$')
     figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
 
-    plt.savefig(dir_plots+'TPS_inner_orbit'+generic_name+'.pdf')
+    plt.savefig(dir_plots+'TRES_inner_orbit_'+generic_name+'.pdf')
 #    plt.show()
     plt.close()
 
@@ -2870,7 +2901,7 @@ def plot_function(triple, dir_plots):
     plot_a_out.set_ylabel('$a_\mathrm{out}$')
 
     figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
-    plt.savefig(dir_plots+'TPS_outer_orbit'+generic_name+'.pdf')
+    plt.savefig(dir_plots+'TRES_outer_orbit_'+generic_name+'.pdf')
 #    plt.show()
     plt.close()
 
