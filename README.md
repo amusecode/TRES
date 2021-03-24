@@ -2,9 +2,11 @@
 TRiple Evolution Simulation 
 
 ### Description
-TRES is a numerical framework for simulating hierarchical triple systems. 
+TRES is a numerical framework for simulating hierarchical triple systems with stellar and planetary components. 
 Mass transfer from one star to another and the consequential effect to the orbital dynamics is realized via heuristic recipes.
 These recipes are combined with  three-body  dynamics and stellar evolution inluding their mutual influences. 
+
+TRES includes the effects of common-envelope evolution, circularized stable mass transfer, tides, gravitational wave emission and up-to-date stellar evolution through SeBa. Other stellar evolution codes such as SSE can also be used. Coming soon: TRES with MESA, transition to N-body calculations (including stellar evolution and dissipative processes) when the system's evolution is not secular anymore. 
 
 This document contains the following parts:
 
