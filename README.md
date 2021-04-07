@@ -99,14 +99,22 @@ The full list of possible input parameters is:
         9:  Verbunt, Igoshev & Cator, 2017, 608, 57
         10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh by mass 
 
-action items                    add these to:
---no_stop_at_merger             avoid stopping the simulation after a merger
---no_stop_at_inner_collision    avoid stopping the simulation after a collision in the inner binary
---no_stop_at_outer_collision    avoid stopping the simulation after a collision involving the outer star
---no_stop_at_disintegrated      avoid stopping after the system disintegrated into seperate systems
---no_stop_at_mass_transfer      avoid stopping the simulation at the onset of mass transfer 
---stop_at_semisecular_regime    to stop the simulation if the sytem is in the semi secular regime
---stop_at_SN                    to stop the simulation when a supernova occurs
+action items                                    add these to:
+--no_stop_at_mass_transfer                      avoid stopping the simulation at the onset of mass transfer 
+--no_stop_at_init_mass_transfer                 avoid stopping the simulation if there is mass transfer initially
+--no_stop_at_outer_mass_transfer                avoid stopping the simulation when tertiary initiates mass transfer 
+                                                methodology is as of yet non-existent
+--stop_at_stable_mass_transfer                  avoid stopping the simulation at the onset of stable mass transfer in the inner binary
+--stop_at_unstable_mass_transfer                avoid stopping the simulation at the onset of unstable mass transfer in the inner binary (leading to common-envelope evolution)
+--stop_at_eccentric_stable_mass_transfer        avoid stopping the simulation at the onset of stable mass transfer in the inner binary if the orbit is eccentric
+--stop_at_eccentric_unstable_mass_transfer      avoid stopping the simulation at the onset of unstable mass transfer in the inner binary if the orbit is eccentric
+
+--no_stop_at_merger                             avoid stopping the simulation after a merger
+--no_stop_at_inner_collision                    avoid stopping the simulation after a collision in the inner binary
+--no_stop_at_outer_collision                    avoid stopping the simulation after a collision involving the outer star
+--no_stop_at_disintegrated                      avoid stopping after the system disintegrated into seperate systems
+--stop_at_semisecular_regime                    to stop the simulation if the sytem is in the semi secular regime
+--stop_at_SN                                    to stop the simulation when a supernova occurs
 
 ```
 

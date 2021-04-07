@@ -23,7 +23,7 @@ import numpy as np
 
 REPORT_USER_WARNINGS = True
 
-REPORT_DEBUG = True
+REPORT_DEBUG = False
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
 REPORT_TRIPLE_EVOLUTION = False 
@@ -70,15 +70,19 @@ class Triple_Class:
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node, 
             metallicity, tend, number, maximum_radius_change_factor, 
-            stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-            stop_at_inner_collision, stop_at_outer_collision, stop_at_dynamical_instability, 
-            stop_at_semisecular_regime, stop_at_mass_transfer, stop_at_init_mass_transfer, 
+            stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+            stop_at_dynamical_instability, stop_at_semisecular_regime,  
             stop_at_SN, SN_kick_distr,
             file_name, file_type, dir_plots):
         
-        self.set_stopping_conditions(stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-            stop_at_inner_collision, stop_at_outer_collision, stop_at_dynamical_instability, 
-            stop_at_semisecular_regime, stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_SN)
+        self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
+            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+            stop_at_dynamical_instability, stop_at_semisecular_regime,  stop_at_SN)
             
         if inner_primary_mass < inner_secondary_mass:
             spare = inner_primary_mass
@@ -151,8 +155,8 @@ class Triple_Class:
 #                self.triple.semisecular_regime = True
 #            return             
 
-        self.check_for_RLOF() 
-        if self.has_tertiary_donor() and (self.stop_at_triple_mass_transfer or self.stop_at_mass_transfer or self.stop_at_init_mass_transfer): 
+        self.check_RLOF() 
+        if self.has_tertiary_donor() and (self.stop_at_outer_mass_transfer or self.stop_at_mass_transfer or self.stop_at_init_mass_transfer): 
             self.triple.mass_transfer_at_initialisation = True
             self.triple.bin_type = bin_type['rlof']
             return
@@ -173,15 +177,17 @@ class Triple_Class:
         self.update_previous_stellar_parameters()
         
 
-    def set_stopping_conditions(self, stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-            stop_at_inner_collision, stop_at_outer_collision, stop_at_dynamical_instability,    
-            stop_at_semisecular_regime,stop_at_mass_transfer,stop_at_init_mass_transfer, stop_at_SN):
+    def set_stopping_conditions(self, stop_at_mass_transfer,stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
+            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+            stop_at_dynamical_instability, stop_at_semisecular_regime, stop_at_SN):
 
         if stop_at_disintegrated == False:
             print('stop_at_disintegrated = False not possible yet. After the disintegration of the triple, further evolution can be done with SeBa directly. ') 
             exit(1)
-        if stop_at_triple_mass_transfer == False:
-            print('stop_at_triple_mass_transfer = False not possible yet. Methodology is as of yet non-existent.' )
+        if stop_at_outer_mass_transfer == False:
+            print('stop_at_outer_mass_transfer = False not possible yet. Methodology is as of yet non-existent.' )
             exit(1)
         if stop_at_outer_collision == False:
             print('stop_at_outer_collision = False not possible. Non-hierarchical triples can not be simulated using the secular equations as used in TRES. Further evolution should be done by other means, e.g. one of the N-body codes implemented in AMUSE.' )
@@ -191,16 +197,23 @@ class Triple_Class:
             exit(1)
 
                             
-        self.stop_at_merger = stop_at_merger            
-        self.stop_at_disintegrated = stop_at_disintegrated            
-        self.stop_at_triple_mass_transfer = stop_at_triple_mass_transfer            
-        self.stop_at_inner_collision = stop_at_inner_collision            
-        self.stop_at_outer_collision = stop_at_outer_collision            
-        self.stop_at_dynamical_instability = stop_at_dynamical_instability            
         self.stop_at_mass_transfer = stop_at_mass_transfer            
         self.stop_at_init_mass_transfer = stop_at_init_mass_transfer
-        self.stop_at_SN = stop_at_SN
+        self.stop_at_outer_mass_transfer = stop_at_outer_mass_transfer            
+
+        self.stop_at_stable_mass_transfer =  stop_at_stable_mass_transfer
+        self.stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer
+        self.stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer
+        self.stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer
+
+        self.stop_at_merger = stop_at_merger            
+        self.stop_at_disintegrated = stop_at_disintegrated            
+        self.stop_at_inner_collision = stop_at_inner_collision            
+        self.stop_at_outer_collision = stop_at_outer_collision            
+
+        self.stop_at_dynamical_instability = stop_at_dynamical_instability            
         self.stop_at_semisecular_regime = stop_at_semisecular_regime
+        self.stop_at_SN = stop_at_SN
     
     def make_stars(self, inner_primary_mass, inner_secondary_mass, outer_mass, inner_semimajor_axis, outer_semimajor_axis):
         stars = Particles(3)
@@ -224,7 +237,7 @@ class Triple_Class:
 
         bins = Particles(2)
         bins.is_star = False
-        bins.is_stable = True
+        bins.is_mt_stable = True
         bins.part_dt_mt = 1.
         bins.bin_type = bin_type['unknown'] #Unknown
 
@@ -627,7 +640,7 @@ class Triple_Class:
 
 #doesn't work well, as it uses bin_types that are set later -> use has_tertiary_donor
 # if a mass transfer in the outer binary of the triple is currently taking place, not if a mass transfer has happened in the past
-#    def has_triple_mass_transfer(self, stellar_system = None): 
+#    def has_outer_mass_transfer(self, stellar_system = None): 
 #        if stellar_system == None:
 #            stellar_system = self.triple
 #            
@@ -636,9 +649,9 @@ class Triple_Class:
 #        elif self.is_binary(stellar_system):
 #            return False
 #        else:
-#            if self.has_triple_mass_transfer(stellar_system.child1):
+#            if self.has_outer_mass_transfer(stellar_system.child1):
 #                return True
-#            if self.has_triple_mass_transfer(stellar_system.child2):
+#            if self.has_outer_mass_transfer(stellar_system.child2):
 #                return True
 #            if stellar_system.bin_type != bin_type['unknown'] and stellar_system.bin_type != bin_type['detached']:  
 #                return True    
@@ -660,11 +673,9 @@ class Triple_Class:
                 return True
             if self.has_tertiary_donor(stellar_system.child2): 
                 return True
-            if stellar_system.child1.is_star and stellar_system.child1.is_donor:
-                #per definition, child2 is binary
+            if stellar_system.child1.is_star and stellar_system.child1.is_donor and not stellar_system.child2.is_star:
                 return True 
-            if stellar_system.child2.is_star and stellar_system.child2.is_donor:
-                #per definition, child1 is binary
+            if stellar_system.child2.is_star and stellar_system.child2.is_donor and not stellar_system.child1.is_star:
                 return True             
         return False            
        
@@ -721,19 +732,20 @@ class Triple_Class:
         else: #binaries and single stars do not have a kozai timescale
             return False            
 
-    def is_system_stable(self, stellar_system = None):
-        if stellar_system == None:
-            stellar_system = self.triple
-            
-        if stellar_system.is_star:
-            return True
-        elif self.is_binary(stellar_system):
-            return stellar_system.is_stable
-        else:
-            if stellar_system.is_stable and self.is_system_stable(stellar_system.child1) and self.is_system_stable(stellar_system.child2):
-                return True                        
-            
-        return False                    
+#obsolete?
+#    def is_system_stable(self, stellar_system = None):
+#        if stellar_system == None:
+#            stellar_system = self.triple
+#            
+#        if stellar_system.is_star:
+#            return True
+#        elif self.is_binary(stellar_system):
+#            return stellar_system.is_mt_stable
+#        else:
+#            if stellar_system.is_mt_stable and self.is_system_stable(stellar_system.child1) and self.is_system_stable(stellar_system.child2):
+#                return True                        
+#            
+#        return False                    
 
     def get_mass(self, stellar_system = None):
         if stellar_system == None:
@@ -782,6 +794,7 @@ class Triple_Class:
             exit(2)
             
     def apsidal_motion_constant(self, star):
+    
         if star.stellar_type in [13]|units.stellar_type: #ns
             #based on Brooke & Olle 1955, for n=1 polytrope
             return 0.260
@@ -893,7 +906,7 @@ class Triple_Class:
             return max(t1, t2)
 
 
-    def check_for_RLOF(self):
+    def check_RLOF(self):
         if self.triple.is_star:
             return
         elif self.is_binary():
@@ -974,7 +987,7 @@ class Triple_Class:
                 exit(1)                   
                 
         else:
-            print('check_for_RLOF: structure stellar system unknown')
+            print('check_RLOF: structure stellar system unknown')
             exit(2)    
                      
 #            
@@ -1029,7 +1042,7 @@ class Triple_Class:
             print(binary.accretion_efficiency_wind_child1_to_child2,)
             print(binary.accretion_efficiency_wind_child2_to_child1,)
             print(binary.specific_AM_loss_mass_transfer,)
-            print(binary.is_stable)
+            print(binary.is_mt_stable)
             print('\t')
         else:
             print('print_binary needs a binary')        
@@ -1407,7 +1420,7 @@ class Triple_Class:
                 print('find rlof', time_step_factor_find_RLOF,self.previous_dt)
 
             #resetting is_donor
-            self.check_for_RLOF()
+            self.check_RLOF()
 
         else:
             #during stable mass transfer   
@@ -1734,7 +1747,7 @@ class Triple_Class:
             return False            
 
         #check for rlof -> if rlof than stop?
-#        self.check_for_RLOF()
+#        self.check_RLOF()
 
 
         return True
@@ -1759,22 +1772,31 @@ class Triple_Class:
             return
         elif self.is_binary(stellar_system):
             if REPORT_TRIPLE_EVOLUTION:
-                print('\n resolve stellar interaction: binary - double star')
-            stellar_system = resolve_binary_interaction(stellar_system, self)
+                print('\n perform stellar interaction: binary - double star')
+#            stellar_system = perform_stellar_interaction(stellar_system, self)
+            stopping_condition = perform_stellar_interaction(stellar_system, self)
+            return stopping_condition #stellar interaction
         else:
-            if stellar_system.child2.is_star: #child1 is a binary
-                self.resolve_stellar_interaction(stellar_system.child1)        
-            elif stellar_system.child1.is_star: #child2 is a binary
-                self.resolve_stellar_interaction(stellar_system.child2)        
+            if not stellar_system.child1.is_star: #child1 is a multiple
+                stopping_condition = self.resolve_stellar_interaction(stellar_system.child1)  
+                if not stopping_condition: #stellar interaction
+                    return False                                     
+            elif not stellar_system.child2.is_star: #child2 is a multiple
+                stopping_condition = self.resolve_stellar_interaction(stellar_system.child2)        
+                if not stopping_condition: #stellar interaction
+                    return False                                     
             else:
                 print('resolve_stellar_interaction: structure stellar system unknown')
                 print('both children are binaries')
                 exit(2)
             
             if REPORT_TRIPLE_EVOLUTION:
-                print('\n resolve stellar interaction: binary')
-            stellar_system = resolve_binary_interaction(stellar_system, self)            
-                            
+                print('\n perform stellar interaction: binary')
+#            stellar_system = perform_stellar_interaction(stellar_system, self)            
+            stopping_condition = perform_stellar_interaction(stellar_system, self)            
+            if not stopping_condition: #stellar interaction
+                return False                                     
+            return True                  
                                                                 
     def determine_mass_transfer_timescale(self, stellar_system = None):
 
@@ -1809,7 +1831,7 @@ class Triple_Class:
         self.secular_code.evolve_model(self.previous_time + full_dt * self.triple.child2.part_dt_mt)
 
         self.channel_from_secular.copy()
-        self.check_for_RLOF() 
+        self.check_RLOF() 
         if self.has_donor():
             print('After partial timestep the system should be detached...')
             print(self.has_donor())
@@ -1922,7 +1944,7 @@ class Triple_Class:
             self.stellar_code.evolve_model(self.triple.time)
             self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
             self.update_stellar_parameters()              
-            self.check_for_RLOF()                    
+            self.check_RLOF()                    
                     
 
     #when the secular code finds RLOF
@@ -1942,7 +1964,7 @@ class Triple_Class:
         self.refresh_memory() 
                                    
             
-    def check_stopping_conditions_stellar_interaction(self):              
+    def check_stopping_conditions_stellar_interaction(self):             
         if self.stop_at_merger and self.has_merger():
             if REPORT_TRIPLE_EVOLUTION:
                 print('Merger at time = ',self.triple.time )                             
@@ -1954,37 +1976,87 @@ class Triple_Class:
         return True            
             
             
-    def check_stopping_conditions_stellar(self):  
-        if self.stop_at_triple_mass_transfer and self.has_tertiary_donor():
-            if self.secular_code.model_time < self.triple.time:
-                self.triple.time = self.secular_code.model_time
+#    def check_stopping_conditions_stellar(self):  
+#        if self.stop_at_outer_mass_transfer and self.has_tertiary_donor():
+#            if self.secular_code.model_time < self.triple.time:
+#                self.triple.time = self.secular_code.model_time
+#
+#            if REPORT_TRIPLE_EVOLUTION:
+#                print('Mass transfer in outer binary of triple at time = ',self.triple.time)
+#            self.triple.bin_type = bin_type['rlof']
+#            
+#            self.determine_mass_transfer_timescale() # to set the stability #obsolete?
+#            return False                                   
+#
+#        elif self.stop_at_mass_transfer and self.has_donor():
+#            if self.secular_code.model_time < self.triple.time:
+#                self.triple.time = self.secular_code.model_time
+#        
+#            if REPORT_TRIPLE_EVOLUTION:
+#                print('Mass transfer at time = ',self.triple.time)
+#            if self.is_binary(self.triple.child2):
+#                self.triple.child2.bin_type = bin_type['rlof'] 
+#            elif self.is_binary(self.triple.child1):
+#                self.triple.child1.bin_type = bin_type['rlof']    
+#            else:
+#                print('currently not implemented')
+#                exit(-1)    
+#                
+#            self.determine_mass_transfer_timescale() # to set the stability #obsolete? 
+#            return False
+#            
+#        return True
 
-            if REPORT_TRIPLE_EVOLUTION:
-                print('Mass transfer in outer binary of triple at time = ',self.triple.time)
-            self.triple.bin_type = bin_type['rlof']
-            self.determine_mass_transfer_timescale() # to set the stability
-            #it's possible that there is mass transfer in the inner and outer binary
-#                print(self.triple.child2.bin_type)
-#                print(self.triple.bin_type)
-#                print(self.has_tertiary_donor())
-            return False                                   
-        elif self.stop_at_mass_transfer and self.has_donor():
-            if self.secular_code.model_time < self.triple.time:
-                self.triple.time = self.secular_code.model_time
-        
-            if REPORT_TRIPLE_EVOLUTION:
-                print('Mass transfer at time = ',self.triple.time)
-            if self.is_binary(self.triple.child2):
-                self.triple.child2.bin_type = bin_type['rlof'] 
-            elif self.is_binary(self.triple.child1):
-                self.triple.child1.bin_type = bin_type['rlof']    
+
+
+    def check_stopping_conditions_stellar(self, stellar_system = None):  
+        #before check stopping conditions_stellar, always make sure the stability labels are up to date
+        #by running self.determine_mass_transfer_timescale()
+
+        if stellar_system == None:
+            stellar_system = self.triple
+
+        if self.is_triple(stellar_system):
+            if self.stop_at_outer_mass_transfer and self.has_tertiary_donor():
+                if self.secular_code.model_time < self.triple.time:
+                    self.triple.time = self.secular_code.model_time
+    
+                if REPORT_TRIPLE_EVOLUTION:
+                    print('Mass transfer in outer binary of triple at time = ',self.triple.time)
+                self.triple.bin_type = bin_type['rlof']
+                return False                                   
             else:
-                print('currently not implemented')
-                exit(-1)    
-            self.determine_mass_transfer_timescale() # to set the stability
-            return False
-        return True
+                if not self.check_stopping_conditions_stellar(stellar_system.child1):
+                    return False
+                if not self.check_stopping_conditions_stellar(stellar_system.child2):
+                    return False
+                return True
+        elif stellar_system.is_star:
+            return True
+        elif self.is_binary(stellar_system):
+            if (self.has_donor() and (self.stop_at_mass_transfer or
+                (self.stop_at_stable_mass_transfer and stellar_system.is_mt_stable) or
+                (self.stop_at_unstable_mass_transfer and not stellar_system.is_mt_stable) or
+                (self.stop_at_eccentric_stable_mass_transfer and stellar_system.is_mt_stable and stellar_system.eccentricity > minimum_eccentricity*5.) or
+                (self.stop_at_eccentric_unstable_mass_transfer and not stellar_system.is_mt_stable and stellar_system.eccentricity > minimum_eccentricity*5.)   )):
+
+                if self.secular_code.model_time < self.triple.time:
+                    self.triple.time = self.secular_code.model_time
             
+                if REPORT_TRIPLE_EVOLUTION:
+                    print('Mass transfer in inner binary at time = ',self.triple.time)
+                    print(self.stop_at_mass_transfer,self.stop_at_stable_mass_transfer, self.stop_at_unstable_mass_transfer, self.stop_at_eccentric_stable_mass_transfer, self.stop_at_eccentric_unstable_mass_transfer, stellar_system.is_mt_stable)
+                if self.is_binary(self.triple.child2):
+                    self.triple.child2.bin_type = bin_type['rlof'] 
+                elif self.is_binary(self.triple.child1):
+                    self.triple.child1.bin_type = bin_type['rlof']    
+                else:
+                    print('currently not implemented')
+                    exit(-1)                        
+                return False
+            
+        return True
+        
             
     def check_stopping_conditions(self):
         if self.check_stopping_conditions_stellar()==False:
@@ -2146,11 +2218,11 @@ class Triple_Class:
                         break  
                     self.instantaneous_evolution = True #skip secular evolution
 
-                self.check_for_RLOF()                                       
+                self.check_RLOF()                                       
                 #find beginning of RLOF
                 if self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and dt > minimum_time_step:
 #                    self.rewind_to_begin_of_rlof_stellar(dt)
-                    print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
+#                    print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
 
                     self.stellar_code.particles.recall_memory_one_step()
                     self.channel_from_stellar.copy_attributes(["age", "mass", "core_mass", "radius", "core_radius", "convective_envelope_radius",  "convective_envelope_mass", "stellar_type", "luminosity", "wind_mass_loss_rate",  "temperature"])  #"gyration_radius_sq"                          
@@ -2162,9 +2234,6 @@ class Triple_Class:
                     continue
 
                                          
-                if self.check_stopping_conditions_stellar()==False:
-                    print('stopping conditions stellar')
-                    break  
 
             #needed for nucleair timescale 
             self.update_time_derivative_of_radius() 
@@ -2174,11 +2243,16 @@ class Triple_Class:
                 print('Stellar interaction')
 
             self.determine_mass_transfer_timescale()
-            self.resolve_stellar_interaction()
+            if self.check_stopping_conditions_stellar()==False:
+                print('stopping conditions stellar')
+                break  
+            if not self.resolve_stellar_interaction():
+                print('stopping conditions stellar interaction')
+                break            
             self.update_time_derivative_of_radius() # includes radius change from wind and ce, not stable mt
             self.update_time_derivative_of_moment_of_inertia() # includes mass and radius change from wind and mass transfer            
-            if self.check_stopping_conditions_stellar_interaction()==False:
-                print('stopping conditions stellar interaction')
+            if self.check_stopping_conditions_stellar_interaction()==False: 
+                print('stopping conditions stellar interaction 2')
                 break
             
             
@@ -2216,6 +2290,7 @@ class Triple_Class:
                     break
                     
                 elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached':
+                    self.determine_mass_transfer_timescale()            
                     if self.check_stopping_conditions_stellar()==False:
                         print('stopping conditions stellar 2')                    
                         break
@@ -2237,6 +2312,7 @@ class Triple_Class:
                     break
                 if self.check_spin_angular_frequency()==False:
                     break
+                self.determine_mass_transfer_timescale()
                 if self.check_stopping_conditions()==False:
                     print('stopping conditions')                
                     break                
@@ -3033,20 +3109,20 @@ def plot_function(triple, dir_plots):
 #    
     
 #-----
-#for running triple.py from other routines
+#for running TRES.py from other routines
 def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSun, outer_mass= 0.5|units.MSun,
             inner_semimajor_axis= 1.0 |units.AU, outer_semimajor_axis= 100.0 |units.AU,
             inner_eccentricity= 0.1, outer_eccentricity= 0.5,
             relative_inclination= 80.0*np.pi/180.0,
             inner_argument_of_pericenter= 0.1, outer_argument_of_pericenter= 0.5,
             inner_longitude_of_ascending_node= 0.0,
-            SN_kick_distr = 2,
             metallicity= 0.02,
             tend= 5.0 |units.Myr, number = 0, maximum_radius_change_factor = 0.005,
-            stop_at_merger = True, stop_at_disintegrated = True, stop_at_triple_mass_transfer = True,
-            stop_at_inner_collision = True, stop_at_outer_collision = True, stop_at_dynamical_instability = True, 
-            stop_at_semisecular_regime = False, stop_at_mass_transfer = True, stop_at_init_mass_transfer = True, 
-            stop_at_SN = False,  
+            stop_at_mass_transfer = True, stop_at_init_mass_transfer = True, stop_at_outer_mass_transfer = True,
+            stop_at_stable_mass_transfer = True, stop_at_eccentric_stable_mass_transfer = True,
+            stop_at_unstable_mass_transfer = False, stop_at_eccentric_unstable_mass_transfer = False,
+            stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
+            stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, stop_at_SN = False,  SN_kick_distr = 2,
             file_name = "triple.hdf", file_type = "hdf5", dir_plots = ""):
 
 
@@ -3062,7 +3138,6 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
     outer_argument_of_pericenter = float(outer_argument_of_pericenter)
     inner_longitude_of_ascending_node = float(inner_longitude_of_ascending_node)
 
-
     triple_class_object = Triple_Class(inner_primary_mass, inner_secondary_mass, outer_mass,
             inner_semimajor_axis, outer_semimajor_axis,
             inner_eccentricity, outer_eccentricity,
@@ -3070,10 +3145,11 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node, 
             metallicity, tend, number, maximum_radius_change_factor,  
-            stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-            stop_at_inner_collision, stop_at_outer_collision, stop_at_dynamical_instability, 
-            stop_at_semisecular_regime, stop_at_mass_transfer, stop_at_init_mass_transfer, 
-            stop_at_SN, SN_kick_distr,
+            stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+            stop_at_dynamical_instability, stop_at_semisecular_regime, stop_at_SN, SN_kick_distr,
             file_name, file_type, dir_plots)
 
 
@@ -3177,13 +3253,29 @@ def parse_arguments():
 #    parser.add_option("--tidal", dest="tidal_terms", action="store_false", default = True, 
 #                      help="tidal terms included [%default] %unit")
 
+    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
+                      help="stop at mass transfer [%default] %unit")
+    parser.add_option("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
+                      help="stop if initially mass transfer[%default] %unit")
+    parser.add_option("--no_stop_at_outer_mass_transfer", dest="stop_at_outer_mass_transfer", action="store_false", default = True,
+                      help="stop at triple mass transfer [%default] %unit")
+                      
+#   if stop_at_mass_transfer is False, the following 4 stopping conditions can be used to further specify.
+#   if stop_at_mass_transfer is True, the following 4 are ignored.
+    parser.add_option("--stop_at_stable_mass_transfer", dest="stop_at_stable_mass_transfer", action="store_true", default = False,
+                      help="stop at stable mass transfer [%default] %unit")
+    parser.add_option("--stop_at_eccentric_stable_mass_transfer", dest="stop_at_eccentric_stable_mass_transfer", action="store_true",                                               
+                    default = False, help="stop at eccentric stable mass transfer [%default] %unit")
+    #unstable mass transfer leads to common-envelope evolution
+    parser.add_option("--stop_at_unstable_mass_transfer", dest="stop_at_unstable_mass_transfer", action="store_true", 
+                    default = False, help="stop at unstable mass transfer [%default] %unit")
+    parser.add_option("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer", 
+                    action="store_true", default = False, help="stop at eccentric unstable mass transfer [%default] %unit")
 
     parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
                       help="stop at merger [%default] %unit")
     parser.add_option("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
                       help="stop at disintegrated [%default] %unit")
-    parser.add_option("--no_stop_at_triple_mass_transfer", dest="stop_at_triple_mass_transfer", action="store_false", default = True,
-                      help="stop at triple mass transfer [%default] %unit")
     parser.add_option("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
                       help="stop at collision in inner binary[%default] %unit")
     parser.add_option("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
@@ -3192,10 +3284,7 @@ def parse_arguments():
                       help="stop at dynamical instability [%default] %unit")
     parser.add_option("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
                       help="stop at semisecular regime [%default] %unit")
-    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
-                      help="stop at mass transfer [%default] %unit")
-    parser.add_option("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
-                      help="stop if initially mass transfer[%default] %unit")
+
     parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
                       help="stop at supernova [%default] %unit")
                       

@@ -80,15 +80,21 @@ lib_inner_loan_distr = {0: "Circular niform distribution",
 ##            -z         metallicity of stars  [0.02 Solar] 
 ##            -n         number of triples to be simulated.  [1]
 ##            -N         number of initial triple.  [0]
-##            --no_stop_at_merger                  stopping condition at merger 
-##            --no_stop_at_disintegrated           stopping condition at disintegration 
-##            --no_stop_at_triple_mass_transfer    stopping condition at mass transfer in outer binary 
-##            --no_stop_at_inner_collision         stopping condition at collision in inner binary 
-##            --no_stop_at_outer_collision         stopping condition at collision involving tertiary star 
-##            --no_stop_at_dynamical_instability   stopping condition at dynamical instability 
-##            --stop_at_semisecular_regime         stopping condition at semisecular regime 
-##            --no_stop_at_mass_transfer           stopping condition at mass transfer 
-##            --stop_at_SN                         stopping condition at supernova 
+##            --no_stop_at_mass_transfer                    stopping condition at mass transfer 
+##            --no_stop_at_init_mass_transfer               stopping condition at mass transfer at initialisation
+##            --no_stop_at_outer_mass_transfer              stopping condition at mass transfer in outer binary 
+##            --stop_at_stable_mass_transfer                stopping condition at stable mass transfer 
+##            --stop_at_eccentric_stable_mass_transfer      stopping condition at eccentric stable mass transfer 
+##            --stop_at_unstable_mass_transfer              stopping condition at unstable mass transfer 
+##            --stop_at_eccentric_unstable_mass_transfer    stopping condition at eccentric unstable mass transfer 
+
+##            --no_stop_at_merger                           stopping condition at merger 
+##            --no_stop_at_disintegrated                    stopping condition at disintegration 
+##            --no_stop_at_inner_collision                  stopping condition at collision in inner binary 
+##            --no_stop_at_outer_collision                  stopping condition at collision involving tertiary star 
+##            --no_stop_at_dynamical_instability            stopping condition at dynamical instability 
+##            --stop_at_semisecular_regime                  stopping condition at semisecular regime 
+##            --stop_at_SN                                  stopping condition at supernova 
 lib_SN_kick_distr = {0: "No kick",
                     1: "Hobbs", #Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
                     2: "Hobbs + momentum rescaling", 
@@ -126,7 +132,6 @@ absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
 absolute_max_mass = 100 |units.MSun
 REPORT = False 
 REPORT_USER_WARNINGS = False 
-stop_at_init_mass_transfer = True
 
 def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
@@ -716,11 +721,12 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                         inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
                         inner_aop_distr, outer_aop_distr, inner_loan_distr,                                                                      
                         metallicity, tend, number, initial_number, seed,
-                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-                        stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,
-                        stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
+                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
 
 
     i_n = 0
@@ -757,7 +763,8 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
         number_of_system = initial_number + i_n
         if REPORT:
             print('number of system = ', number_of_system)
-            
+
+
         tr = None
         tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
                     inner_secondary_mass = triple_system.inner_secondary_mass, 
@@ -769,15 +776,19 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                     relative_inclination = triple_system.incl, 
                     inner_argument_of_pericenter = triple_system.inner_aop, 
                     outer_argument_of_pericenter = triple_system.outer_aop, 
-                    inner_longitude_of_ascending_node = triple_system.inner_loan, 
-                    SN_kick_distr = SN_kick_distr,                     
-                    metallicity = metallicity, tend = tend, number = number_of_system, 
+                    inner_longitude_of_ascending_node = triple_system.inner_loan,                      
+                    metallicity = metallicity, tend = tend, number = number_of_system,
+                    stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
+                    stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
+                    stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
+                    stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
+                    stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
+                    stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
                     stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                    stop_at_triple_mass_transfer = stop_at_triple_mass_transfer, 
                     stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
                     stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                    stop_at_semisecular_regime = stop_at_semisecular_regime, stop_at_mass_transfer = stop_at_mass_transfer, 
-                    stop_at_init_mass_transfer = stop_at_init_mass_transfer, stop_at_SN = stop_at_SN,
+                    stop_at_semisecular_regime = stop_at_semisecular_regime,  
+                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr,
                     file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
         if tr.triple.correct_params == False:
@@ -811,11 +822,12 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
                         inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
                         metallicity, tend, number, initial_number, seed,
-                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-                        stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,
-                        stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
+                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
     print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
@@ -831,6 +843,23 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
     print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
     print('\n\n')
+    
+    print('Stopping conditions:')
+    print(stop_at_mass_transfer, '\t Stop at mass transfer')
+    print(stop_at_init_mass_transfer, '\t Stop at mass transfer initially')
+    print(stop_at_outer_mass_transfer, '\t Stop at outer mass transfer')
+    print(stop_at_stable_mass_transfer, '\t Stop at stable mass transfer')
+    print(stop_at_eccentric_stable_mass_transfer, '\t Stop at eccentric stable mass transfer')
+    print(stop_at_unstable_mass_transfer, '\t Stop at unstable mass transfer')
+    print(stop_at_eccentric_unstable_mass_transfer, '\t Stop at eccentric unstable mass transfer')
+    print(stop_at_merger, '\t Stop at merger')
+    print(stop_at_disintegrated, '\t Stop at disintegration')
+    print(stop_at_inner_collision, '\t Stop at collision in inner binary')
+    print(stop_at_outer_collision, '\t Stop at collision with outer star')
+    print(stop_at_dynamical_instability, '\t Stop at dynamical instability')
+    print(stop_at_semisecular_regime, '\t Stop at semisecular regime')
+    print('\n\n')
+
 
 def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min, 
                         inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
@@ -847,11 +876,12 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
                         inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
                         metallicity, tend, number, initial_number, seed,
-                        stop_at_merger, stop_at_disintegrated, stop_at_triple_mass_transfer,
-                        stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,
-                        stop_at_mass_transfer, stop_at_SN,
-                        SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
+                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
         print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
@@ -1117,12 +1147,29 @@ def parse_arguments():
                       help="seed [%default] %unit")
 #    int actual_seed = srandinter(input_seed);
 
+    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
+                      help="stop at mass transfer [%default] %unit")
+    parser.add_option("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
+                      help="stop if initially mass transfer[%default] %unit")
+    parser.add_option("--no_stop_at_outer_mass_transfer", dest="stop_at_outer_mass_transfer", action="store_false", default = True,
+                      help="stop at outer mass transfer [%default] %unit")
+
+#   if stop_at_mass_transfer is False, the following 4 stopping conditions can be used to further specify.
+#   if stop_at_mass_transfer is True, the following 4 are ignored.
+    parser.add_option("--stop_at_stable_mass_transfer", dest="stop_at_stable_mass_transfer", action="store_true", default = False,
+                      help="stop at stable mass transfer [%default] %unit")
+    parser.add_option("--stop_at_eccentric_stable_mass_transfer", dest="stop_at_eccentric_stable_mass_transfer", action="store_true",                                               
+                    default = False, help="stop at eccentric stable mass transfer [%default] %unit")
+    #unstable mass transfer leads to common-envelope evolution
+    parser.add_option("--stop_at_unstable_mass_transfer", dest="stop_at_unstable_mass_transfer", action="store_true", 
+                    default = False, help="stop at unstable mass transfer [%default] %unit")
+    parser.add_option("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer", 
+                    action="store_true", default = False, help="stop at eccentric unstable mass transfer [%default] %unit")
+
     parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
                       help="stop at merger [%default] %unit")
     parser.add_option("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
                       help="stop at disintegrated [%default] %unit")
-    parser.add_option("--no_stop_at_triple_mass_transfer", dest="stop_at_triple_mass_transfer", action="store_false", default = True,
-                      help="stop at triple mass transfer [%default] %unit")
     parser.add_option("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
                       help="stop at collision in inner binary[%default] %unit")
     parser.add_option("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
@@ -1131,8 +1178,6 @@ def parse_arguments():
                       help="stop at dynamical instability [%default] %unit")
     parser.add_option("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
                       help="stop at semisecular regime [%default] %unit")
-    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
-                      help="stop at mass transfer [%default] %unit")
     parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
                       help="stop at supernova [%default] %unit")
                       
