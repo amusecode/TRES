@@ -3339,5 +3339,9 @@ if __name__ == '__main__':
         if REPORT_TRIPLE_EVOLUTION:
             print('Simulation has finished succesfully')
             
+    print('\nYou have used the TRES triple evolution code. Literature reference:')
+    print('** Toonen, Hamers & Portegies Zwart 2016, ComAC, 3, 6T:')
+    print('... "The evolution of hierarchical triple star-systems" ')
+            
     triple_class_object.stellar_code.stop()
     triple_class_object.secular_code.stop()

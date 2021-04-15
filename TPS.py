@@ -1207,5 +1207,8 @@ if __name__ == '__main__':
     print_distr(**options)
     evolve_model(**options)
 
+    print('\nYou have used the TRES triple evolution code. Literature reference:')
+    print('** Toonen, Hamers & Portegies Zwart 2016, ComAC, 3, 6T:')
+    print('... "The evolution of hierarchical triple star-systems" ')
 
 
