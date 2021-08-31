@@ -2572,6 +2572,19 @@ def plot_function(triple, dir_plots):
     plt.close()
 
 
+    dyn_inst =  2.8 / (1-e_out_array) * (1-0.3*i_relative_array/np.pi) * ((1+m3_array/(m1_array+m2_array))*(1+e_out_array)/(np.sqrt(1-e_out_array)))**0.4 / (a_out_array_AU/a_in_array_AU)
+    oct = (m1_array-m2_array)/(m1_array+m2_array) * a_in_array_AU/a_out_array_AU * e_out_array/(1-e_out_array**2)
+    semiseq = (5.*np.pi* m3_array/(m1_array+m2_array) * (a_in_array_AU/a_out_array_AU/(1-e_out_array))**3)/ np.sqrt(1-e_in_array) 
+
+    plt.semilogy(times_array_Myr, dyn_inst, '.')
+    plt.semilogy(times_array_Myr, oct, '.')
+    plt.semilogy(times_array_Myr, semiseq, '.')
+    plt.xlabel('t (Myr)')
+    plt.ylabel('stability,oct and semiseq')
+    plt.legend(loc=0)
+    plt.savefig(dir_plots+'dyn_time'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
 
     plt.plot(times_array_Myr,e_in_array)
     plt.plot(times_array_Myr,e_in_array, '.')
@@ -2604,6 +2617,20 @@ def plot_function(triple, dir_plots):
     plt.savefig(dir_plots+'g_time'+generic_name+'.pdf')
 #    plt.show()
     plt.close()
+    
+    
+    plt.plot(e_in_array,(g_in_array%np.pi)/np.pi*180)
+    plt.plot(e_in_array,(g_in_array%np.pi)/np.pi*180, '.')
+#    plt.plot(e_out_array,g_out_array)
+#    plt.plot(e_out_array,g_out_array, '.')
+#    plt.xlim(0,1)
+    plt.xlabel('$e_\mathrm{in}$')
+    plt.ylabel('$g_\mathrm{in}$')
+    plt.savefig(dir_plots+'g_e_inner'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
+
+    
 
     plt.plot(times_array_Myr,o_in_array)
     plt.plot(times_array_Myr,o_in_array, '.')
