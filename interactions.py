@@ -408,7 +408,10 @@ def common_envelope_energy_balance(bs, donor, accretor, self):
     Rl_donor = roche_radius(bs, donor, self)
     donor_radius = min(donor.radius, Rl_donor)
 
-    orb_energy_new = donor.mass * (donor.mass-donor.core_mass) / (alpha * lambda_donor * donor_radius) + donor.mass * accretor.mass/2/bs.semimajor_axis
+    #based on Glanz & Perets 2021  2021MNRAS.507.2659G
+    #eccentric CE -> end result depends on pericenter distance more than semi-major axis
+    pericenter_init =  bs.semimajor_axis * (1-bs.eccentricity)
+    orb_energy_new = donor.mass * (donor.mass-donor.core_mass) / (alpha * lambda_donor * donor_radius) + donor.mass * accretor.mass/2/pericenter_init
     a_new = donor.core_mass * accretor.mass / 2 / orb_energy_new
 #    a_new = bs.semimajor_axis * (donor.core_mass/donor.mass) / (1. + (2.*(donor.mass-donor.core_mass)*bs.semimajor_axis/(alpha_lambda*donor_radius*accretor.mass)))
     
@@ -475,7 +478,11 @@ def double_common_envelope_energy_balance(bs, donor, accretor, self):
     donor_radius = min(donor.radius, Rl_donor)
     accretor_radius = accretor.radius
     
-    orb_energy_new = donor.mass * (donor.mass-donor.core_mass) / (alpha * lambda_donor * donor_radius) + accretor.mass * (accretor.mass-accretor.core_mass) / (alpha * lambda_accretor * accretor_radius) + donor.mass * accretor.mass/2/bs.semimajor_axis
+    
+    #based on Glanz & Perets 2021  2021MNRAS.507.2659G
+    #eccentric CE -> end result depends on pericenter distance more than semi-major axis
+    pericenter_init =  bs.semimajor_axis * (1-bs.eccentricity)
+    orb_energy_new = donor.mass * (donor.mass-donor.core_mass) / (alpha * lambda_donor * donor_radius) + accretor.mass * (accretor.mass-accretor.core_mass) / (alpha * lambda_accretor * accretor_radius) + donor.mass * accretor.mass/2/pericenter_init
     a_new = donor.core_mass * accretor.core_mass / 2 / orb_energy_new
 
     Rl_donor_new = roche_radius_dimensionless(donor.core_mass, accretor.core_mass)*a_new
