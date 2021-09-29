@@ -280,6 +280,9 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('m1', dtype='float64', direction=function.IN)
         function.addParameter('m2', dtype='float64', direction=function.IN)
         function.addParameter('m3', dtype='float64', direction=function.IN)
+        function.addParameter('a_in', dtype='float64', direction=function.IN)
+        function.addParameter('a_out', dtype='float64', direction=function.IN)
+        function.addParameter('e_in', dtype='float64', direction=function.IN)
         function.addParameter('e_out', dtype='float64', direction=function.IN)
         function.addParameter('itot', dtype='float64', direction=function.IN)        
         function.result_type = 'float64'
@@ -349,6 +352,20 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('value', dtype='float64',direction=function.IN,description = "",unit=1.0/unit_t)
         function.result_type = 'int32'
         return function
+
+#    @legacy_function
+#    def get_dynamical_stability_model():
+#        function = LegacyFunctionSpecification()
+#        function.addParameter('value', dtype='int32',direction=function.OUT,description = "")
+#        function.result_type = 'int32'
+#        return function
+#
+#    @legacy_function
+#    def set_dynamical_stability_model():
+#        function = LegacyFunctionSpecification()
+#        function.addParameter('value', dtype='int32',direction=function.IN,description = "")
+#        function.result_type = 'int32'
+#        return function
         
     @legacy_function
     def get_input_precision():
@@ -852,6 +869,13 @@ class SecularTriple(InCodeComponentImplementation):
             "",
             default_value = 1.0e-8
         )
+#        object.add_method_parameter(
+#            "get_dynamical_stability_model",
+#            "set_dynamical_stability_model",
+#            "dynamical_stability_model",
+#            "",
+#            default_value = 0
+#        )
         object.add_method_parameter(
             "get_input_precision",
             "set_input_precision",
@@ -1333,6 +1357,9 @@ class SecularTriple(InCodeComponentImplementation):
                 unit_m,                     ### m1
                 unit_m,                     ### m2
                 unit_m,                     ### m3
+                unit_l,                     ### a_in
+                unit_l,                     ### a_out
+                object.NO_UNIT,             ### e_in
                 object.NO_UNIT,             ### e_out
                 object.NO_UNIT,             ### itot -- NOTE: should be in radians
             ),
@@ -1512,7 +1539,7 @@ class SecularTriple(InCodeComponentImplementation):
             inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
             m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
             
-            a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,e_out,triple.relative_inclination)
+            a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in, e_out,triple.relative_inclination)
             if a_out/a_in <= a_out_div_a_in_dynamical_stability:
                 if self.parameters.verbose == True:
                     print('SecularTriple -- triple system is dynamically unstable: a_out/a_in = ',a_out/a_in,', whereas for dynamical stability, a_out/a_in should be > ',a_out_div_a_in_dynamical_stability)
@@ -1956,7 +1983,7 @@ def extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2
 
     ### if enabled, check for dynamical stability at initialisation ###
     if parameters.check_for_dynamical_stability_at_initialisation == True:
-        a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,e_out,triple.relative_inclination)
+        a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,triple.relative_inclination)
         if a_out/a_in <= a_out_div_a_in_dynamical_stability:
             if self.parameters.verbose == True:
                 print( 'SecularTriple -- code parameter "check_for_dynamical_stability_at_initialisation" = True')

@@ -1052,7 +1052,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         /*  in future other criteria could be implemented as well */
 
         double itot = acos(Ith(yev,9));
-        double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,e_out,itot);
+        double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot);
         
         gout[0] = a_out/a_in - a_out_div_a_in_crit;///1.5;
     }
@@ -1127,11 +1127,16 @@ double a_out_div_a_in_semisecular_regime(double m1, double m2, double m3, double
     return a_out_div_a_in_crit;
 }
 
-double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double e_out, double itot)
+double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double a_in, double a_out, double e_in, double e_out, double itot)
 {
     /* wrapper used in interface.py */
     
     return a_out_div_a_in_dynamical_stability_mardling_aarseth_01(m1,m2,m3,e_out,itot);
+//    return a_out_div_a_in_dynamical_stability_petrovich_15_simple(e_in,e_out);
+//    return a_out_div_a_in_dynamical_stability_petrovich_15(m1,m2,m3,e_in,e_out,a_in,a_out);
+//    return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);
+//    return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);
+
 }
 
 double a_out_div_a_in_dynamical_stability_mardling_aarseth_01(double m1, double m2, double m3, double e_out, double itot)
@@ -1145,6 +1150,55 @@ double a_out_div_a_in_dynamical_stability_mardling_aarseth_01(double m1, double 
     
     return a_out_div_a_in_crit;
 }
+
+
+
+double a_out_div_a_in_dynamical_stability_petrovich_15_simple(double e_in,  double e_out)
+{
+    /* Petrovich criterion (2015ApJ...808..120P) 
+       for star + 2 planets */     
+//     printf("Petrovich \n");
+
+    double a_out_div_a_in_crit = 1.83 * (1+e_in)/(1-e_out);        
+    return a_out_div_a_in_crit;
+}
+
+
+double a_out_div_a_in_dynamical_stability_petrovich_15(double m1, double m2, double m3,double e_in,  double e_out, double a_in,  double a_out)
+{
+    /* Petrovich criterion (2015ApJ...808..120P) 
+       for star + 2 planets */ 
+//     printf("Petrovich \n");
+
+    double mu_in = min(m1,m2)/max(m1,m2);
+    double mu_out = m3/max(m1,m2);
+    double max_mu = max(mu_in, mu_out);
+    double a_out_div_a_in_crit = (1+e_in)/(1-e_out) * (2.4*pow(max_mu,1./3.)*pow(a_out/a_in, 0.5)+1.15);        
+    return a_out_div_a_in_crit;
+}
+
+double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, double m3, double e_out)
+{
+    /* Holman criterion ( 1999AJ....117..621H) 
+        for planet orbiting a star (s+p)+s */     
+     printf("Holman S-type \n");
+
+    double mu = m3/(max(m1,m2)+m3);
+    double a_out_div_a_in_crit = 1./(0.464-0.38*mu-0.631*e_out+0.586*mu*e_out+0.15*e_out*e_out-0.198*mu*e_out*e_out);
+    return a_out_div_a_in_crit;
+}
+
+double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, double m3, double e_in)
+{
+    /* Holman criterion ( 1999AJ....117..621H) 
+         for planet orbiting a binary (s+s)+p */     
+     printf("Holman P-type \n");
+
+    double mu = min(m1,m2)/(m1+m2);
+    double a_out_div_a_in_crit = 1.6+5.1*e_in-2.22*e_in*e_in+4.12*mu-4.27*e_in*mu-5.09*mu*mu+4.61*e_in*e_in*mu*mu;
+    return a_out_div_a_in_crit;
+}
+
 
 double roche_radius_pericenter_eggleton(double rp, double q)
 {
