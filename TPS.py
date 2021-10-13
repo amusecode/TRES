@@ -39,7 +39,7 @@ lib_outer_semi_distr = {0: "Log Uniform distribution", #default
                    3: "Lognormal mu = 10^3.5d, sigma = 2.3",
                    4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
                    5: "Sana et al. 2012",}
-##            --E_max    upper limit for the inner eccentricity [1.]
+##            --E_max    upper limit for the inner eccentricity [0.9]
 ##            --E_min    lower limit for the inner eccentricity [0.]
 ##            --E_distr  inner eccentricity option: 
 lib_inner_ecc_distr = {0: "Thermal", #default
@@ -47,7 +47,7 @@ lib_inner_ecc_distr = {0: "Thermal", #default
                  2: "Sana et al. 2012 e^-0.45", #-> close binaries
                  3: "Flat distribution",
                  4: "Powerlaw e^0.5",}                                    
-##            --e_max    upper limit for the outer eccentricity [1.]
+##            --e_max    upper limit for the outer eccentricity [0.9]
 ##            --e_min    lower limit for the outer eccentricity [0.]
 ##            --e_distr  outer eccentricity option: 
 lib_outer_ecc_distr = {0: "Thermal", #default
@@ -1077,7 +1077,7 @@ def parse_arguments():
                       dest="inner_ecc_min", type="float", default = 0.,
                       help="minimum of inner eccentricity [%default]")
     parser.add_option("--E_max",
-                      dest="inner_ecc_max", type="float", default = 1.0,
+                      dest="inner_ecc_max", type="float", default = 0.9,
                       help="maximum of inner eccentricity [%default]")
     parser.add_option("--E_distr", dest="inner_ecc_distr", type="int", default = 0,
                       help="inner eccentricity distribution [Thermal]")
@@ -1086,7 +1086,7 @@ def parse_arguments():
                       dest="outer_ecc_min", type="float", default = 0.,
                       help="minimum of outer eccentricity [%default]")
     parser.add_option("--e_max",
-                      dest="outer_ecc_max", type="float", default = 1.,
+                      dest="outer_ecc_max", type="float", default = 0.9,
                       help="maximum of outer eccentricity [%default]")
     parser.add_option("--e_distr", dest="outer_ecc_distr", type="int", default = 0,
                       help="outer eccentricity distribution [Thermal]")
