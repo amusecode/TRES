@@ -726,7 +726,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
 
     i_n = 0
@@ -788,8 +788,8 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                     stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
                     stop_at_dynamical_instability = stop_at_dynamical_instability, 
                     stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr,
-                    file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
+                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, stop_at_CPU_time = stop_at_CPU_time,
+                    max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
         if tr.triple.correct_params == False:
             nr_cp += 1
@@ -827,7 +827,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
     print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
@@ -858,6 +858,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print(stop_at_outer_collision, '\t Stop at collision with outer star')
     print(stop_at_dynamical_instability, '\t Stop at dynamical instability')
     print(stop_at_semisecular_regime, '\t Stop at semisecular regime')
+    print(stop_at_CPU_time, '\t Stop at maximum CPU time')
     print('\n\n')
 
 
@@ -881,7 +882,7 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
         print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
@@ -1180,6 +1181,10 @@ def parse_arguments():
                       help="stop at semisecular regime [%default] %unit")
     parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
                       help="stop at supernova [%default] %unit")
+    parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
+                      help="stop at CPU time [%default] %unit")
+    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = False,
+                      help="max CPU time [%default] %unit")
                       
                       
     parser.add_option("-f", dest="file_name", type ="string", default = "TRES.hdf",#"TRES.txt"
