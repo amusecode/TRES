@@ -1183,7 +1183,7 @@ def parse_arguments():
                       help="stop at supernova [%default] %unit")
     parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
                       help="stop at CPU time [%default] %unit")
-    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = False,
+    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 3600.0,
                       help="max CPU time [%default] %unit")
                       
                       
