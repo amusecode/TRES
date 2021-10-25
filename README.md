@@ -99,6 +99,13 @@ The full list of possible input parameters is:
         9:  Verbunt, Igoshev & Cator, 2017, 608, 57
         10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh by mass 
 
+```
+
+Additionally, there is a list of stopping conditions that determines whether the simulation of a system should stop at a certain evolutionary phase. 
+By default, these stopping conditions are set to True, which means they are in effect. However, the four specific mass transfer cases (stable, unstable, eccentric stable & eccentric unstable) are set to False by default. Once "--no_stop_at_mass_transfer" is set to False, it is possible to set the specific mass transfer cases to True.
+
+```
+
 action items                                    add these to:
 --no_stop_at_mass_transfer                      avoid stopping the simulation at the onset of mass transfer 
 --no_stop_at_init_mass_transfer                 avoid stopping the simulation if there is mass transfer initially
