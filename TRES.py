@@ -120,7 +120,6 @@ class Triple_Class:
         self.file_type = file_type
         self.SN_kick_distr = SN_kick_distr
         self.max_CPU_time = max_CPU_time
-        self.evolve_time = 0.0
 
         self.triple = bins[1]
         self.triple.time = 0.0|units.yr
@@ -128,7 +127,8 @@ class Triple_Class:
         self.triple.is_star = False #maybe not necessary?
         self.triple.dynamical_instability = False 
         self.triple.number = number 
-        self.triple.error_flag_secular = 0          
+        self.triple.error_flag_secular = 0
+	self.triple.CPU_time = 0.0   
             
         self.setup_stellar_code(metallicity, stars)
         self.setup_secular_code(self.triple.as_set())      
@@ -2362,10 +2362,10 @@ class Triple_Class:
             
             # if the maximum CPU time has been exceeded for the system, stop the evolution and continue with the next system
             end_time = time.time()
-            self.evolve_time = end_time - start_time
+            self.triple.CPU_time = end_time - start_time
             if (self.stop_at_CPU_time == True) and float(end_time - start_time) > self.max_CPU_time:
                 print('stopping conditions maximum CPU time')
-                print("evolve time: ", self.evolve_time)
+                print("CPU time: ", self.tiple.CPU_time)
                 break
             
             
@@ -3331,7 +3331,7 @@ def parse_arguments():
                       help="stop at supernova [%default] %unit")
     parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
                       help="stop at CPU time [%default] %unit")
-    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 600,
+    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 3600.0,
                       help="max CPU time [%default] %unit")
                       
                       
