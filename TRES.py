@@ -2186,6 +2186,15 @@ class Triple_Class:
         self.determine_mass_transfer_timescale()
         self.save_snapshot()  
         while self.triple.time<self.tend: 
+		
+	    # if the maximum CPU time has been exceeded for the system, stop the evolution and continue with the next system
+            end_time = time.time()
+            self.triple.CPU_time = end_time - start_time
+            if (self.stop_at_CPU_time == True) and float(end_time - start_time) > self.max_CPU_time:
+                print('stopping conditions maximum CPU time')
+                print("CPU time: ", self.tiple.CPU_time)
+                break
+		
             if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
                 print('\n\n kozai timescale:', self.kozai_timescale(), self.triple.kozai_type, self.octupole_parameter())
                         
@@ -2358,19 +2367,8 @@ class Triple_Class:
                 moi1_array.append(self.triple.child2.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
                 moi2_array.append(self.triple.child2.child2.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
                 moi3_array.append(self.triple.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
-                
             
-            # if the maximum CPU time has been exceeded for the system, stop the evolution and continue with the next system
-            end_time = time.time()
-            self.triple.CPU_time = end_time - start_time
-            if (self.stop_at_CPU_time == True) and float(end_time - start_time) > self.max_CPU_time:
-                print('stopping conditions maximum CPU time')
-                print("CPU time: ", self.tiple.CPU_time)
-                break
-            
-            
-            
-            
+                                    
         self.save_snapshot()        
             
             
