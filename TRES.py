@@ -128,7 +128,7 @@ class Triple_Class:
         self.triple.dynamical_instability = False 
         self.triple.number = number 
         self.triple.error_flag_secular = 0
-	self.triple.CPU_time = 0.0   
+        self.triple.CPU_time = 0.0
             
         self.setup_stellar_code(metallicity, stars)
         self.setup_secular_code(self.triple.as_set())      
@@ -2192,7 +2192,7 @@ class Triple_Class:
             self.triple.CPU_time = end_time - start_time
             if (self.stop_at_CPU_time == True) and float(end_time - start_time) > self.max_CPU_time:
                 print('stopping conditions maximum CPU time')
-                print("CPU time: ", self.tiple.CPU_time)
+                print("CPU time: ", self.triple.CPU_time)
                 break
 		
             if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
