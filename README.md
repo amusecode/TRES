@@ -83,7 +83,8 @@ The full list of possible input parameters is:
 -F      type of output file (hdf5/txt)          default = hdf5
 --dir_plots   directory for plots for debugging default = "" (current directory)
         mode  (aka REPORT_DEBUG == True)
-
+--max_CPU_time   maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
+                                                default = 7200 (seconds)
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:
@@ -122,6 +123,7 @@ action items                                    add these to:
 --no_stop_at_disintegrated                      avoid stopping after the system disintegrated into seperate systems
 --stop_at_semisecular_regime                    to stop the simulation if the sytem is in the semi secular regime
 --stop_at_SN                                    to stop the simulation when a supernova occurs
+--stop_at_CPU_time                              to stop the simulation when the computational time exceeds a given value
 
 ```
 
@@ -253,6 +255,7 @@ action items                    add these to:
 --no_stop_at_mass_transfer      avoid stopping the simulation at the onset of mass transfer 
 --stop_at_semisecular_regime    to stop the simulation if the sytem is in the semi secular regime
 --stop_at_SN                    to stop the simulation when a supernova occurs
+--stop_at_CPU_time              to stop the simulation when the computational time exceeds a given value
 
 ```
 
