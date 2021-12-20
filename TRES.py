@@ -3285,8 +3285,8 @@ def parse_arguments():
     parser.add_option("-t", "-T", unit=units.Myr, 
                       dest="tend", type="float", default = 5.0 |units.Myr,
                       help="end time [%default] %unit")
-    parser.add_option("-N", "-n", dest="number", type="int", default = 0,
-                      help="number of system [%default]")
+    parser.add_option("-N", dest="number", type="int", default = 0,
+                      help="number ID of system [%default]")
     parser.add_option("-r", dest="maximum_radius_change_factor", type="float", default = 0.01,
                       help="maximum_radius_change_factor [%default] %unit")
 
