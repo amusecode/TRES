@@ -78,8 +78,8 @@ lib_inner_loan_distr = {0: "Circular niform distribution",
                  1: "Constant longitude of ascending nodes",} #default
 ##            -T or -t   binary end time. [13500 Myr]
 ##            -z         metallicity of stars  [0.02 Solar] 
-##            -n         number of triples to be simulated.  [1]
-##            -N         number of initial triple.  [0]
+##            -n         total number of systems to be simulated.  [1]
+##            -N         number ID of first system.  [0]
 ##            --no_stop_at_mass_transfer                    stopping condition at mass transfer 
 ##            --no_stop_at_init_mass_transfer               stopping condition at mass transfer at initialisation
 ##            --no_stop_at_outer_mass_transfer              stopping condition at mass transfer in outer binary 
@@ -1140,9 +1140,9 @@ def parse_arguments():
                       dest="tend", type="float", default = 13500|units.Myr,
                       help="end time [%default] %unit")
     parser.add_option("-n", dest="number", type="int", default = 10,
-                      help="number of systems [%default]")
+                      help="total number of systems to be simulated [%default]")
     parser.add_option("-N", dest="initial_number", type="int", default = 0,
-                      help="number of initial system [%default]")
+                      help="number ID of first system [%default]")
     parser.add_option("-s", unit=units.none, 
                       dest="seed", type="float", default = 0.|units.none,
                       help="seed [%default] %unit")
