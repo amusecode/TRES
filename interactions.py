@@ -982,7 +982,7 @@ def q_crit(star):
     elif star.stellar_type in stellar_types_compact_objects:#eventhough ns & bh shouldn't be donors... 
         return 0.628
     else: #stellar type 2, and 8
-        return 3 #SILVIA this seems awfully high for hg
+        return 3 # high for hg?
         
     
 
