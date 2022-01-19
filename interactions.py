@@ -33,6 +33,8 @@ bin_type = {
                 'unknown': 'unknown',       
                 'merger': 'merger', 
                 'disintegrated': 'disintegrated', 
+                'dyn_inst': 'dynamical_instability', 
+
                 'detached': 'detached',       
                 'contact': 'contact',    
                 'collision': 'collision',    
@@ -53,6 +55,7 @@ bin_type = {
 
                 'double_common_envelope': 'double_common_envelope',
                 'dce': 'double_common_envelope',
+                
                 
             }            
 

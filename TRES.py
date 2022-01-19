@@ -143,6 +143,7 @@ class Triple_Class:
         if stop_at_dynamical_instability == True and self.secular_code.triples[0].dynamical_instability == True:
             self.triple.dynamical_instability_at_initialisation = True
             self.triple.dynamical_instability = True
+            self.set_bintype_to_dynamical_instability()
             return 
 
         self.secular_code.check_for_semisecular_regime()
@@ -641,6 +642,36 @@ class Triple_Class:
                 return True    
             
         return False            
+
+
+
+# if a dynamical instability is currently taking place, not if an instability has happened in the past
+    def has_dynamical_instability(self, stellar_system = None): 
+        if stellar_system == None:
+            stellar_system = self.triple
+            
+        if stellar_system.is_star:
+            return False
+        else:
+            if self.has_dynamical_instability(stellar_system.child1):
+                return True
+            if self.has_diynamical_instability(stellar_system.child2):
+                return True
+            if stellar_system.bin_type == bin_type['dyn_inst']:  
+                return True    
+            
+        return False            
+
+    def set_bintype_to_dynamical_instability(self, stellar_system = None): 
+        if self.triple.dynamical_instability: 
+            if stellar_system == None:
+                stellar_system = self.triple
+                
+            if stellar_system.is_star == False:
+                stellar_system.bin_type = bin_type['dyn_inst']       
+                self.set_bintype_to_dynamical_instability(stellar_system.child1)
+                self.set_bintype_to_dynamical_instability(stellar_system.child2)           
+
 
 #doesn't work well, as it uses bin_types that are set later -> use has_tertiary_donor
 # if a mass transfer in the outer binary of the triple is currently taking place, not if a mass transfer has happened in the past
@@ -2070,6 +2101,7 @@ class Triple_Class:
             if self.secular_code.model_time < self.triple.time:
                 self.triple.time = self.secular_code.model_time
             self.triple.dynamical_instability = True   
+            self.set_bintype_to_dynamical_instability()            
             if REPORT_TRIPLE_EVOLUTION:
                 print("Dynamical instability at time = ",self.triple.time)
             return False
@@ -3389,3 +3421,4 @@ if __name__ == '__main__':
             
     triple_class_object.stellar_code.stop()
     triple_class_object.secular_code.stop()
+
