@@ -268,68 +268,46 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 ## Reducing the TRES output
 
 The python script rdc_TRES.py reduce the TRES hdf output to a txt file keeping only selected parameters. These can be adjusted to your liking in the function rdc(). Currently there are 6 lines for every snapshot. The columns represent:
+
 General information on the system: 
+```
 Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular
+```
 Orbital information (inner binary | outer binary) :
+```
 Line 2: 'bs:', binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
         | binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
+```
 Stellar information (primary | secondary | tertiary)
+```
 Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
+```        
 
-
-
-## TRES development team
-Members of the TRES development team are recommended to work on their own fork on github. To set this up:
-
-0) After installing AMUSE and downloading TRES
-1) First create a fork. Can be done easily on the github webinterface. 
-
-2) Now we have to set up links to the official TRES repository and the forked one. Clone the forked TRES repository, which will be know as ‘origin’
+The stellar types in TRES follow the standard terminology of AMUSE:
 ```
-git clone git@github.com:(name)/TRES.git
+0 deeply or fully convective low mass MS star
+1 Main Sequence star
+2 Hertzsprung Gap
+3 First Giant Branch
+4 Core Helium Burning
+5 First Asymptotic Giant Branch
+6 Second Asymptotic Giant Branch
+7 Main Sequence Naked Helium star
+8 Hertzsprung Gap Naked Helium star
+9 Giant Branch Naked Helium star
+10 Helium White Dwarf
+11 Carbon/Oxygen White Dwarf
+12 Oxygen/Neon White Dwarf
+13 Neutron Star
+14 Black Hole
+15 Massless Supernova
+16 Unknown stellar type
+17 Pre-main-sequence Star
+18 Planet
+19 Brown Dwarf
 ```
-And add a link to the official TRES repository, which will be known as upstream
-```
-git remote add upstream git@github.com:amusecode/TRES.git
-```
-Also to list the current configured remote repositories for your fork:
-```
-git remove -v
-```
-
-
-Example of workflow:
-1) Good practise to work on a new branch
-```
-git checkout -b (branch)
-```
-2) pull all updates from ‘origin’ to current branch
-```
-git pull origin main
-```
-3) pull all updates from upstream to current branch
-```
-git pull upstream main
-```
-4) make the desired changes to TRES
-```
-git add / git commit
-git checkout main / git merge (branch)/ git branch -d (branch)
-```
-5) push changes to your own fork and follow that branch
-```
-git push origin main
-```
-6) If so desired, push changes to the official TRES repository
-```
-git push --set-upstream upstream (branch) 
-```
-
-
-Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
-
 
 
 ## References
