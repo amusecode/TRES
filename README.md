@@ -269,6 +269,7 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 
 The python script rdc_TRES.py reduce the TRES hdf output to a txt file keeping only selected parameters. These can be adjusted to your liking in the function rdc(). Currently there are 6 lines for every snapshot. The columns represent:
 General information on the system: 
+```
 Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular
 Orbital information (inner binary | outer binary) :
 Line 2: 'bs:', binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
@@ -277,7 +278,7 @@ Stellar information (primary | secondary | tertiary)
 Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
-        
+```        
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
