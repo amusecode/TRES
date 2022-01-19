@@ -277,6 +277,31 @@ Stellar information (primary | secondary | tertiary)
 Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
+        
+
+The stellar types in TRES follow the standard terminology of AMUSE:
+```
+0 deeply or fully convective low mass MS star
+1 Main Sequence star
+2 Hertzsprung Gap
+3 First Giant Branch
+4 Core Helium Burning
+5 First Asymptotic Giant Branch
+6 Second Asymptotic Giant Branch
+7 Main Sequence Naked Helium star
+8 Hertzsprung Gap Naked Helium star
+9 Giant Branch Naked Helium star
+10 Helium White Dwarf
+11 Carbon/Oxygen White Dwarf
+12 Oxygen/Neon White Dwarf
+13 Neutron Star
+14 Black Hole
+15 Massless Supernova
+16 Unknown stellar type
+17 Pre-main-sequence Star
+18 Planet
+19 Brown Dwarf
+```
 
 
 ## References
