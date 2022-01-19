@@ -279,59 +279,6 @@ Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, cor
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
 
 
-
-## TRES development team
-Members of the TRES development team are recommended to work on their own fork on github. To set this up:
-
-0) After installing AMUSE and downloading TRES
-1) First create a fork. Can be done easily on the github webinterface. 
-
-2) Now we have to set up links to the official TRES repository and the forked one. Clone the forked TRES repository, which will be know as ‘origin’
-```
-git clone git@github.com:(name)/TRES.git
-```
-And add a link to the official TRES repository, which will be known as upstream
-```
-git remote add upstream git@github.com:amusecode/TRES.git
-```
-Also to list the current configured remote repositories for your fork:
-```
-git remove -v
-```
-
-
-Example of workflow:
-1) Good practise to work on a new branch
-```
-git checkout -b (branch)
-```
-2) pull all updates from ‘origin’ to current branch
-```
-git pull origin main
-```
-3) pull all updates from upstream to current branch
-```
-git pull upstream main
-```
-4) make the desired changes to TRES
-```
-git add / git commit
-git checkout main / git merge (branch)/ git branch -d (branch)
-```
-5) push changes to your own fork and follow that branch
-```
-git push origin main
-```
-6) If so desired, push changes to the official TRES repository
-```
-git push --set-upstream upstream (branch) 
-```
-
-
-Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
-
-
-
 ## References
 
 See the following publication: [Toonen et al 2016](https://ui.adsabs.harvard.edu/abs/2016ComAC...3....6T/abstract) for more details.
