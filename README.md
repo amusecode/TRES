@@ -268,6 +268,7 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 ## Reducing the TRES output
 
 The python script rdc_TRES.py reduce the TRES hdf output to a txt file keeping only selected parameters. These can be adjusted to your liking in the function rdc(). Currently there are 6 lines for every snapshot. The columns represent:
+
 General information on the system: 
 ```
 Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular
