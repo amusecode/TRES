@@ -310,7 +310,7 @@ The stellar types in TRES follow the standard terminology of AMUSE:
 ```
 
 The binary type is a classification for a specific orbit, e.g. the inner or the outer orbit of a triple. The following options exist:
-'''
+```
 unknown
 merger
 disintegrated
@@ -325,7 +325,7 @@ common_envelope
 common_envelope_energy_balance (i.e. alpha-CE)
 common_envelope_angular_momentum_balance (i.e. gamma-CE)
 double_common_envelope
-'''
+```
 
 
 
