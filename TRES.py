@@ -76,7 +76,8 @@ class Triple_Class:
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
             stop_at_dynamical_instability, stop_at_semisecular_regime,  
-            stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time,
+            stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+            stop_at_CPU_time, max_CPU_time,
             file_name, file_type, dir_plots):
         
         self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
@@ -119,6 +120,8 @@ class Triple_Class:
         self.file_name = file_name
         self.file_type = file_type
         self.SN_kick_distr = SN_kick_distr
+        self.impulse_kick_for_black_holes = impulse_kick_for_black_holes
+        self.fallback_kick_for_black_holes = fallback_kick_for_black_holes
         self.max_CPU_time = max_CPU_time
 
         self.triple = bins[1]
@@ -1619,23 +1622,33 @@ class Triple_Class:
         if star.stellar_type != star.previous_stellar_type and star.stellar_type in stellar_types_SN_remnants:
             if self.SN_kick_distr == 0: 
                 v_kick =  [0.,0.,0.]|units.kms
-            elif self.SN_kick_distr in [1,2]: # Hobbs, Lorimer, Lyne & Kramer, 2005, 360, 974
+            elif self.SN_kick_distr in [1]: # Hobbs, Lorimer, Lyne & Kramer, 2005, 360, 974
                 v_kick = self.kick_velocity_hobbs()
-            elif self.SN_kick_distr in [3,4]: #Arzoumanian ea 2002, 568, 289
+            elif self.SN_kick_distr in [2]: #Arzoumanian ea 2002, 568, 289
                 v_kick = self.kick_velocity_arzoumanian()
-            elif self.SN_kick_distr in [5,6]: #Hansen & Phinney 1997, 291, 569
+            elif self.SN_kick_distr in [3]: #Hansen & Phinney 1997, 291, 569
                 v_kick = self.kick_velocity_hansen()
-            elif self.SN_kick_distr in [7,8]: # Paczynski 1990, 348, 485
+            elif self.SN_kick_distr in [4]: # Paczynski 1990, 348, 485
                 v_kick = self.kick_velocity_paczynski()
-            elif self.SN_kick_distr in [9,10]: # Verbunt, Igoshev & Cator, 2017, 608, 57
+            elif self.SN_kick_distr in [5]: # Verbunt, Igoshev & Cator, 2017, 608, 57
                 v_kick = self.kick_velocity_verbunt()
             else:
                 print("SN kick distribution not specified, assuming no kick")
                 v_kick =  [0.,0.,0.]|units.kms
 
+
+            print(self.impulse_kick_for_black_holes, self.fallback_kick_for_black_holes, v_kick)
             #reduce kick of BH by conservation of momentum
-            if self.SN_kick_distr in [2,4,6,8,10] and star.stellar_type == 14|units.stellar_type:
-                    v_kick *= (kanonical_neutron_star_mass / star.mass)
+            if self.impulse_kick_for_black_holes and star.stellar_type == 14|units.stellar_type:
+                v_kick *= (kanonical_neutron_star_mass / star.mass)
+#                print(star.mass, kanonical_neutron_star_mass)
+            if self.fallback_kick_for_black_holes and star.stellar_type == 14|units.stellar_type:
+                self.channel_from_stellar.copy_attributes(["fallback"]) 
+                v_kick *= (1-star.fallback)
+#                print(star.fallback)
+#                del star.fallback #doesn't work
+#                delattr(star, "fallback")  #doesn't work                
+                    
         return v_kick
 
     def save_mean_anomalies_at_SN(self, inner_mean_anomaly, outer_mean_anomaly, stellar_system = None):
@@ -3194,8 +3207,9 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             stop_at_stable_mass_transfer = True, stop_at_eccentric_stable_mass_transfer = True,
             stop_at_unstable_mass_transfer = False, stop_at_eccentric_unstable_mass_transfer = False,
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
-            stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, stop_at_SN = False,  SN_kick_distr = 2, stop_at_CPU_time = False,
-            max_CPU_time = 3600.0, file_name = "triple.hdf", file_type = "hdf5", dir_plots = ""):
+            stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, 
+            stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
+            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "triple.hdf", file_type = "hdf5", dir_plots = ""):
 
 
     set_printing_strategy("custom", 
@@ -3221,8 +3235,9 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-            stop_at_dynamical_instability, stop_at_semisecular_regime, stop_at_SN, SN_kick_distr, stop_at_CPU_time,
-            max_CPU_time, file_name, file_type, dir_plots)
+            stop_at_dynamical_instability, stop_at_semisecular_regime, 
+            stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+            stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
 
     if triple_class_object.triple.correct_params == False:
@@ -3299,18 +3314,16 @@ def parse_arguments():
 
     #0  No kick 
     #1  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
-    #2  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  scaled down for bh
-    #3  Arzoumanian ea 2002, 568, 289
-    #4  Arzoumanian ea 2002, 568, 289 scaled down for bh
-    #5  Hansen & Phinney 1997, 291, 569
-    #6  Hansen & Phinney 1997, 291, 569 scaled down for bh
-    #7  Paczynski 1990, 348, 485
-    #8  Paczynski 1990, 348, 485 scaled down for bh
-    #9  Verbunt, Igoshev & Cator, 2017, 608, 57
-    #10  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh #default
-    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 10,
+    #2  Arzoumanian ea 2002, 568, 289
+    #3  Hansen & Phinney 1997, 291, 569
+    #4  Paczynski 1990, 348, 485
+    #5  Verbunt, Igoshev & Cator, 2017, 608, 57
+    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
                       help="which supernova kick distribution [%default]")                      
-
+    parser.add_option("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
+    parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick with fallback  [%default]")                      
 
     parser.add_option("-z", dest="metallicity", type="float", default = 0.02,
                       help="metallicity [%default] %unit")

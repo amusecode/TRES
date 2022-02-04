@@ -97,15 +97,11 @@ lib_inner_loan_distr = {0: "Circular niform distribution",
 ##            --stop_at_SN                                  stopping condition at supernova 
 lib_SN_kick_distr = {0: "No kick",
                     1: "Hobbs", #Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974  
-                    2: "Hobbs + momentum rescaling", 
-                    3: "Arzoumanian", #Arzoumanian ea 2002, 568, 289
-                    4: "Arzoumanian + momentum rescaling",
-                    5: "Hansen", #Hansen & Phinney 1997, 291, 569
-                    6: "Hansen + momentum rescaling",
-                    7: "Paczynski", #Paczynski 1990, 348, 485
-                    8: "Paczynski + momentum rescaling",
-                    9: "Verbunt", #Verbunt, Igoshev & Cator, 2017, 608, 57
-                    10: "Verbunt + momentum rescaling",} #default
+                    2: "Arzoumanian", #Arzoumanian ea 2002, 568, 289
+                    3: "Hansen", #Hansen & Phinney 1997, 291, 569
+                    4: "Paczynski", #Paczynski 1990, 348, 485
+                    5: "Verbunt", #Verbunt, Igoshev & Cator, 2017, 608, 57
+                    } #default
 
          
 #not implemented yet
@@ -726,7 +722,8 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
 
     i_n = 0
@@ -788,7 +785,10 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
                     stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
                     stop_at_dynamical_instability = stop_at_dynamical_instability, 
                     stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, stop_at_CPU_time = stop_at_CPU_time,
+                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
+                    impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
+                    fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                    stop_at_CPU_time = stop_at_CPU_time,
                     max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
         if tr.triple.correct_params == False:
@@ -827,7 +827,8 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
     print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
@@ -882,7 +883,8 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
         print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
@@ -1130,8 +1132,12 @@ def parse_arguments():
     parser.add_option("--O_distr", dest="inner_loan_distr", type="int", default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
 
-    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 10,
+    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
                       help="which supernova kick distribution [%default]")                      
+    parser.add_option("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
+    parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick with fallback  [%default]")                      
 
     parser.add_option("-z", unit=units.none, 
                       dest="metallicity", type="float", default = 0.02|units.none,
