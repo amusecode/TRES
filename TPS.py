@@ -164,7 +164,8 @@ class Generate_initial_triple:
     #-------
     #setup stellar system
     def __init__(self, inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_min, outer_mass_min, outer_mass_max,
+                        inner_secondary_mass_max, inner_secondary_mass_min, 
+                        outer_mass_min, outer_mass_max,
                         inner_mass_ratio_max, inner_mass_ratio_min, 
                         outer_mass_ratio_max, outer_mass_ratio_min, 
                         inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
@@ -192,7 +193,7 @@ class Generate_initial_triple:
 
                         else:    
                             self.generate_mass(inner_primary_mass_max, inner_primary_mass_min, 
-                                inner_secondary_mass_min,outer_mass_min,outer_mass_max,
+                                inner_secondary_mass_max,inner_secondary_mass_min,outer_mass_min,outer_mass_max,
                                 inner_mass_ratio_max, inner_mass_ratio_min,
                                 outer_mass_ratio_max, outer_mass_ratio_min, 
                                 inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr)
@@ -220,7 +221,7 @@ class Generate_initial_triple:
 
     #-------                        
     def generate_mass(self, inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_min,outer_mass_min, outer_mass_max,
+                        inner_secondary_mass_max,inner_secondary_mass_min,outer_mass_min, outer_mass_max,
                         inner_mass_ratio_max, inner_mass_ratio_min,
                         outer_mass_ratio_max, outer_mass_ratio_min,  
                         inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr):
@@ -255,7 +256,9 @@ class Generate_initial_triple:
             self.inner_secondary_mass = inner_mass_ratio * self.inner_primary_mass
         else: 
             if inner_mass_ratio_distr == 1:# Kroupa 2001 
-                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass_max)[0]
+                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_secondary_mass_max)[0]
+#                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass_max)[0]
+#                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass)[0]
             else: # flat distribution  
                inner_mass_ratio = flat_distr(max(inner_mass_ratio_min, inner_secondary_mass_min / self.inner_primary_mass), inner_mass_ratio_max)
                self.inner_secondary_mass = inner_mass_ratio * self.inner_primary_mass        
@@ -702,7 +705,7 @@ class Generate_initial_triple:
 
 #-------
 
-def evolve_model(inner_primary_mass_max, inner_primary_mass_min, 
+def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_mass_max, 
                         inner_secondary_mass_min,outer_mass_min,outer_mass_max,
                         inner_mass_ratio_max, inner_mass_ratio_min, 
                         outer_mass_ratio_max, outer_mass_ratio_min, 
@@ -733,7 +736,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
     nr_cp = 0 #number of systems with incorrect parameters
     while i_n < number:
         triple_system = Generate_initial_triple(inner_primary_mass_max, inner_primary_mass_min, 
-                    inner_secondary_mass_min, outer_mass_min, outer_mass_max,
+                    inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max,
                     inner_mass_ratio_max, inner_mass_ratio_min, 
                     outer_mass_ratio_max, outer_mass_ratio_min, 
                     inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
@@ -808,7 +811,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,
 
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
+                        inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
                         inner_mass_ratio_max, inner_mass_ratio_min, 
                         outer_mass_ratio_max, outer_mass_ratio_min, 
                         inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
@@ -864,7 +867,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
 
 
 def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
+                        inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
                         inner_mass_ratio_max, inner_mass_ratio_min, 
                         outer_mass_ratio_max, outer_mass_ratio_min, 
                         inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
@@ -890,8 +893,13 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
         print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
         exit(1)
         
-    if (inner_primary_mass_max < inner_primary_mass_min):
-        print('error: maximum inner primary mass smaller than minimum in primary mass')
+    if (inner_secondary_mass_max > absolute_max_mass) :
+        print('error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']')
+        exit(1)
+
+    
+    if (outer_mass_max > absolute_max_mass) :
+        print('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
         exit(1)
     
 #     if (inner_secondary_mass_min < absolute_min_mass) :
@@ -901,10 +909,18 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
 #         print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
 #         exit(1)
     
-    
-    if (outer_mass_max > absolute_max_mass) :
-        print('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
+    if (inner_primary_mass_max < inner_primary_mass_min):
+        print('error: maximum inner primary mass smaller than minimum in primary mass')
         exit(1)
+
+    if (inner_secondary_mass_max < inner_secondary_mass_min):
+        print('error: maximum inner secondary mass smaller than minimum in secondary mass')
+        exit(1)
+
+    if (outer_mass_max < outer_mass_min):
+        print('error: maximum outer mass smaller than minimum in outer mass')
+        exit(1)
+
 
         
     if (inner_mass_ratio_min < 0.) or (inner_mass_ratio_max > 1.):
@@ -1024,6 +1040,10 @@ def parse_arguments():
     parser.add_option("--m_min", unit=units.MSun, 
                       dest="inner_secondary_mass_min", type="float", default = absolute_min_mass,
                       help="minimum of inner secondary mass [%default]")
+    #only used for inner_mass_ratio_distr == 1:# Kroupa 2001    
+    parser.add_option("--m_max", unit=units.MSun, 
+                      dest="inner_secondary_mass_max", type="float", default = absolute_max_mass,
+                      help="maximum of inner secondary mass [%default]") 
     parser.add_option("--l_min", unit=units.MSun, 
                       dest="outer_mass_min", type="float", default = absolute_min_mass,
                       help="minimum of outer mass [%default]")
