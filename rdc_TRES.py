@@ -42,12 +42,13 @@ def rdc(file_name_root, file_type):
         file_name = file_name_root
 
     triple=read_set_from_file(file_name , file_type)
-    counter = list(enumerate(triple.history))[0][1].number 
+#    counter = list(enumerate(triple.history))[0][1].number 
 
     for i, triple in enumerate(triple.history):
-        if triple[0].number == counter:
-            counter += 1    
-            print('\n\n')
+        print(triple[0].number, triple[0].time)
+#        if triple[0].number == counter:
+#            counter += 1    
+#            print('\n\n')
              
         print(' ')
         print(i, triple[0].time, triple[0].number, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular)
