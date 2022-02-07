@@ -1947,7 +1947,9 @@ class Triple_Class:
 
         self.update_time_derivative_of_radius()
         dt = self.triple.time-self.previous_time
-        dt_new = max(minimum_time_step, min(self.determine_time_step(), 0.9*dt))
+        #crashes for M=1.4Msun: MS hook at stellar type change	
+        #dt_new = max(minimum_time_step, min(self.determine_time_step(), 0.9*dt))
+        dt_new = max(minimum_time_step, 0.5*dt)
         self.stellar_code.particles.recall_memory_one_step()
         self.triple.time += (dt_new - dt)                     
         
