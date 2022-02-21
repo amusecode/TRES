@@ -1734,7 +1734,7 @@ class Triple_Class:
 
 
         if REPORT_SN_EVOLUTION:
-            print('before SN')
+            print('before SN:', self.triple.number) 
             print('\n\ntime:', self.triple.time, self.previous_time, self.triple.time-self.previous_time)
             print('eccentricity:', inner_ecc, outer_ecc)
             print('semi-major axis:', bin.semimajor_axis, self.triple.semimajor_axis)
