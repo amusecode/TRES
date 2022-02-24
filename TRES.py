@@ -307,7 +307,7 @@ class Triple_Class:
         if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
             self.channel_from_stellar.copy_attributes(["gyration_radius"]) 
         if GET_AMC_FROM_STELLAR_CODE:
-            self.channel_from_stellar.copy_attributes(["amc"]) 
+            self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"]) 
 
 
     def setup_secular_code(self, triple_set):
@@ -1979,7 +1979,7 @@ class Triple_Class:
         if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
             self.channel_from_stellar.copy_attributes(["gyration_radius"]) 
         if GET_AMC_FROM_STELLAR_CODE:
-            self.channel_from_stellar.copy_attributes(["amc"]) 
+            self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"]) 
         self.update_stellar_parameters()          
                 
         if nr_unsuccessfull > 1:
@@ -2018,7 +2018,7 @@ class Triple_Class:
             if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
                 self.channel_from_stellar.copy_attributes(["gyration_radius"]) 
             if GET_AMC_FROM_STELLAR_CODE:
-                self.channel_from_stellar.copy_attributes(["amc"]) 
+                self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"]) 
             self.update_stellar_parameters()              
             self.check_RLOF()                    
                     
@@ -2295,7 +2295,7 @@ class Triple_Class:
                 if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
                     self.channel_from_stellar.copy_attributes(["gyration_radius"]) 
                 if GET_AMC_FROM_STELLAR_CODE:
-                    self.channel_from_stellar.copy_attributes(["amc"]) 
+                    self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"]) 
                 self.update_stellar_parameters()     
          
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
@@ -2321,7 +2321,7 @@ class Triple_Class:
                     if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
                         self.channel_from_stellar.copy_attributes(["gyration_radius"]) 
                     if GET_AMC_FROM_STELLAR_CODE:
-                        self.channel_from_stellar.copy_attributes(["amc"]) 
+                        self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"]) 
                     self.update_stellar_parameters()                              
                     self.refresh_memory()                     
                     #note that 'previous' parameters cannot be reset 
