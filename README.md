@@ -29,7 +29,26 @@ This document contains the following parts:
 TRES makes use of the Astrophysical Multipurpose Software Environment (AMUSE) See https://amusecode.github.io/ for how to install AMUSE. 
 Note that for standard TRES usage, the only necessary community code to install is SeBa. 
 
-After compiling AMUSE, TRES needs to be compiled by means of it Makefile as following:
+Thus, after installing the AMUSE pre-requisites, we can simply install the minimal framework and then add SeBa:
+
+```
+
+pip install [--user] amuse-framework
+pip install [--user] amuse-<seba>
+
+```
+
+After compiling AMUSE, TRES needs to be installed and compiled by means of the Makefile as following:
+
+First, clone the TRES github repository:
+
+```
+
+git clone https://github.com/amusecode/TRES.git
+
+```
+
+Then, from the root of the cloned respository compile the Makefile:
 
 ```
 
