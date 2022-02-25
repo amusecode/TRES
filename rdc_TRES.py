@@ -29,10 +29,22 @@ bin_type = {
 
 
 
+lib_print_style = { 0: "TRES standard; selected parameters", #default
+                1: "Full",
+                2: "Readable format",}
 
+def print_particle(particle):
+        if particle.is_star:
+            print(particle)                 
+        else:
+            print(particle) 
+            print_particle(particle.child1)                
+            print_particle(particle.child2)                
        
 
-def rdc(file_name_root, file_type):
+def rdc(file_name_root, file_type, print_style):
+    print(lib_print_style[print_style])
+
     f_type = file_type
     if file_type == "hdf5":
         f_type = "hdf"
@@ -44,21 +56,40 @@ def rdc(file_name_root, file_type):
     triple=read_set_from_file(file_name , file_type)
 #    counter = list(enumerate(triple.history))[0][1].number 
 
+
     for i, triple in enumerate(triple.history):
-        print(triple[0].number, triple[0].time)
+#        print(triple[0].number, triple[0].time)
 #        if triple[0].number == counter:
 #            counter += 1    
 #            print('\n\n')
-             
-        print(' ')
-        print(i, triple[0].time, triple[0].number, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular)
-              
-        print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.is_mt_stable, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
-        print( '|', triple[0].bin_type, triple[0].is_mt_stable, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
-        print( ' st: ',  triple[0].child2.child1.is_donor, triple[0].child2.child1.stellar_type, triple[0].child2.child1.mass,  triple[0].child2.child1.spin_angular_frequency, triple[0].child2.child1.radius, triple[0].child2.child1.core_mass,)
-        print( '|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass, )
-        print( '|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
 
+        if print_style == 2:
+            print(' ')
+            print(i, triple[0].time, triple[0].number, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular)
+                  
+            print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.is_mt_stable, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
+            print( '|', triple[0].bin_type, triple[0].is_mt_stable, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
+            print( ' st: ',  triple[0].child2.child1.is_donor, triple[0].child2.child1.stellar_type, triple[0].child2.child1.mass,  triple[0].child2.child1.spin_angular_frequency, triple[0].child2.child1.radius, triple[0].child2.child1.core_mass,)
+            print( '|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass, )
+            print( '|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
+
+        elif print_style == 1:
+            print_particle(triple[0])
+        
+#            print('triple particle', triple[0])
+#            print('child1', triple[0].child1)
+#            print('child2',triple[0].child2)
+#            print('child2.child1',triple[0].child2.child1)
+#            print('child2.child2',triple[0].child2.child2)
+            exit(0)
+        else:
+
+            print(i, triple[0].time.value_in(units.Myr), triple[0].number, triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), end = '\t')
+            print(bin_type[triple[0].child2.bin_type], int(triple[0].child2.is_mt_stable), triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
+            print(bin_type[triple[0].bin_type], int(triple[0].is_mt_stable), triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
+            print(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
+            print(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t' )
+            print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 
 
 
@@ -68,7 +99,10 @@ def parse_arguments():
     parser.add_option("-f", dest="file_name_root", default = "TRES",
                       help="file name [%default]")                      
     parser.add_option("-F", dest="file_type", default = "hdf5",
-                      help="file type [%default]")  
+                      help="file type [%default]") 
+    parser.add_option("-S", dest="print_style", type="int", default = 0,
+                      help="print style [%default]") 
+                       
 
                       
     options, args = parser.parse_args()

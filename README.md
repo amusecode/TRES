@@ -286,7 +286,26 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 
 ## Reducing the TRES output
 
-The python script rdc_TRES.py reduce the TRES hdf output to a txt file keeping only selected parameters. These can be adjusted to your liking in the function rdc(). Currently there are 6 lines for every snapshot. The columns represent:
+The python script rdc_TRES.py reduce the TRES hdf output. The full list of available options is [default]:
+
+```
+-f      root of the name of the input file [TRES]
+-F      extension of input file [hdf5]
+-S      printing style [0] 
+```
+
+Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
+Currently there are 3 options settable on the command line via -S (print_style):
+```
+0 TRES standard - selected parameters
+1 Full - all possible parameters are printed
+2 Selected parameters are printed in a human readible way
+```
+
+
+
+For option 2: 
+6 lines are printed for every snapshot. The columns represent:
 
 General information on the system: 
 ```
@@ -303,6 +322,11 @@ Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, cor
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
         | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
 ```        
+
+
+For option 0: 
+One line is printed for every snapshot with the parameters in the same order as above. The units are Solar Mass, Solar radius, Myr. 
+
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
