@@ -1496,8 +1496,8 @@ class Triple_Class:
             self.triple.child2.child1.spin_angular_frequency = corotation_spin
             self.triple.child2.child2.spin_angular_frequency = corotation_spin
             
-            if REPORT_DT or REPORT_DEBUG:
-                print('prev timestep', time_step, previous_time_step)
+#            if REPORT_DT or REPORT_DEBUG:
+#                print('prev timestep', time_step, previous_time_step)
             previous_time_step = self.triple.time - self.previous_time
             time_step = min(time_step, maximum_time_step_factor_after_stable_mt*previous_time_step)  
 
