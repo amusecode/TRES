@@ -29,9 +29,9 @@ bin_type = {
 
 
 
-lib_print_style = { 0: "TRES standard; selected parameters", #default
+lib_print_style = { 0: "TRES standard; selected parameters", 
                 1: "Full",
-                2: "Readable format",}
+                2: "Readable format",}#default
 
 def print_particle(particle):
         if particle.is_star:
@@ -100,7 +100,7 @@ def parse_arguments():
                       help="file name [%default]")                      
     parser.add_option("-F", dest="file_type", default = "hdf5",
                       help="file type [%default]") 
-    parser.add_option("-S", dest="print_style", type="int", default = 0,
+    parser.add_option("-S", dest="print_style", type="int", default = 2,
                       help="print style [%default]") 
                        
 
