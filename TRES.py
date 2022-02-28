@@ -55,6 +55,7 @@ time_step_factor_find_RLOF = 0.5
                               # radius grows maximally by error_dr
 time_step_factor_kozai = 0.025 # 0.2*0.1, 0.2-> for error in kozai timescale, 0.1-> 10 steps per cycle
 kozai_type_factor = 10.
+maximum_time_step = np.inf|units.Myr
 
 kanonical_neutron_star_mass = 1.4|units.MSun
 fall_back_mass = 41 |units.MSun
@@ -1511,7 +1512,7 @@ class Triple_Class:
 
 
         time_step = max(time_step, minimum_time_step)  
-#        time_step = min(time_step, 0.01|units.Myr)  
+        time_step = min(time_step, maximum_time_step)  
 
 
 
