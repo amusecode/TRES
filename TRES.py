@@ -2230,6 +2230,9 @@ class Triple_Class:
             moi1_array = []
             moi2_array = []
             moi3_array = []
+            RL1_array = []
+            RL2_array = []
+            RL3_array = []
         
             times_array.append(self.triple.time)
             e_in_array.append(self.triple.child2.eccentricity)
@@ -2253,6 +2256,10 @@ class Triple_Class:
             moi1_array.append(self.triple.child2.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
             moi2_array.append(self.triple.child2.child2.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
             moi3_array.append(self.triple.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
+            RL1, RL2, RL3 = self.secular_code.give_roche_radii(self.triple)
+            RL1_array.append(RL1.value_in(units.RSun))
+            RL2_array.append(RL2.value_in(units.RSun))
+            RL3_array.append(RL3.value_in(units.RSun))
         
         if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
             print('kozai timescale:', self.kozai_timescale(), self.triple.kozai_type, self.tend)
@@ -2448,6 +2455,10 @@ class Triple_Class:
                 moi1_array.append(self.triple.child2.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
                 moi2_array.append(self.triple.child2.child2.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
                 moi3_array.append(self.triple.child1.moment_of_inertia_of_star.value_in(units.RSun**2*units.MSun))
+                RL1, RL2, RL3 = self.secular_code.give_roche_radii(self.triple)
+                RL1_array.append(RL1.value_in(units.RSun))
+                RL2_array.append(RL2.value_in(units.RSun))
+                RL3_array.append(RL3.value_in(units.RSun))
             
                                     
         self.save_snapshot()        
@@ -2471,6 +2482,10 @@ class Triple_Class:
             moi1_array = np.array(moi1_array)
             moi2_array = np.array(moi2_array)
             moi3_array = np.array(moi3_array)
+            RL1, RL2, RL3 = self.secular_code.give_roche_radii(self.triple)
+            RL1_array = np.array(RL1_array)
+            RL2_array = np.array(RL2_array)
+            RL3_array = np.array(RL3_array)
     
             self.plot_data = plot_data_container()
             self.plot_data.times_array = times_array
@@ -2495,6 +2510,10 @@ class Triple_Class:
             self.plot_data.moi1_array = moi1_array
             self.plot_data.moi2_array = moi2_array
             self.plot_data.moi3_array = moi3_array
+            self.plot_data.RL1_array = RL1_array
+            self.plot_data.RL2_array = RL2_array
+            self.plot_data.RL3_array = RL3_array
+            
         
     #-------
 
@@ -2529,6 +2548,9 @@ def plot_function(triple, dir_plots):
     moi1_array = triple.plot_data.moi1_array
     moi2_array = triple.plot_data.moi2_array
     moi3_array = triple.plot_data.moi3_array
+    RL1_array = triple.plot_data.RL1_array
+    RL2_array = triple.plot_data.RL2_array
+    RL3_array = triple.plot_data.RL3_array
     
     f = open(triple.file_name[:-4]+'.txt','w')
     f.write('#' + str(t_max_Myr) + '\n')
@@ -2543,6 +2565,9 @@ def plot_function(triple, dir_plots):
         f.write(str(r1_array[i_p] ) + '\t')
         f.write(str(r2_array[i_p] ) + '\t')
         f.write(str(r3_array[i_p] ) + '\t')
+        f.write(str(RL1_array[i_p] ) + '\t')
+        f.write(str(RL2_array[i_p] ) + '\t')
+        f.write(str(RL3_array[i_p] ) + '\t')
         f.write(str(moi1_array[i_p] ) + '\t')
         f.write(str(moi2_array[i_p] ) + '\t')
         f.write(str(moi3_array[i_p] ) + '\t')
@@ -2577,7 +2602,10 @@ def plot_function(triple, dir_plots):
         print( spin3_array[i_s], end = ' ')  
         print( r1_array[i_s], end = ' ')    
         print( r2_array[i_s], end = ' ')    
-        print( r3_array[i_s], end = ' ')    
+        print( r3_array[i_s], end = ' ')
+        print( RL1_array[i_s], end = ' ')
+        print( RL2_array[i_s], end = ' ')
+        print( RL3_array[i_s], end = ' ')
         print( moi1_array[i_s], end = ' ')   
         print( moi2_array[i_s], end = ' ')   
         print( moi3_array[i_s])   
@@ -2962,7 +2990,21 @@ def plot_function(triple, dir_plots):
     plt.close()
 
 
-
+    RL1_frac = r1_array/RL1_array
+    RL2_frac = r2_array/RL2_array
+    RL3_frac = r3_array/RL3_array
+    plt.plot(times_array_Myr,RL1_frac)
+    plt.plot(times_array_Myr,RL1_frac, '.', label='Primary')
+    plt.plot(times_array_Myr,RL2_frac)
+    plt.plot(times_array_Myr,RL2_frac, '.', label='Secondary')
+    plt.plot(times_array_Myr,RL3_frac)
+    plt.plot(times_array_Myr,RL3_frac, '.', label='Tertiary')
+    plt.xlabel('$t/\mathrm{Myr}$')
+    plt.ylabel('r/RL')
+    plt.legend(fontsize=12)
+    plt.savefig(dir_plots+'rl_frac_time'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
 
 
 #   wind a = ai * Mti/Mt
