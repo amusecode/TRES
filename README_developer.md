@@ -12,11 +12,22 @@ If you are interested in applying changes to the stellar evolution code SeBa, th
 git clone https://github.com/amusecode/amuse.git
 ```
 
-Then, SeBa can be installed with:
+It is important to install the amuse packages using the developer mode. We can do this by typing the following command in the root of the cloned repository:
 
 ```
 pip install -e .
+```
+
+Then, SeBa can be build with:
+
+```
 make seba.code
+```
+
+If instead you wish to build all the community codes that amuse provides, we can write:
+
+```
+python setup.py develop_build
 ```
 
 Now, you should be able to navigate to a directory called "amuse/src/amuse/community/seba", which contains the complete evolution code. To compile the code, write (exluding the comments preceded by a "#"):
@@ -24,11 +35,9 @@ Now, you should be able to navigate to a directory called "amuse/src/amuse/commu
 ```
 make clean
 make               # Here we compile all the C files
-cd src/SeBa/dstar
-make               # Here we make the actual executable file called "SEBA"
 ```
 
-It is very important to know that anytime the code is compiled, the source code will be downloaded again, meaning any changes will be overwritten. To prevent this from happening, we need to comment out a line in the Makefile. In line 47, put a "#" before "download src/SeBa".
+It is very important to know that anytime the code is compiled, the source code will be downloaded again, meaning any changes to SeBa will be overwritten. To prevent this from happening, we need to comment out a line in the Makefile. In line 47, put a "#" before "download src/SeBa".
 
 TRES can simply be installed by cloning the github repository in the terminal:
 
