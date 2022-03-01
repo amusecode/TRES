@@ -44,11 +44,14 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double gyration_radius_star2 = data->gyration_radius_star2; // gyration radius (NOT squared)     
     double gyration_radius_star3 = data->gyration_radius_star3; // gyration radius (NOT squared)             
 
+
     /* !!!!!!!!!!!!!!!!!!!!!!!! */
     /* HARDCODED gyration radii that overwrite the above user-specified gyration radii */
-    gyration_radius_star1 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type1,m1);
-    gyration_radius_star2 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type2,m2);
-    gyration_radius_star3 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type3,m3);
+    //Gabriele
+//   gyration_radius_star1 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type1,m1);
+//   gyration_radius_star2 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type2,m2);
+//   gyration_radius_star3 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type3,m3);
+
     
     double moment_of_inertia_star1 = data->moment_of_inertia_star1;
     double moment_of_inertia_star2 = data->moment_of_inertia_star2;

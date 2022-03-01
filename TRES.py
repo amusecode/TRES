@@ -545,10 +545,9 @@ class Triple_Class:
         if stellar_system.is_star:
             
             if not GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
-                stellar_system.gyration_radius = 0. 
+                stellar_system.gyration_radius = set_gyration_radius(stellar_system.stellar_type, stellar_system.mass)
             if not GET_AMC_FROM_STELLAR_CODE:
                 stellar_system.apsidal_motion_constant = self.apsidal_motion_constant(stellar_system) 
-    
             if stellar_system.core_radius > stellar_system.radius:
                 #can happen very late on the agb before WD formation
                 stellar_system.core_radius = stellar_system.radius                
