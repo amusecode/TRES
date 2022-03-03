@@ -1662,12 +1662,14 @@ class Triple_Class:
                 v_kick *= (kanonical_neutron_star_mass / star.mass)
 #                print(star.mass, kanonical_neutron_star_mass)
             if self.fallback_kick_for_black_holes and star.stellar_type == 14|units.stellar_type:
-                self.channel_from_stellar.copy_attributes(["fallback"]) 
-                v_kick *= (1-star.fallback)
-#                print(star.fallback)
-#                del star.fallback #doesn't work
-#                delattr(star, "fallback")  #doesn't work                
-                    
+#                self.channel_from_stellar.copy_attributes(["fallback"]) 
+#                v_kick *= (1-star.fallback)
+
+                star_in_stellar_code = star.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]                
+                fallback = star_in_stellar_code.get_fallback() 
+                v_kick *= (1-fallback)
+#                print(fallback)                    
+
         return v_kick
 
     def save_mean_anomalies_at_SN(self, inner_mean_anomaly, outer_mean_anomaly, stellar_system = None):
@@ -1731,6 +1733,16 @@ class Triple_Class:
         bin.child1.mass = bin.child1.previous_mass 
         bin.child2.mass = bin.child2.previous_mass
         star.mass = star.previous_mass 
+        
+        #reset the stellar types to before SN 
+        #to get the stellar types correct for the snapshot
+        bin_child1_proper_stellar_type = bin.child1.stellar_type
+        bin_child2_proper_stellar_type = bin.child2.stellar_type
+        star_proper_stellar_type = star.stellar_type
+        
+        bin.child1.stellar_type = bin.child1.previous_stellar_type
+        bin.child2.stellar_type = bin.child2.previous_stellar_type
+        star.stellar_type = star.previous_stellar_type                
  
         self.save_snapshot()                    
  
@@ -1772,6 +1784,10 @@ class Triple_Class:
         bin.child2.mass = bin.child2.previous_mass - dm2
         star.mass = star.previous_mass - dm3
 
+        #reset the stellar types to after SN 
+        bin.child1.stellar_type = bin_child1_proper_stellar_type
+        bin.child2.stellar_type = bin_child2_proper_stellar_type
+        star.stellar_type =  star_proper_stellar_type
 
 
         if REPORT_SN_EVOLUTION:
