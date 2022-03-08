@@ -297,9 +297,9 @@ The python script rdc_TRES.py reduce the TRES hdf output. The full list of avail
 Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
 Currently there are 3 options settable on the command line via -S (print_style):
 ```
-0 TRES standard - selected parameters
-1 Full - all possible parameters are printed
-2 Selected parameters are printed in a human readible way
+0      TRES standard - selected parameters
+1      Full - all possible parameters are printed
+2      Selected parameters are printed in a human readible way
 ```
 
 
@@ -326,7 +326,6 @@ Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, cor
 
 For option 0: 
 One line is printed for every snapshot with the parameters in the same order as above. The units are Solar Mass, Solar radius, Myr. 
-
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
@@ -369,6 +368,18 @@ common_envelope_energy_balance (i.e. alpha-CE)
 common_envelope_angular_momentum_balance (i.e. gamma-CE)
 double_common_envelope
 ```
+
+Do you want to rerun a system in your datafile? No need to copy all the parameters, simply run rdc_TRES.py with two extra parameters: 
+
+```
+--print_init      to print initial conditions for re-running 
+-l                the line number of the first line in your hdf datafile where the system appears
+                  where the stars are on the zero-age main-sequence. 
+``` 
+For example: ```rdc_TRES.py -f TRES.hdf --print_init -l 0```. This will return something like:
+```amuse TRES.py -M 1.3 -m 0.5  -l  0.5 -A 200.0 -a 20000.0 -E 0.1 -e 0.5 -G 0.1 -g 0.5 -I 1.3962634016 ```
+
+
 
 
 
