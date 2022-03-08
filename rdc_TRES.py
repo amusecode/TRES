@@ -61,11 +61,11 @@ def rdc(file_name_root, file_type, print_style, print_init, line_number):
         for i, triple in enumerate(triple.history):
             if i == line_number:
                 print('amuse TRES.py ', end = '' )
-                print('-M', triple[0].child2.child1.mass.value_in(units.MSun), '-m', triple[0].child2.child2.mass.value_in(units.MSun), ' -l ', triple[0].child1.mass.value_in(units.MSun), end = '')
-                print('-A', triple[0].child2.semimajor_axis.value_in(units.RSun), '-a', triple[0].semimajor_axis.value_in(units.RSun), end = '')
-                print('-E', triple[0].child2.eccentricity, '-e', triple[0].eccentricity, end = '')
-                print('-G', triple[0].child2.argument_of_pericenter, '-g', triple[0].argument_of_pericenter, end = '')
-                print('-I', triple[0].relative_inclination, end = '\t')
+                print(' -M ', triple[0].child2.child1.mass.value_in(units.MSun), ' -m ', triple[0].child2.child2.mass.value_in(units.MSun), ' -l ', triple[0].child1.mass.value_in(units.MSun), end = '')
+                print(' -A ', triple[0].child2.semimajor_axis.value_in(units.RSun), ' -a ', triple[0].semimajor_axis.value_in(units.RSun), end = '')
+                print(' -E ', triple[0].child2.eccentricity, ' -e ', triple[0].eccentricity, end = '')
+                print(' -G ', triple[0].child2.argument_of_pericenter, ' -g ', triple[0].argument_of_pericenter, end = '')
+                print(' -I ', triple[0].relative_inclination, end = '\t')
 
         return
 
