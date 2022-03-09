@@ -846,6 +846,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print('Outer aop: \t\t',                    outer_aop_distr, ' ',lib_outer_aop_distr[outer_aop_distr] )        
     print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
     print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
+    print('Metallicity: \t\t',                  '-', ' ', metallicity.value_in(units.none))
     print('\n\n')
     
     print('Stopping conditions:')

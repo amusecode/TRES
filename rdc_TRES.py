@@ -4,6 +4,7 @@ from amuse.io import read_set_from_file
 from amuse.support.console import set_printing_strategy
 import numpy as np
 
+minimum_time_step = 1.e-9 |units.Myr
 
 
 bin_type = {    
@@ -66,6 +67,9 @@ def rdc(file_name_root, file_type, print_style, print_init, line_number):
                 print(' -E ', triple[0].child2.eccentricity, ' -e ', triple[0].eccentricity, end = '')
                 print(' -G ', triple[0].child2.argument_of_pericenter, ' -g ', triple[0].argument_of_pericenter, end = '')
                 print(' -I ', triple[0].relative_inclination, end = '\t')
+                
+                if triple[0].time > minimum_time_step:
+                    print('Warning: these parameters do not represent a system at birth (ZAMS).')
 
         return
 
@@ -117,7 +121,7 @@ def parse_arguments():
                       help="print style [%default]") 
                        
     parser.add_option("--print_init", dest="print_init", action="store_true", default = False, 
-                      help="print initial conditions for re running[%default]")
+                      help="print initial conditions for re running [%default]")
     parser.add_option("-l", dest="line_number", type="int", default = 0,
                       help="line number for printing initial conditions [%default]") #will only do something when print_init = True
 
