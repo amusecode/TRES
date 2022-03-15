@@ -1029,90 +1029,90 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
 
 def parse_arguments():
     parser = OptionParser()
-    parser.add_option("--M_min", unit=units.MSun, 
+    parser.add_option("--M_min", "--M1_min",unit=units.MSun, 
                       dest="inner_primary_mass_min", type="float", default = 1.|units.MSun,
                       help="minimum of inner primary mass [%default]")
-    parser.add_option("--M_max", unit=units.MSun, 
+    parser.add_option("--M_max", "--M1_max",unit=units.MSun, 
                       dest="inner_primary_mass_max", type="float", default = absolute_max_mass,
                       help="maximum of inner primary mass [%default]")
-    parser.add_option("--M_distr", dest="inner_primary_mass_distr", type="int", default = 0,
+    parser.add_option("--M_distr", "--M1_distr",dest="inner_primary_mass_distr", type="int", default = 0,
                       help="inner primary mass distribution [Kroupa]")
 
-    parser.add_option("--m_min", unit=units.MSun, 
+    parser.add_option("--m_min", "--M2_min",unit=units.MSun, 
                       dest="inner_secondary_mass_min", type="float", default = absolute_min_mass,
                       help="minimum of inner secondary mass [%default]")
     #only used for inner_mass_ratio_distr == 1:# Kroupa 2001    
-    parser.add_option("--m_max", unit=units.MSun, 
+    parser.add_option("--m_max", "--M2_max",unit=units.MSun, 
                       dest="inner_secondary_mass_max", type="float", default = absolute_max_mass,
                       help="maximum of inner secondary mass [%default]") 
-    parser.add_option("--l_min", unit=units.MSun, 
+    parser.add_option("--l_min", "--M3_min",unit=units.MSun, 
                       dest="outer_mass_min", type="float", default = absolute_min_mass,
                       help="minimum of outer mass [%default]")
-    parser.add_option("--l_max", unit=units.MSun, 
+    parser.add_option("--l_max", "--M3_max",unit=units.MSun, 
                       dest="outer_mass_max", type="float", default = absolute_max_mass,
                       help="maximum of outer mass [%default]")
                       
-    parser.add_option("--Q_max", dest="inner_mass_ratio_max", type="float", default = 1.0,
+    parser.add_option("--Q_max", "--Qin_max",dest="inner_mass_ratio_max", type="float", default = 1.0,
                       help="maximum of inner mass ratio [%default]")
-    parser.add_option("--Q_min", dest="inner_mass_ratio_min", type="float", default = 0.,
+    parser.add_option("--Q_min", "--Qin_min", dest="inner_mass_ratio_min", type="float", default = 0.,
                       help="minimum of inner mass ratio [%default]")
-    parser.add_option("--Q_distr", dest="inner_mass_ratio_distr", type="int", default = 0,
+    parser.add_option("--Q_distr", "--Qin_distr", dest="inner_mass_ratio_distr", type="int", default = 0,
                       help="inner mass ratio distribution [Flat]")
 
-    parser.add_option("--q_max", dest="outer_mass_ratio_max", type="float", default = 1.0,
+    parser.add_option("--q_max", "--Qout_max", dest="outer_mass_ratio_max", type="float", default = 1.0,
                       help="maximum of outer mass ratio [%default]")
-    parser.add_option("--q_min", dest="outer_mass_ratio_min", type="float", default = 0.,
+    parser.add_option("--q_min", "--Qout_min", dest="outer_mass_ratio_min", type="float", default = 0.,
                       help="minimum of outer mass ratio [%default]")
-    parser.add_option("--q_distr", dest="outer_mass_ratio_distr", type="int", default = 0,
+    parser.add_option("--q_distr", "--Qout_distr", dest="outer_mass_ratio_distr", type="int", default = 0,
                       help="outer mass ratio distribution [Flat]")
 
-    parser.add_option("--A_min", unit=units.RSun,
+    parser.add_option("--A_min", "--Ain_min", unit=units.RSun,
                       dest="inner_semi_min", type="float", 
                       default = 5|units.RSun,
                       help="minimum of inner semi major axis [%default]")
-    parser.add_option("--A_max", unit=units.RSun,
+    parser.add_option("--A_max",  "--Ain_max",unit=units.RSun,
                       dest="inner_semi_max", type="float", 
                       default = 5e6|units.RSun,
                       help="maximum of inner semi major axis [%default]")
-    parser.add_option("--A_distr", dest="inner_semi_distr", type="int", default = 0,
+    parser.add_option("--A_distr",  "--Ain_distr",dest="inner_semi_distr", type="int", default = 0,
                       help="inner semimajor axis distribution [logFlat]")
 
-    parser.add_option("--a_min", unit=units.RSun,
+    parser.add_option("--a_min",  "--Aout_min",unit=units.RSun,
                       dest="outer_semi_min", type="float", 
                       default = 5|units.RSun,
                       help="minimum of outer semi major axis [%default]")
-    parser.add_option("--a_max", unit=units.RSun,
+    parser.add_option("--a_max",  "--Aout_max", unit=units.RSun,
                       dest="outer_semi_max", type="float", 
                       default = 5e6|units.RSun,
                       help="maximum of outer semi major axis [%default]")
-    parser.add_option("--a_distr", dest="outer_semi_distr", type="int", default = 0,
+    parser.add_option("--a_distr",  "--Aout_distr", dest="outer_semi_distr", type="int", default = 0,
                       help="outer semimajor axis distribution [logFlat]")
 
-    parser.add_option("--Ar_min", dest="inner_semi_latus_rectum_min", action="store_true", default = False, 
+    parser.add_option("--Ar_min",  "--Arin_min", dest="inner_semi_latus_rectum_min", action="store_true", default = False, 
                       help="minimum inner semi latus rectrum  [%default] %unit")
-    parser.add_option("--ar_min", dest="outer_semi_latus_rectum_min", action="store_true", default = False, 
+    parser.add_option("--ar_min",  "--Arout_min",dest="outer_semi_latus_rectum_min", action="store_true", default = False, 
                       help="minimum outer semi latus rectrum  [%default] %unit")
-    parser.add_option("--Ar_max", dest="inner_semi_latus_rectum_max", action="store_true", default = False, 
+    parser.add_option("--Ar_max",  "--Arin_max",dest="inner_semi_latus_rectum_max", action="store_true", default = False, 
                       help="maximum inner semi latus rectrum  [%default] %unit")
-    parser.add_option("--ar_max", dest="outer_semi_latus_rectum_max", action="store_true", default = False, 
+    parser.add_option("--ar_max",  "--Arout_max",dest="outer_semi_latus_rectum_max", action="store_true", default = False, 
                       help="maximum outer semi latus rectrum  [%default] %unit")
 
-    parser.add_option("--E_min",
+    parser.add_option("--E_min",  "--Ein_min",
                       dest="inner_ecc_min", type="float", default = 0.,
                       help="minimum of inner eccentricity [%default]")
-    parser.add_option("--E_max",
+    parser.add_option("--E_max",   "--Ein_max",
                       dest="inner_ecc_max", type="float", default = 0.9,
                       help="maximum of inner eccentricity [%default]")
-    parser.add_option("--E_distr", dest="inner_ecc_distr", type="int", default = 0,
+    parser.add_option("--E_distr",   "--Ein_distr", dest="inner_ecc_distr", type="int", default = 0,
                       help="inner eccentricity distribution [Thermal]")
 
-    parser.add_option("--e_min",
+    parser.add_option("--e_min",  "--Eout_min",
                       dest="outer_ecc_min", type="float", default = 0.,
                       help="minimum of outer eccentricity [%default]")
-    parser.add_option("--e_max",
+    parser.add_option("--e_max",  "--Eout_max",
                       dest="outer_ecc_max", type="float", default = 0.9,
                       help="maximum of outer eccentricity [%default]")
-    parser.add_option("--e_distr", dest="outer_ecc_distr", type="int", default = 0,
+    parser.add_option("--e_distr", "--Eout_distr",dest="outer_ecc_distr", type="int", default = 0,
                       help="outer eccentricity distribution [Thermal]")
                       
                       
@@ -1126,31 +1126,31 @@ def parse_arguments():
                       help="relative inclination distribution [Circular uniform]")
 
                       
-    parser.add_option("--G_min",
+    parser.add_option("--G_min",  "--Gin_min",
                       dest="inner_aop_min", type="float", default = -np.pi,
                       help="minimum of inner argument of pericenter [rad] [%default]")
-    parser.add_option("--G_max",
+    parser.add_option("--G_max",  "--Gin_max",
                       dest="inner_aop_max", type="float", default = np.pi,
                       help="maximum of inner argument of pericenter [rad] [%default]")
-    parser.add_option("--G_distr", dest="inner_aop_distr", type="int", default = 0,
+    parser.add_option("--G_distr",   "--Gin_distr",dest="inner_aop_distr", type="int", default = 0,
                       help="inner argument of pericenter distribution [Uniform]")
 
-    parser.add_option("--g_min",
+    parser.add_option("--g_min",  "--Gout_min",
                       dest="outer_aop_min", type="float", default = -np.pi,
                       help="minimum of outer argument of pericenter [rad] [%default]")
-    parser.add_option("--g_max",
+    parser.add_option("--g_max", "--Gout_max",
                       dest="outer_aop_max", type="float", default = np.pi,
                       help="maximum of outer argument of pericenter [rad] [%default]")
-    parser.add_option("--g_distr", dest="outer_aop_distr", type="int", default = 0,
+    parser.add_option("--g_distr",  "--Gout_distr", dest="outer_aop_distr", type="int", default = 0,
                       help="outer argument of pericenter distribution [Uniform]")
                       
-    parser.add_option("--O_min",
+    parser.add_option("--O_min",  "--Oin_min",
                       dest="inner_loan_min", type="float", default = -np.pi,
                       help="minimum of inner longitude of ascending node [rad] [%default]")
-    parser.add_option("--O_max",
+    parser.add_option("--O_max", "--Oin_max",
                       dest="inner_loan_max", type="float", default = np.pi,
                       help="maximum of inner longitude of ascending node [rad] [%default]")
-    parser.add_option("--O_distr", dest="inner_loan_distr", type="int", default = 1,
+    parser.add_option("--O_distr",  "--Oin_distr",dest="inner_loan_distr", type="int", default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
 
     parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
@@ -1160,7 +1160,7 @@ def parse_arguments():
     parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick with fallback  [%default]")                      
 
-    parser.add_option("-z", unit=units.none, 
+    parser.add_option("-z", "-Z",unit=units.none, 
                       dest="metallicity", type="float", default = 0.02|units.none,
                       help="metallicity [%default] %unit")                     
     parser.add_option("-t", "-T", unit=units.Myr, 

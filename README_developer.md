@@ -95,7 +95,7 @@ git push --set-upstream upstream (branch)
 
 Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
 
-### Developement tips & tricks
+### Development tips & tricks
 To receive more output, there are a number of 'REPORT' statements (REPORT_DEBUG, REPORT_DT, REPORT_SN_EVOLUTION, REPORT_TRIPLE_EVOLUTION) that can be set to True on the top of TRES.py. For the most extensive and generic option choose REPORT_DEBUG. This option will also create pdfs a txt file with output at every global (TRES) timestep, as well as create pdf of the time evolution of many parameters. 
 
 To receive more output from SeBa, do the following: in setup_stellar_code(), comment out self.stellar_code = SeBa() and uncomment self.stellar_code = SeBa(redirection='none'). 
@@ -105,6 +105,15 @@ To receive more output from the secular code, there are two options. 1) in setup
 To reduce the global (TRES) timestep (aka get more timestamps in the TRES terminal output, see above) set the maximum_time_step on the top of TRES.py
 
 To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True on the top of TRES.py
+
+To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr: 
+
+```
+amuse TRES.py --initial_time 2.5  
+```
+If you use this option, the stellar masses should reflect the masses on the zero-age main-sequence, while the orbital parameters should reflect values at the specified time. 
+For the moment this only works for pre-mass transfer systems. 
+
 
 
 ### Run TRES on cluster

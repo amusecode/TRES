@@ -78,31 +78,32 @@ assuming AMUSE is loaded in your python.
 ### Input parameters 
 
 The full list of possible input parameters is:
+Depreciated (yet still functioning) parameters are given in {}. 
 
 ```
-        parameter                               unit / default
--M      inner_primary_mass                      in Solar mass
--m      inner secondary mass                    in Solar mass 
--l      outer mass                              in Solar mass
--A      inner semi major axis                   in Solar radius
--a      outer semi major axis                   in Solar radius
--E      inner eccentricity 
--e      outer eccentricity 
--i, -I  relative inclination                    in rad  
--G      inner argument of pericenter            in rad
--g      outer argument of pericenter            in rad
--O      inner longitude of ascending node       in rad
-    (outer longitude of ascending nodes = inner - pi)               
--z      metallicity                             default = 0.02 (Solar)
--t, -T  end time                                in Myr
--N, -n  integer number asigned to the triple    default = 0
-
-
--f      name of output file                     default = TRES
--F      type of output file (hdf5/txt)          default = hdf5
---dir_plots   directory for plots for debugging default = "" (current directory)
-        mode  (aka REPORT_DEBUG == True)
---max_CPU_time   maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
+                  parameter                               unit / default
+--M1    {-M}      inner_primary_mass                      in Solar mass
+--M2    {-m}      inner secondary mass                    in Solar mass 
+--M3    {-l}      outer mass                              in Solar mass
+--Ain   {-A}      inner semi major axis                   in Solar radius
+--Aout  {-a}      outer semi major axis                   in Solar radius
+--Ein   {-E}      inner eccentricity 
+--Eout  {-e}      outer eccentricity 
+-i, -I            relative inclination                    in rad  
+--Gin   {-G}      inner argument of pericenter            in rad
+--Gout  {-g}      outer argument of pericenter            in rad
+--Oin   {-O}      inner longitude of ascending node       in rad
+                  (outer longitude of ascending nodes = inner - pi)               
+-Z      {-z}      metallicity                             default = 0.02 (Solar)
+-t, -T            end time                                in Myr
+-N, -n            integer number asigned to the triple    default = 0
+    
+    
+-f                name of output file                     default = TRES
+-F                type of output file (hdf5/txt)          default = hdf5
+--dir_plots       directory for plots for debugging default = "" (current directory)
+                  mode  (aka REPORT_DEBUG == True)
+--max_CPU_time    maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
                                                 default = 7200 (seconds)
 
 --SN_kick_distr   supernova kick distribution   default = 10
@@ -170,11 +171,12 @@ python TPS.py -n 10 --M_max 5 --M_min 4  --M_distr 0 --A_max 2000 --A_min 200 --
 ```
 
 The full list of options is [default]:
+Depreciated (yet still functioning) parameters are given in {}. 
 ```
 
---M_max    upper limit for the inner primary mass [100 Msun]
---M_min    lower limit for the inner primary mass [0.1 Msun]
---M_distr  mass function option: 
+--M1_max       {--M_max}    upper limit for the inner primary mass [100 Msun]
+--M1_min       {--M_min}    lower limit for the inner primary mass [0.1 Msun]
+--M1_distr     {--M_distr}  mass function option: 
         0: "Kroupa", #default
         1: "Scalo",
         2: "Miller & Scalo",
@@ -182,75 +184,75 @@ The full list of options is [default]:
         4: "Logarithmically flat",
         5: "Eggleton",
         6: "Kroupa for massive stars M>0.5 powerlaw with exp=-2.3",
---Q_max    upper limit for the inner mass ratio [1.]
---Q_min    lower limit for the inner mass ratio [0.]
---Q_distr  inner mass ratio option: 
-        0: "Uniform distribution", #default
+--Qin_max      {--Q_max}    upper limit for the inner mass ratio [1.]
+--Qin_min      {--Q_min}    lower limit for the inner mass ratio [0.]
+--Qin_distr    {--Q_distr}  inner mass ratio option: 
+       0: "Uniform distribution", #default
         1: "Kroupa IMF",
---q_max    upper limit for the outer mass ratio [1.]
---q_min    lower limit for the mass of the outer star [0.]
---q_distr  outer mass ratio option: 
-        0: "Uniform distribution", #default
+--Qout_max     {--q_max}    upper limit for the outer mass ratio [1.]
+--Qout_min     {--q_min}    lower limit for the mass of the outer star [0.]
+--Qout_distr   {--q_distr}  outer mass ratio option: 
+       0: "Uniform distribution", #default
         1: "Kroupa IMF",
---A_max    upper limit for the inner semi-major axis [5e6 RSun]
---A_min    lower limit for the inner semi-major axis [5]
---A_distr  inner semi-major axcis option: 
+--Ain_max      {--A_max}    upper limit for the inner semi-major axis [5e6 RSun]
+--Ain_min      {--A_min}    lower limit for the inner semi-major axis [5]
+--Ain_distr    {--A_distr}  inner semi-major axis option: 
         0: "Log Uniform distribution", #default
         1: "Constant semi-major axis",
         2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
         3: "Lognormal mu = 10^3.5d, sigma = 2.3",
         4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
         5: "Sana et al. 2012",
---a_max    upper limit for the outer semi-major axis [5e6 RSun]
---a_min    lower limit for the outer semi-major axis [5 RSun]
---a_distr  outer semi-major axis option: 
+--Aout_max     {--a_max}    upper limit for the outer semi-major axis [5e6 RSun]
+--Aout_min     {--a_min}    lower limit for the outer semi-major axis [5 RSun]
+--Aout_distr   {--a_distr}  outer semi-major axis option: 
         0: "Log Uniform distribution", #default
         1: "Constant semi-major axis",
         2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
         3: "Lognormal mu = 10^3.5d, sigma = 2.3",
         4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
         5: "Sana et al. 2012",
---E_max    upper limit for the inner eccentricity [1.]
---E_min    lower limit for the inner eccentricity [0.]
---E_distr  inner eccentricity option: 
+--Ein_max      {--E_max}    upper limit for the inner eccentricity [1.]
+--Ein_min      {--E_min}    lower limit for the inner eccentricity [0.]
+--Ein_distr    {--E_distr}  inner eccentricity option: 
         0: "Thermal", #default
         1: "Constant eccentricity",
         2: "Sana et al. 2012 e^-0.45", #-> close binaries
         3: "Flat distribution",
         4: "Powerlaw e^0.5",                                   
---e_max    upper limit for the outer eccentricity [1.]
---e_min    lower limit for the outer eccentricity [0.]
---e_distr  outer eccentricity option: 
+--Eout_max     {--e_max}    upper limit for the outer eccentricity [1.]
+--Eout_min     {--e_min}    lower limit for the outer eccentricity [0.]
+--Eout_distr   {--e_distr}  outer eccentricity option: 
         0: "Thermal", #default
         1: "Constant eccentricity",
         2: "Sana et al. 2012 e^-0.45", #-> close binaries
         3: "Flat distribution",
         4: "Powerlaw e^0.5",
---i_max    upper limit for the relative inclination [pi]
---i_min    lower limit for the relative inclination [0]
---i_distr  relative inclination option: 
+--i_max                     upper limit for the relative inclination [pi]
+--i_min                     lower limit for the relative inclination [0]
+--i_distr                   relative inclination option: 
         0: "Circular uniform distribution", #default
         1: "Constant inclination",
---G_max    upper limit for the inner argument of pericenter [pi]
---G_min    lower limit for the inner argument of pericenter [-pi]
---G_distr  inner argument of pericenter option: r
+--Gin_max      {--G_max}    upper limit for the inner argument of pericenter [pi]
+--Gin_min      {--G_min}    lower limit for the inner argument of pericenter [-pi]
+--Gin_distr    {--G_distr}  inner argument of pericenter option: r
         0: "Uniform distribution", #default
         1: "Constant argument of pericenter",    
---g_max    upper limit for the outer argument of pericenter [pi]
---g_min    lower limit for the outer argument of pericenter [-pi]
---g_distr  outer argument of pericenter option: 
+--Gout_max     {--g_max}    upper limit for the outer argument of pericenter [pi]
+--Gout_min     {--g_min}    lower limit for the outer argument of pericenter [-pi]
+--Gout_distr   {--g_distr}  outer argument of pericenter option: 
         0: "Uniform distribution", #default
         1: "Constant argument of pericenter",     
---O_max    upper limit for the inner longitude of ascending node [pi]
---O_min    lower limit for the inner longitude of ascending node [-pi]
---O_distr  inner longitude of ascending node option: 
+--Oin_max     {--O_max}    upper limit for the inner longitude of ascending node [pi]
+--Oin_min     {--O_min}    lower limit for the inner longitude of ascending node [-pi]
+--Oin_distr   {--O_distr}  inner longitude of ascending node option: 
         0: "Circular niform distribution", 
         1: "Constant longitude of ascending nodes", #default
         (outer longitude of ascending nodes = inner - pi)             
--T or -t   binary end time. [13500 Myr]
--z         metallicity of stars  [0.02 (Solar)] 
--n         number of triples to be simulated  [1]
--N         number of initial triple  [0]
+-T or -t                     binary end time. [13500 Myr]
+-Z              {-z}         metallicity of stars  [0.02 (Solar)] 
+-n                           number of triples to be simulated  [1]
+-N                           number of initial triple  [0]
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:

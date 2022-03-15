@@ -3392,40 +3392,40 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
 def parse_arguments():
     from amuse.units.optparse import OptionParser
     parser = OptionParser()
-    parser.add_option("-M", unit=units.MSun, 
+    parser.add_option("-M", "--M1", unit=units.MSun, 
                       dest="inner_primary_mass", type="float", default = 1.3|units.MSun,
                       help="inner primary mass [%default]")
-    parser.add_option("-m",  unit=units.MSun, 
+    parser.add_option("-m", "--M2", unit=units.MSun, 
                       dest="inner_secondary_mass", type="float", default = 0.5|units.MSun,
                       help="inner secondary mass [%default]")
-    parser.add_option("-l",  unit=units.MSun, 
+    parser.add_option("-l", "--M3", unit=units.MSun, 
                       dest="outer_mass", type="float", default = 0.5|units.MSun,
                       help="outer mass [%default]")
 
-    parser.add_option("-A", unit=units.RSun,
+    parser.add_option("-A", "--Ain",  unit=units.RSun,
                       dest="inner_semimajor_axis", type="float", 
                       default = 200.0 |units.RSun,
                       help="inner semi major axis [%default]")
-    parser.add_option("-a", unit=units.RSun,
+    parser.add_option("-a", "--Aout",unit=units.RSun,
                       dest="outer_semimajor_axis", type="float", 
                       default = 20000.0 |units.RSun,
                       help="outer semi major axis [%default]")
-    parser.add_option("-E",
+    parser.add_option("-E", "--Ein",
                       dest="inner_eccentricity", type="float", default = 0.1,
                       help="inner eccentricity [%default]")
-    parser.add_option("-e",
+    parser.add_option("-e", "--Eout",
                       dest="outer_eccentricity", type="float", default = 0.5,
                       help="outer eccentricity [%default]")
     parser.add_option("-i","-I",
                       dest="relative_inclination", type="float", default = 80.0*np.pi/180.0,
                       help="relative inclination [rad] [%default]")
-    parser.add_option("-G",
+    parser.add_option("-G", "--Gin",
                       dest="inner_argument_of_pericenter", type="float", default = 0.1,
                       help="inner argument of pericenter [rad] [%default]")
-    parser.add_option("-g",
+    parser.add_option("-g","--Gout",
                       dest="outer_argument_of_pericenter", type="float", default = 0.5,
                       help="outer argument of pericenter [rad] [%default]")
-    parser.add_option("-O",
+    parser.add_option("-O", "--Oin",
                       dest="inner_longitude_of_ascending_node", type="float", default = 0.0,
                       help="inner longitude of ascending node [rad] [%default]")
 ##             outer longitude of ascending nodes = inner - pi               
@@ -3447,7 +3447,7 @@ def parse_arguments():
     parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick with fallback  [%default]")                      
 
-    parser.add_option("-z", dest="metallicity", type="float", default = 0.02,
+    parser.add_option("-z", "-Z", dest="metallicity", type="float", default = 0.02,
                       help="metallicity [%default] %unit")
     parser.add_option("-t", "-T", unit=units.Myr, 
                       dest="tend", type="float", default = 5.0 |units.Myr,
