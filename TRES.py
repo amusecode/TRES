@@ -74,7 +74,7 @@ class Triple_Class:
             relative_inclination,
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node, 
-            metallicity, tend, number, maximum_radius_change_factor, 
+            metallicity, tend, tinit, number, maximum_radius_change_factor, 
             stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
@@ -114,13 +114,18 @@ class Triple_Class:
             inner_longitude_of_ascending_node, outer_longitude_of_ascending_node)
 
             
-        self.instantaneous_evolution = False # no secular evolution        
+
+        self.tend = tend 
+        self.tinit = tinit
+        self.previous_time = 0.0|units.yr
+        self.previous_dt = 0.0|units.yr
+        self.instantaneous_evolution = False 
+        if tinit > 0|units.Myr:
+            self.instantaneous_evolution = True # no secular    
+        
         self.maximum_radius_change_factor = maximum_radius_change_factor
         self.fixed_timestep = -1|units.Myr
 
-        self.tend = tend 
-        self.previous_time = 0.0|units.yr
-        self.previous_dt = 0.0|units.yr
         self.file_name = file_name
         self.file_type = file_type
         self.SN_kick_distr = SN_kick_distr
@@ -1424,7 +1429,11 @@ class Triple_Class:
             print("Dt = ", self.stellar_code.particles.time_step, self.tend, self.previous_time)
 
         #maximum time_step            
-        time_step_max = self.tend - self.triple.time        
+        time_step_max = self.tend - self.triple.time      
+        
+        #make sure we hit the timestamp of tinit
+        if self.triple.time < self.tinit:
+            time_step_max = min(time_step_max, self.tinit - self.triple.time)
                                
         # time_step of stellar evolution
         time_step_stellar_code = self.stellar_code.particles.time_step
@@ -1741,15 +1750,21 @@ class Triple_Class:
         bin.child2.mass = bin.child2.previous_mass
         star.mass = star.previous_mass 
         
-        #reset the stellar types to before SN 
-        #to get the stellar types correct for the snapshot
+        #reset parameters to before SN 
+        #to get correct values for the snapshot
         bin_child1_proper_stellar_type = bin.child1.stellar_type
         bin_child2_proper_stellar_type = bin.child2.stellar_type
         star_proper_stellar_type = star.stellar_type
-        
         bin.child1.stellar_type = bin.child1.previous_stellar_type
         bin.child2.stellar_type = bin.child2.previous_stellar_type
         star.stellar_type = star.previous_stellar_type                
+
+        bin_child1_proper_radius = bin.child1.radius
+        bin_child2_proper_radius = bin.child2.radius
+        star_proper_radius = star.radius
+        bin.child1.radius = bin.child1.previous_radius
+        bin.child2.radius = bin.child2.previous_radius
+        star.radius = star.previous_radius                
  
         self.save_snapshot()                    
  
@@ -1796,6 +1811,10 @@ class Triple_Class:
         bin.child2.stellar_type = bin_child2_proper_stellar_type
         star.stellar_type =  star_proper_stellar_type
 
+        bin.child1.radius = bin_child1_proper_radius
+        bin.child2.radius = bin_child2_proper_radius
+        star.radius =  star_proper_radius
+
 
         if REPORT_SN_EVOLUTION:
             print('after SN')
@@ -1826,6 +1845,18 @@ class Triple_Class:
             return False 
 
         self.adjust_spin_after_supernova() 
+
+        #bh spin frequency has no meaning. make sure it doesn't affect the evolution
+        bin.child1.previous_moment_of_inertia_of_star = bin.child1.moment_of_inertia_of_star
+        bin.child2.previous_moment_of_inertia_of_star = bin.child2.moment_of_inertia_of_star
+        star.previous_moment_of_inertia_of_star =  star.moment_of_inertia_of_star
+                
+        if bin.child1.stellar_type in stellar_types_SN_remnants:
+            self.secular_code.parameters.include_spin_radius_mass_coupling_terms_star1 = False
+        if bin.child2.stellar_type in stellar_types_SN_remnants:
+            self.secular_code.parameters.include_spin_radius_mass_coupling_terms_star2 = False
+        if star.stellar_type in stellar_types_SN_remnants:
+            self.secular_code.parameters.include_spin_radius_mass_coupling_terms_star3 = False
 
 
         if self.stop_at_SN:
@@ -2280,7 +2311,7 @@ class Triple_Class:
         self.determine_mass_transfer_timescale()
         self.save_snapshot()  
         while self.triple.time<self.tend: 
-		
+		    
 	    # if the maximum CPU time has been exceeded for the system, stop the evolution and continue with the next system
             end_time = time.time()
             self.triple.CPU_time = end_time - start_time
@@ -2288,6 +2319,7 @@ class Triple_Class:
                 print('stopping conditions maximum CPU time')
                 print("CPU time: ", self.triple.CPU_time)
                 break
+
 		
             if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
                 print('\n\n kozai timescale:', self.kozai_timescale(), self.triple.kozai_type, self.octupole_parameter())
@@ -2305,6 +2337,9 @@ class Triple_Class:
             self.previous_dt = dt         
             if REPORT_DEBUG or REPORT_DT:
                 print('\t time:', self.triple.time, self.previous_time, self.previous_dt)
+                
+            if self.triple.time <self.tinit:
+                self.instantaneous_evolution = True
                             
             #do stellar evolution 
             if not no_stellar_evolution: 
@@ -2367,6 +2402,9 @@ class Triple_Class:
                                                            
             # do secular evolution
             if self.instantaneous_evolution == False:
+                if REPORT_DEBUG:
+                    print('Secular evolution')
+
                 #needed for refreshing memory in case secular finds RLOF    
                 previous_semimajor_axis_in = self.triple.child2.semimajor_axis
                 previous_eccentricity_in = self.triple.child2.eccentricity
@@ -2375,8 +2413,6 @@ class Triple_Class:
                 previous_spin1 = self.triple.child2.child1.spin_angular_frequency
                 previous_spin2 = self.triple.child2.child2.spin_angular_frequency
     
-                if REPORT_DEBUG:
-                    print('Secular evolution')
 
                 self.channel_to_secular.copy()
                 
@@ -3284,8 +3320,8 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             relative_inclination= 80.0*np.pi/180.0,
             inner_argument_of_pericenter= 0.1, outer_argument_of_pericenter= 0.5,
             inner_longitude_of_ascending_node= 0.0,
-            metallicity= 0.02,
-            tend= 5.0 |units.Myr, number = 0, maximum_radius_change_factor = 0.005,
+            metallicity= 0.02, tend= 5.0 |units.Myr, 
+            number = 0, maximum_radius_change_factor = 0.005,
             stop_at_mass_transfer = True, stop_at_init_mass_transfer = True, stop_at_outer_mass_transfer = True,
             stop_at_stable_mass_transfer = True, stop_at_eccentric_stable_mass_transfer = True,
             stop_at_unstable_mass_transfer = False, stop_at_eccentric_unstable_mass_transfer = False,
@@ -3307,13 +3343,16 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
     outer_argument_of_pericenter = float(outer_argument_of_pericenter)
     inner_longitude_of_ascending_node = float(inner_longitude_of_ascending_node)
 
+    tinit = 0|units.Myr
+    
     triple_class_object = Triple_Class(inner_primary_mass, inner_secondary_mass, outer_mass,
             inner_semimajor_axis, outer_semimajor_axis,
             inner_eccentricity, outer_eccentricity,
             relative_inclination,
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node, 
-            metallicity, tend, number, maximum_radius_change_factor,  
+            metallicity, tend, tinit,
+            number, maximum_radius_change_factor,  
             stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
@@ -3413,6 +3452,9 @@ def parse_arguments():
     parser.add_option("-t", "-T", unit=units.Myr, 
                       dest="tend", type="float", default = 5.0 |units.Myr,
                       help="end time [%default] %unit")
+    parser.add_option("--initial_time", unit=units.Myr, 
+                      dest="tinit", type="float", default = 0.0 |units.Myr,
+                      help="initial time [%default] %unit")
     parser.add_option("-N", dest="number", type="int", default = 0,
                       help="number ID of system [%default]")
     parser.add_option("-r", dest="maximum_radius_change_factor", type="float", default = 0.01,
