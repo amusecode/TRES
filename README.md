@@ -336,8 +336,8 @@ The stellar types in TRES follow the standard terminology of AMUSE:
 2 Hertzsprung Gap
 3 First Giant Branch
 4 Core Helium Burning
-5 First Asymptotic Giant Branch
-6 Second Asymptotic Giant Branch
+5 Early Asymptotic Giant Branch
+6 Thermally Pulsating Asymptotic Giant Branch (not used in SeBa -> labelled as 5) 
 7 Main Sequence Naked Helium star
 8 Hertzsprung Gap Naked Helium star
 9 Giant Branch Naked Helium star
