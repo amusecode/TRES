@@ -101,8 +101,9 @@ def nuclear_evolution_timescale(star):
     if star.stellar_type in [0,1,7]|units.stellar_type:
         return (0.1 * star.mass * nucleair_efficiency * constants.c**2 / star.luminosity).in_(units.Gyr)
     elif star.stellar_type in stellar_types_planetary_objects:
-        print('nuclear evolution timescale for planetary objects requested')
-        return np.inf|units.Myr         
+#        print('nuclear evolution timescale for planetary objects requested')
+#        return np.inf|units.Myr         
+        return dynamic_timescale(star)
     else: #t_nuc ~ delta t * R/ delta R, other prescription gave long timescales in SeBa which destables the mass transfer
         if star.time_derivative_of_radius <= (quantities.zero+numerical_error**2)|units.RSun/units.yr:
         #when star is shrinking
@@ -115,7 +116,8 @@ def nuclear_evolution_timescale(star):
 
 def kelvin_helmholds_timescale(star):
     if star.stellar_type in stellar_types_planetary_objects:
-        print('thermal evolution timescale for planetary objects requested')
+#        print('thermal evolution timescale for planetary objects requested')
+        return dynamic_timescale(star)
 
     if REPORT_FUNCTION_NAMES:
         print("KH timescale:", (constants.G*star.mass**2/star.radius/star.luminosity).in_(units.Myr))
@@ -354,7 +356,7 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
     if REPORT_BINARY_EVOLUTION:
         print('donor:', donor.radius, donor.core_radius, Rl_donor_new)
         print('accretor:', accretor.radius, accretor.core_radius, Rl_accretor_new)
-       
+              
     if (donor.core_radius > Rl_donor_new) or (accretor.radius > Rl_accretor_new):
         stopping_condition = perform_inner_merger(bs, donor, accretor, self)
         if not stopping_condition: #stellar interaction
@@ -365,7 +367,7 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
         #check if star changes type     
         donor_in_stellar_code.change_mass(-1*(donor.mass-donor.core_mass+(small_numerical_error|units.MSun)), 0.|units.yr)    
         self.copy_from_stellar()
-
+        
         donor.moment_of_inertia_of_star = self.moment_of_inertia(donor)        
         accretor.moment_of_inertia_of_star = self.moment_of_inertia(accretor)        
 
@@ -384,6 +386,7 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
     self.check_RLOF()       
     if self.has_donor():
         print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.child1.radius, self.triple.child2.child2.radius,self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
+        print(self.triple.child2.child1.core_mass, self.triple.child2.child1.mass-self.triple.child2.child1.core_mass, self.triple.child2.child1.stellar_type)
         print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
         print('after adjust_triple_after_ce_in_inner_binary: RLOF')
         exit(1)
@@ -976,20 +979,23 @@ def perform_stellar_interaction(bs, self):
         
 #-------------------------
 #functions for the stability of mass transfer
-def q_crit(star):
+def q_crit(donor, companion):
     #following Hurley, Tout, Pols 2002
-    if star.stellar_type in [9]|units.stellar_type:
-#    if star.stellar_type in [8,9]|units.stellar_type:
+    if donor.stellar_type in [9]|units.stellar_type:
+#    if donor.stellar_type in [8,9]|units.stellar_type:
         return 0.784
-    elif star.stellar_type in [3,4,5,6]|units.stellar_type:
+    elif donor.stellar_type in [3,4,5,6]|units.stellar_type:
         x=0.3
-        return (1.67-x+2*(star.core_mass/star.mass)**5)/2.13
-    elif star.stellar_type == 0|units.stellar_type:
+        return (1.67-x+2*(donor.core_mass/donor.mass)**5)/2.13
+    elif donor.stellar_type == 0|units.stellar_type:
         return 0.695
-    elif star.stellar_type == 1|units.stellar_type:
+    elif donor.stellar_type == 1|units.stellar_type:
         return 1./0.625 #following claeys et al. 2014 based on de mink et al 2007
-    elif star.stellar_type in stellar_types_compact_objects:#eventhough ns & bh shouldn't be donors... 
+    elif donor.stellar_type in stellar_types_compact_objects:#eventhough ns & bh shouldn't be donors... 
         return 0.628
+    elif donor.stellar_type in [18,19]|units.stellar_type:#planet or brown dwarf. 
+        #metzger et al 2012,425,2778, 
+        return 1. * (donor.radius/self.get_size(companion))**3
     else: #stellar type 2, and 8
         return 3 # high for hg?
         
@@ -1026,12 +1032,12 @@ def mass_transfer_stability(binary, self):
             binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
             binary.is_mt_stable = False    
 
-        elif binary.child1.is_donor and binary.child1.mass > binary.child2.mass*q_crit(binary.child1):
+        elif binary.child1.is_donor and binary.child1.mass > binary.child2.mass*q_crit(binary.child1, binary.child2):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor1>Macc*q_crit ")
             binary.mass_transfer_rate = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
             binary.is_mt_stable = False
-        elif binary.child2.is_donor and binary.child2.mass > binary.child1.mass*q_crit(binary.child2):
+        elif binary.child2.is_donor and binary.child2.mass > binary.child1. qmass*q_crit(binary.child2, binary.child1):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor2>Macc*q_crit ")
             binary.mass_transfer_rate= -1.* binary.child2.mass / dynamic_timescale(binary.child2) 
@@ -1085,7 +1091,7 @@ def mass_transfer_stability(binary, self):
             binary.mass_transfer_rate = -1.* star.mass / dynamic_timescale(star)
             binary.is_mt_stable = False          
             
-        elif star.is_donor and star.mass > self.get_mass(companion)*q_crit(star):
+        elif star.is_donor and star.mass > self.get_mass(companion)*q_crit(star, companion):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor1>Macc*q_crit")
             binary.mass_transfer_rate = -1.* star.mass / dynamic_timescale(star)

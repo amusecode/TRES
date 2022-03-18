@@ -818,6 +818,17 @@ class Triple_Class:
             M1 = self.get_mass(stellar_system.child1)        
             M2 = self.get_mass(stellar_system.child2)
             return M1 + M2 
+
+    def get_size(self, stellar_system = None):
+        if stellar_system == None:
+            stellar_system = self.triple
+
+        if stellar_system.is_star:
+            return stellar_system.radius
+        else:
+            return stellar_system.semimajor_axis
+ 
+
     #-------
 
     #-------
