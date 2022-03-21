@@ -1,4 +1,4 @@
-#used for estimating tidal timestep 
+#not used - file should be removed 
 """
 Routine that calculates the ratio k/T for tidal friction, where k is the apsidal motion constant and T the tidal friction time scale as they appear in Hut (1981; 1981A&A....99..126H).
 The entire routine has been copied directly from c-code that is part of binary_c and converted to Python.
@@ -22,6 +22,11 @@ CHeB=4|units.stellar_type
 HeMS=7|units.stellar_type
 HeWD=10|units.stellar_type
 
+NS=13|units.stellar_type
+BH=14|units.stellar_type
+PREMS=17|units.stellar_type
+PLANET=18|units.stellar_type
+BD=19|units.stellar_type
 
 
 
@@ -46,12 +51,12 @@ def check_for_radiative_damping(stellar_type,mass):
         return False
    
 def check_for_convective_damping(stellar_type):    
-    if stellar_type < HeWD:
+    if stellar_type < HeWD or stellar_type == PREMS:
         return True
     else:
         return False
 
-def tidal_friction_constant(stellar_type,mass,companion_mass,semimajor_axis,radius,convective_envelope_mass,convective_envelope_radius,luminosity,spin_angular_frequency):
+def tidal_friction_constant(stellar_type,mass,companion_mass,semimajor_axis,radius,convective_envelope_mass,convective_envelope_radius,luminosity,spin_angular_frequency, gyration_radius, amc):
     
     USE_RADIATIVE_DAMPING = check_for_radiative_damping(stellar_type,mass)
     USE_CONVECTIVE_DAMPING = check_for_convective_damping(stellar_type)
@@ -87,10 +92,17 @@ def tidal_friction_constant(stellar_type,mass,companion_mass,semimajor_axis,radi
 #        print('convective damping', mass, k_div_T_tides)
         return k_div_T_tides
 
+    elif stellar_type==NS or stellar_type==BH:
+        ### no tides for NS or BH
+        k_div_T_tides = 0      
+#        print('ns/bh tides', k_div_T_tides, stellar_type)
+        return k_div_T_tides      
+    elif stellar_type==PLANET or stellar_type==BD: #based on Fabrycky & Tremaine 2007, appendix
+        T_viscous = 0.001|units.yr
+        return amc/T_viscous
     else: ### degenerate damping -- 1984MNRAS.207..433C ###
         tau_degenerate = 1.3e7 | units.yr 
-        gyration_radius_star1 = set_gyration_radius(stellar_type, mass)
-        k_div_T_tides = (1.0/(3.0*tau_degenerate))*gyration_radius_star1**2*pow(luminosity.value_in(units.LSun)/mass.value_in(units.MSun),5.0/7.0)
+        k_div_T_tides = (1.0/(3.0*tau_degenerate))*gyration_radius**2*pow(luminosity.value_in(units.LSun)/mass.value_in(units.MSun),5.0/7.0)
 #        print('degenerate damping', k_div_T_tides)
 #        print('degenerate damping ', k_div_T_tides, gyration_radius_star1, luminosity.value_in(units.LSun),mass.value_in(units.MSun))
         return k_div_T_tides

@@ -21,6 +21,14 @@ int const CHeB = 4;
 int const HeMS = 7;
 int const HeWD = 10;
 
+int const NS = 13; 
+int const BH = 14;
+int const PREMS = 17;
+int const PLANET = 18;
+int const BD = 19;
+
+
+
 double set_crude_gyration_radii_based_on_stellar_structure(int stellar_type, double mass)
 { 
     //printf("tides in c");
@@ -57,7 +65,7 @@ bool check_for_radiative_damping(int stellar_type, double mass)
 }   
 bool check_for_convective_damping(int stellar_type)
 {
-    if (stellar_type < HeWD)
+    if ((stellar_type < HeWD) || (stellar_type == PREMS))
     {
         return TRUE;
     }
@@ -78,13 +86,15 @@ double compute_k_div_T_tides
     double convective_envelope_radius,
     double luminosity,
     double spin_angular_frequency,
-    double gyration_radius
+    double gyration_radius,
+    double amc
 )
 {
     bool USE_RADIATIVE_DAMPING = check_for_radiative_damping(stellar_type,mass);
     bool USE_CONVECTIVE_DAMPING = check_for_convective_damping(stellar_type);
     double k_div_T_tides;
     
+        
     if (USE_RADIATIVE_DAMPING == TRUE) // radiative damping
     {
         double E2 = 1.592e-09*pow(mass/CONST_MSUN,2.84); // Hurley prescription; Zahn, 1977, A&A, 57, 383 and 1975, A&A, 41, 329
@@ -182,6 +192,19 @@ double compute_k_div_T_tides
 
         return k_div_T_tides;//*100;//*10000;
         }
+    }
+    
+    else if (stellar_type == NS or stellar_type == BH) //no tides for NS or BH
+    {
+        k_div_T_tides = 0;   
+//        printf("ns/bh tidess %g %i \n", k_div_T_tides, stellar_type);   
+        return k_div_T_tides;      
+    }
+    else if (stellar_type == PLANET or stellar_type == BD)  //based on Fabrycky & Tremaine 2007, appendix
+    { 
+        double T_viscous = 0.001/1e6; // in Myr
+//        printf("planet/bd tidess %g %g %i \n", k, T_viscous, stellar_type);   
+        return amc/T_viscous;      
     }
     else // degenerate damping -- 1984MNRAS.207..433C
     {

@@ -336,9 +336,9 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     }
     	
     /* tides quantities */
-    double k_div_T_tides_star1 = compute_k_div_T_tides(stellar_type1,m1,m1_convective_envelope,m2,a_in,R1,R1_convective_envelope,luminosity_star1,spin_angular_frequency1,gyration_radius_star1); // AMC divided by tidal dissipation time-scale
-    double k_div_T_tides_star2 = compute_k_div_T_tides(stellar_type2,m2,m2_convective_envelope,m1,a_in,R2,R2_convective_envelope,luminosity_star2,spin_angular_frequency2,gyration_radius_star2); // AMC divided by tidal dissipation time-scale
-    double k_div_T_tides_star3 = compute_k_div_T_tides(stellar_type3,m3,m3_convective_envelope,m1+m2,a_out,R3,R3_convective_envelope,luminosity_star3,spin_angular_frequency3,gyration_radius_star3); // AMC divided by tidal dissipation time-scale
+    double k_div_T_tides_star1 = compute_k_div_T_tides(stellar_type1,m1,m1_convective_envelope,m2,a_in,R1,R1_convective_envelope,luminosity_star1,spin_angular_frequency1,gyration_radius_star1, AMC_star1); // AMC divided by tidal dissipation time-scale
+    double k_div_T_tides_star2 = compute_k_div_T_tides(stellar_type2,m2,m2_convective_envelope,m1,a_in,R2,R2_convective_envelope,luminosity_star2,spin_angular_frequency2,gyration_radius_star2, AMC_star2); // AMC divided by tidal dissipation time-scale
+    double k_div_T_tides_star3 = compute_k_div_T_tides(stellar_type3,m3,m3_convective_envelope,m1+m2,a_out,R3,R3_convective_envelope,luminosity_star3,spin_angular_frequency3,gyration_radius_star3, AMC_star3); // AMC divided by tidal dissipation time-scale
 
 //    printf("k_div_T %g %g %g \n",k_div_T_tides_star1,k_div_T_tides_star2,k_div_T_tides_star3);
 

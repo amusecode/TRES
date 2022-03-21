@@ -13,5 +13,6 @@ double compute_k_div_T_tides
     double convective_envelope_radius,
     double luminosity,
     double spin_angular_frequency,
-    double gyration_radius
+    double gyration_radius,
+    double amc
 );

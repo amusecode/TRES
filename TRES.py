@@ -1314,7 +1314,7 @@ class Triple_Class:
     
         R_div_a = star.radius/semi        
         spin = star.spin_angular_frequency
-        k_div_T_tides = tidal_friction_constant(star.stellar_type, star.mass, m_comp, semi, star.radius, star.convective_envelope_mass, star.convective_envelope_radius, star.luminosity, spin)
+        k_div_T_tides = tidal_friction_constant(star.stellar_type, star.mass, m_comp, semi, star.radius, star.convective_envelope_mass, star.convective_envelope_radius, star.luminosity, spin, star.gyration_radius, star.apsidal_motion_constant)
         n = corotating_spin_angular_frequency_binary(semi, star.mass, m_comp) # mean orbital angular speed
 
         e_dot = -27.0*(1.0+m_comp/star.mass)*(m_comp/star.mass) * R_div_a**6 * k_div_T_tides * R_div_a**2 *eccentricity* (l**-13.0) * (f_tides3 - 11.0/18.0*(l**3)*f_tides4*(spin/n))
@@ -1470,7 +1470,7 @@ class Triple_Class:
         #tides - ADD ALSO DURING MT
         time_step_tides = np.inf |units.Myr 
 	#interesting alternative, slows down code 
-#         if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:    
+#        if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:    
 #             time_step_tides = self.determine_time_step_tides()  	
                 
         if REPORT_DT or REPORT_DEBUG:
