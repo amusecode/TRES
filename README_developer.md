@@ -49,11 +49,11 @@ git clone https://github.com/amusecode/TRES.git
 Members of the TRES development team are recommended to work on their own fork on github. To set this up:
 
 0) After installing AMUSE and downloading TRES
-1) First create a fork. Can be done easily on the github webinterface. 
+1) First create a fork. Can be done easily on the github webinterface and creates the repository "username/TRES", where the username refers to your git account. 
 
 2) Now we have to set up links to the official TRES repository and the forked one. Clone the forked TRES repository, which will be know as ‘origin’
 ```
-git clone git@github.com:(name)/TRES.git
+git clone git@github.com:(username)/TRES.git
 ```
 And add a link to the official TRES repository, which will be known as upstream
 ```
@@ -61,7 +61,7 @@ git remote add upstream git@github.com:amusecode/TRES.git
 ```
 Also to list the current configured remote repositories for your fork:
 ```
-git remove -v
+git remote -v
 ```
 
 
