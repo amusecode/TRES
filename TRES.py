@@ -1843,6 +1843,8 @@ class Triple_Class:
                 print("Outer orbit dissociated by SN at time = ",self.triple.time) 
             self.triple.bin_type = bin_type['disintegrated']   
 
+	    # When the outer orbit has disintegrated, change its orbital parameters such
+	    # that it has no influence on the inner orbit for the remainder of the simulation
             self.triple.semimajor_axis = 1e100|units.RSun
             self.triple.eccentricity = 0
 
