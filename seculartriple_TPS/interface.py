@@ -1779,8 +1779,9 @@ class SecularTriple(InCodeComponentImplementation):
             print( 'Egg',R_L_eggleton(a_in,m1/m2),R_L_eggleton(a_in,m2/m1),R_L_eggleton(a_out,m3/(m1+m2)))
             print( 'ratios',R_L_star1/R_L_eggleton(a_in,m1/m2),R_L_star2/R_L_eggleton(a_in,m2/m1),R_L_star3/R_L_eggleton(a_out,m3/(m1+m2)))
 
-        return R_L_eggleton(a_in,m1/m2),R_L_eggleton(a_in,m2/m1),R_L_eggleton(a_out,m3/(m1+m2))        
-#        return R_L_star1,R_L_star2,R_L_star3
+#         return R_L_eggleton(a_in,m1/m2),R_L_eggleton(a_in,m2/m1),R_L_eggleton(a_out,m3/(m1+m2))        
+#         return R_L_eggleton(rp_in,m1/m2),R_L_eggleton(rp_in,m2/m1),R_L_eggleton(rp_out,m3/(m1+m2))        
+        return R_L_star1,R_L_star2,R_L_star3
 
     def compute_effect_of_SN_on_triple(self,Vkick_1,Vkick_2,Vkick_3,delta_m_1,delta_m_2,delta_m_3,inner_true_anomaly,outer_true_anomaly):
         triples = self.triples
