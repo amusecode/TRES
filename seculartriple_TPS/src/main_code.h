@@ -177,7 +177,7 @@ int evolve(
     double * R1_output, double * R2_output, double * R3_output,
     double * spin_angular_frequency1_output, double * spin_angular_frequency2_output, double * spin_angular_frequency3_output,
     double * a_in_output, double * a_out_output,
-    double * e_in_output, double * e_out_output,
+    double * e_in_output, double * e_out_output, double * max_delta_e_output,
     double *INCL_in_output, double *INCL_out_output, double *INCL_in_out_output, double * AP_in_output, double * AP_out_output, double *LAN_in_output, double *LAN_out_output,
     double * t_output,
     int * CVODE_flag, int * root_finding_flag
