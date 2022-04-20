@@ -54,6 +54,11 @@ int linear_solver = 0;
 bool check_for_semisecular_regime;
 double check_for_semisecular_regime_parameter = 1.0;
 
+double e_in_prev = 1.0;
+double tracker = 0.0;
+double delta_e_in = 0.0;
+double t_prev = 0.0;
+
 int evolve(
     int stellar_type1, int stellar_type2, int stellar_type3,
     double m1, double m2, double m3,
@@ -84,12 +89,18 @@ int evolve(
     double * R1_output, double * R2_output, double * R3_output,
     double * spin_angular_frequency1_output, double * spin_angular_frequency2_output, double * spin_angular_frequency3_output,
     double * a_in_output, double * a_out_output,
-    double * e_in_output, double * e_out_output,
+    double * e_in_output, double * e_out_output, double * delta_e_in_output,
     double *INCL_in_output, double *INCL_out_output, double *INCL_in_out_output, double * AP_in_output, double * AP_out_output, double *LAN_in_output, double *LAN_out_output,
     double * t_output,
     int * CVODE_flag, int * root_finding_flag
 )
 {
+    extern double delta_e_in;
+    extern double tracker;
+    extern double t_prev;
+    delta_e_in = 0.0;
+    t_prev = 0.0;
+    
     double tiny_double = input_precision;
     if (e_in<=tiny_double) { e_in = tiny_double; }
     if (e_out<=tiny_double) { e_out = tiny_double; }    
@@ -481,7 +492,9 @@ int evolve(
         *LAN_in_output = Ith(yev_out,5);
         *LAN_out_output = Ith(yev_out,6);
         *a_in_output = Ith(yev_out,7);
-        *a_out_output = Ith(yev_out,8);        
+        *a_out_output = Ith(yev_out,8);
+        
+        *delta_e_in_output = delta_e_in;
 
         if (*e_in_output<=tiny_double) { *e_in_output = tiny_double; }
         if (*e_out_output<=tiny_double) { *e_out_output = tiny_double; }    

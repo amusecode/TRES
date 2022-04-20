@@ -194,7 +194,38 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
 	double e_in = 1.0 - pow(10.0,x);
 	double e_out = 1.0 - pow(10.0,y);
+    
+    /*  track the positive changes in eccentricity to obtain
+     *  the largest Kozai-Lidov amplitude
+     */
+    
+    extern double e_in_prev;
+    extern double tracker;
+    extern double delta_e_in;
+    extern double t_prev;
 
+    double diff = e_in - e_in_prev;
+    
+    if (t >= t_prev) {
+        if (diff >= -1.0e-5) {
+            tracker += diff;
+            if (tracker > delta_e_in) {
+                delta_e_in = tracker;
+            }
+        }
+        else {
+            if (tracker > delta_e_in) {
+                delta_e_in = tracker;
+            }
+            tracker = 0;
+        }
+    }
+    else{
+        tracker += diff;
+    }
+    t_prev = t;
+    e_in_prev = e_in;
+ 
     /* in the case that the tertiary is not to be taken into account (ignore_tertiary == TRUE),
      * several quantities should still be set to some arbitrary, nonzero value in order to avoid nans at various instances
      * this does not affect the values of the quantities outside of this function,

@@ -141,6 +141,8 @@ class Triple_Class:
         self.triple.number = number 
         self.triple.error_flag_secular = 0
         self.triple.CPU_time = 0.0
+        self.triple.child2.delta_e_in = 0.0
+        self.triple.child2.max_delta_e_in = 0.0
             
         self.setup_stellar_code(metallicity, stars)
         self.setup_secular_code(self.triple.as_set())      
@@ -1196,7 +1198,9 @@ class Triple_Class:
             self.set_parents(parents)
 
         else:
-            write_set_to_file(self.triple.as_set(), self.file_name, self.file_type, version='2.0', append_to_file=True) 
+            write_set_to_file(self.triple.as_set(), self.file_name, self.file_type, version='2.0', append_to_file=True)
+            
+        self.triple.child2.max_delta_e_in = 0
 
     #some minor parameters are missing:
 #        self.instantaneous_evolution = False 
@@ -2256,7 +2260,12 @@ class Triple_Class:
                 print("Error in secular code at time = ",self.triple.time)
                 print(self.triple.error_flag_secular)
             return False
-        return True                
+        return True
+        
+    def calculate_maximum_change_eccentricity(self):
+        if self.triple.child2.delta_e_in > self.triple.child2.max_delta_e_in:
+            self.triple.child2.max_delta_e_in = self.triple.child2.delta_e_in
+            
             
 #-------------------------    
 
@@ -2290,6 +2299,7 @@ class Triple_Class:
             RL1_array = []
             RL2_array = []
             RL3_array = []
+            delta_e_in_array = []
         
             times_array.append(self.triple.time)
             e_in_array.append(self.triple.child2.eccentricity)
@@ -2317,6 +2327,7 @@ class Triple_Class:
             RL1_array.append(RL1.value_in(units.RSun))
             RL2_array.append(RL2.value_in(units.RSun))
             RL3_array.append(RL3.value_in(units.RSun))
+            delta_e_in_array.append(self.triple.child2.delta_e_in)
         
         if REPORT_TRIPLE_EVOLUTION or REPORT_DEBUG:
             print('kozai timescale:', self.kozai_timescale(), self.triple.kozai_type, self.tend)
@@ -2481,8 +2492,8 @@ class Triple_Class:
                     print('skip secular')
                 self.secular_code.model_time = self.triple.time
                 self.instantaneous_evolution = False
-            
-
+                
+            self.calculate_maximum_change_eccentricity()
 
 
             if REPORT_DEBUG:
@@ -2513,7 +2524,7 @@ class Triple_Class:
                 RL1_array.append(RL1.value_in(units.RSun))
                 RL2_array.append(RL2.value_in(units.RSun))
                 RL3_array.append(RL3.value_in(units.RSun))
-            
+                delta_e_in_array.append(self.triple.child2.delta_e_in)
                                     
         self.save_snapshot()        
             
@@ -2567,6 +2578,7 @@ class Triple_Class:
             self.plot_data.RL1_array = RL1_array
             self.plot_data.RL2_array = RL2_array
             self.plot_data.RL3_array = RL3_array
+            self.plot_data.delta_e_in_array = delta_e_in_array
             
         
     #-------
@@ -2605,6 +2617,7 @@ def plot_function(triple, dir_plots):
     RL1_array = triple.plot_data.RL1_array
     RL2_array = triple.plot_data.RL2_array
     RL3_array = triple.plot_data.RL3_array
+    delta_e_in_array = triple.plot_data.delta_e_in_array
     
     f = open(triple.file_name[:-4]+'.txt','w')
     f.write('#' + str(t_max_Myr) + '\n')
@@ -2634,6 +2647,7 @@ def plot_function(triple, dir_plots):
         f.write(str(g_out_array[i_p] ) + '\t')
         f.write(str(e_out_array[i_p] ) + '\t')
         f.write(str(o_out_array[i_p] ) + '\t')
+        f.write(str(delta_e_in_array[i_p] ) + '\t')
         f.write('\n')
     f.close()
     
@@ -2662,7 +2676,8 @@ def plot_function(triple, dir_plots):
         print( RL3_array[i_s], end = ' ')
         print( moi1_array[i_s], end = ' ')   
         print( moi2_array[i_s], end = ' ')   
-        print( moi3_array[i_s])   
+        print( moi3_array[i_s], end = ' ')
+        print( delta_e_in_array[i_s])
     
     
             
@@ -3057,6 +3072,15 @@ def plot_function(triple, dir_plots):
     plt.ylabel('r/RL')
     plt.legend(fontsize=12)
     plt.savefig(dir_plots+'rl_frac_time'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
+    
+    
+    plt.plot(times_array_Myr,delta_e_in_array)
+    plt.plot(times_array_Myr,delta_e_in_array, '.')
+    plt.xlabel('$t/\mathrm{Myr}$')
+    plt.ylabel('$\Delta e_{\mathrm{in}}$')
+    plt.savefig(dir_plots+'delta_e_in_time'+generic_name+'.pdf')
 #    plt.show()
     plt.close()
 
