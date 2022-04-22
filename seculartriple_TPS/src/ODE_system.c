@@ -1079,6 +1079,8 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     double rp_in = a_in*(1.0 - e_in);
     double rp_out = a_out*(1.0 - e_out);
     
+    int roche_radius_specification = data->roche_radius_specification;
+    
     if (check_for_dynamical_stability == TRUE)
     {
         /*	check for dynamical stability */
@@ -1113,12 +1115,10 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         double f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse;
         double f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse;
         
-        double roche_radius_pericenter_inner_star1 = roche_radius_pericenter_eggleton(rp_in, m1/m2) /rp_in*a_in;        
-//        double roche_radius_pericenter_inner_star1 = roche_radius_pericenter_sepinsky(rp_in, m1/m2, e_in, f1);
+        double roche_radius_pericenter_inner_star1 = roche_radius(rp_in, m1/m2, e_in, f1, roche_radius_specification);
         gout[3] = R1 - roche_radius_pericenter_inner_star1;
 
-        double roche_radius_pericenter_inner_star2 = roche_radius_pericenter_eggleton(rp_in, m2/m1)/rp_in*a_in;        
-//        double roche_radius_pericenter_inner_star2 = roche_radius_pericenter_sepinsky(rp_in, m2/m1, e_in, f2);
+        double roche_radius_pericenter_inner_star2 = roche_radius(rp_in, m2/m1, e_in, f2, roche_radius_specification);
 
         gout[4] = R2 - roche_radius_pericenter_inner_star2;
     }
@@ -1129,8 +1129,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         double spin_angular_frequency_outer_orbit_periapse = sqrt( CONST_G*(m1+m2+m3)*(1.0+e_out)/(rp_out*rp_out*rp_out) );        
         double f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse;
         
-        double roche_radius_pericenter_outer_star3 = roche_radius_pericenter_eggleton(rp_out, m3/(m1+m2))/rp_out*a_out;        
-//        double roche_radius_pericenter_outer_star3 = roche_radius_pericenter_sepinsky(rp_out, m3/(m1+m2), e_out, f3);
+        double roche_radius_pericenter_outer_star3 = roche_radius(rp_out, m3/(m1+m2), e_out, f3, roche_radius_specification);
         gout[5] = R3 - roche_radius_pericenter_outer_star3;
     }            
     
@@ -1234,6 +1233,21 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
 }
 
 
+
+double roche_radius(double rp, double q, double e, double f, int roche_radius_specification)
+{   
+    
+    if (roche_radius_specification == 1){ //printf("roche radius of sepinsky \n");
+        return roche_radius_pericenter_sepinsky(rp, q, e, f);}
+    else if (roche_radius_specification == 2){ //printf("classical roche radius of eggleton for circular binaries \n");  
+        return roche_radius_pericenter_eggleton(rp/(1.-e), q);} 
+    else { //printf("roche radius of eggleton with eccentricity factor \n");
+    return roche_radius_pericenter_eggleton(rp, q);}
+
+}
+
+
+
 double roche_radius_pericenter_eggleton(double rp, double q)
 {
     /* 2007ApJ...660.1624S Eqs. (45) */    
@@ -1242,6 +1256,7 @@ double roche_radius_pericenter_eggleton(double rp, double q)
     double q_pow_two_third = q_pow_one_third*q_pow_one_third;
     return rp*0.49*q_pow_two_third/(0.6*q_pow_two_third + log(1.0 + q_pow_one_third));
 }
+
 double roche_radius_pericenter_sepinsky(double rp, double q, double e, double f)
 {
     /* 2007ApJ...660.1624S Eqs. (47)-(52) */

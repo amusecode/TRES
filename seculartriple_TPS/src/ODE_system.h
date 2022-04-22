@@ -27,4 +27,5 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
 
 double roche_radius_pericenter_eggleton(double rp, double q);
 double roche_radius_pericenter_sepinsky(double rp, double q, double e, double f);
+double roche_radius(double rp, double q, double e, double f, int roche_radius_specification);
 

@@ -25,6 +25,7 @@
 
 /*	interface parameters	*/
 int equations_of_motion_specification = 0;
+int roche_radius_specification = 0;
 bool check_for_dynamical_stability;
 bool check_for_inner_collision,check_for_outer_collision;
 bool check_for_inner_RLOF,check_for_outer_RLOF;
@@ -152,6 +153,7 @@ int evolve(
     data->R2_convective_envelope = R2_convective_envelope;
     data->R3_convective_envelope = R3_convective_envelope;
 
+
     data->include_quadrupole_terms = include_quadrupole_terms;
     data->include_octupole_terms = include_octupole_terms;    
     data->include_1PN_inner_terms = include_1PN_inner_terms;
@@ -218,6 +220,7 @@ int evolve(
     data->inner_spin_angular_momentum_wind_accretion_efficiency_child1_to_child2 = inner_spin_angular_momentum_wind_accretion_efficiency_child1_to_child2;
     data->inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1 = inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1;    
 
+    data->roche_radius_specification = roche_radius_specification;
     data->check_for_dynamical_stability = check_for_dynamical_stability;
     data->check_for_inner_collision = check_for_inner_collision;
     data->check_for_outer_collision = check_for_outer_collision;
@@ -598,6 +601,16 @@ int get_equations_of_motion_specification(int *value)
 int set_equations_of_motion_specification(int value)
 {
     equations_of_motion_specification = value;
+    return 0;
+}
+int get_roche_radius_specification(int *value)
+{
+    *value = roche_radius_specification;
+    return 0;
+}
+int set_roche_radius_specification(int value)
+{
+    roche_radius_specification = value;
     return 0;
 }
 int get_relative_tolerance(double *value)

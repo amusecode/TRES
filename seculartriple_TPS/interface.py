@@ -301,14 +301,14 @@ class SecularTripleInterface(CodeInterface):
         function.result_type = 'float64'
         return function
 
-
     @legacy_function
-    def roche_radius_pericenter_sepinsky():
+    def roche_radius():
         function = LegacyFunctionSpecification()
         function.addParameter('rp', dtype='float64', direction=function.IN)
         function.addParameter('q', dtype='float64', direction=function.IN)
         function.addParameter('e', dtype='float64', direction=function.IN)
         function.addParameter('f', dtype='float64', direction=function.IN)
+        function.addParameter('roche_radius_specification', dtype='int32', direction=function.IN)
         function.result_type = 'float64'
         return function
 
@@ -405,6 +405,20 @@ class SecularTripleInterface(CodeInterface):
 
     @legacy_function
     def set_equations_of_motion_specification():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='int32',direction=function.IN,description = "...")
+        function.result_type = 'int32'
+        return function
+
+    @legacy_function
+    def get_roche_radius_specification():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='int32',direction=function.OUT,description = "...")
+        function.result_type = 'int32'
+        return function
+
+    @legacy_function
+    def set_roche_radius_specification():
         function = LegacyFunctionSpecification()
         function.addParameter('value', dtype='int32',direction=function.IN,description = "...")
         function.result_type = 'int32'
@@ -899,6 +913,13 @@ class SecularTriple(InCodeComponentImplementation):
             default_value = 0
         )
         object.add_method_parameter(
+            "get_roche_radius_specification",
+            "set_roche_radius_specification",
+            "roche_radius_specification",
+            "roche_radius_specification",
+            default_value = 0
+        )
+        object.add_method_parameter(
             "get_check_for_dynamical_stability",
             "set_check_for_dynamical_stability",
             "check_for_dynamical_stability",
@@ -1387,12 +1408,13 @@ class SecularTriple(InCodeComponentImplementation):
 
 
         object.add_method(
-            "roche_radius_pericenter_sepinsky",
+            "roche_radius",
             (
                 unit_l,                     ### rp
                 object.NO_UNIT,             ### q
                 object.NO_UNIT,             ### e
                 object.NO_UNIT,             ### f
+                object.NO_UNIT,             ### roche_radius_specification
             ),
             (
                 unit_l,                     ### Roche radius
@@ -1427,6 +1449,16 @@ class SecularTriple(InCodeComponentImplementation):
         )
         object.add_method(
             "set_equations_of_motion_specification",
+            (object.NO_UNIT, ),
+            (object.ERROR_CODE,)
+        )
+        object.add_method(
+            "get_roche_radius_specification",
+            (),
+            (object.NO_UNIT, object.ERROR_CODE,)
+        )
+        object.add_method(
+            "set_roche_radius_specification",
             (object.NO_UNIT, ),
             (object.ERROR_CODE,)
         )
@@ -1768,23 +1800,11 @@ class SecularTriple(InCodeComponentImplementation):
         f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse
         f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse      
 
-        R_L_star1 = self.roche_radius_pericenter_sepinsky(rp_in,m1/m2,e_in,f1)
-        R_L_star2 = self.roche_radius_pericenter_sepinsky(rp_in,m2/m1,e_in,f2)
-        R_L_star3 = self.roche_radius_pericenter_sepinsky(rp_out,m3/(m1+m2),e_out,f3)
+        R_L_star1 = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
+        R_L_star2 = self.roche_radius(rp_in,m2/m1,e_in,f2, self.parameters.roche_radius_specification)
+        R_L_star3 = self.roche_radius(rp_out,m3/(m1+m2),e_out,f3, self.parameters.roche_radius_specification)
                         
-        if 1==0: ### test with circular & synchronous orbits: compare to Eggleton
-            f1=f2=f3=1.0
-            e_in=e_out=0.0
-            rp_in = a_in*(1.0-e_in)
-            rp_out = a_out*(1.0-e_out)
-            
-            print( 'R_Ls',R_L_star1,R_L_star2,R_L_star3)
-            print( 'Egg',R_L_eggleton(a_in,m1/m2),R_L_eggleton(a_in,m2/m1),R_L_eggleton(a_out,m3/(m1+m2)))
-            print( 'ratios',R_L_star1/R_L_eggleton(a_in,m1/m2),R_L_star2/R_L_eggleton(a_in,m2/m1),R_L_star3/R_L_eggleton(a_out,m3/(m1+m2)))
-
-#        return R_L_eggleton(a_in,m1/m2),R_L_eggleton(a_in,m2/m1),R_L_eggleton(a_out,m3/(m1+m2))        
-        return R_L_eggleton(rp_in,m1/m2),R_L_eggleton(rp_in,m2/m1),R_L_eggleton(rp_out,m3/(m1+m2))        
-#        return R_L_star1,R_L_star2,R_L_star3
+        return R_L_star1,R_L_star2,R_L_star3
 
     def compute_effect_of_SN_on_triple(self,Vkick_1,Vkick_2,Vkick_3,delta_m_1,delta_m_2,delta_m_3,inner_true_anomaly,outer_true_anomaly):
         triples = self.triples
@@ -1910,10 +1930,6 @@ def print_CVODE_output(self,CVODE_flag):
             message = "unknown error."
         print( "SecularTriple -- unrecoverable error occurred during secular integration (CVODE_flag ",str(CVODE_flag),"): ",message)
 
-def R_L_eggleton(a,q):
-    q_pow_one_third = pow(q,1.0/3.0)
-    q_pow_two_third = q_pow_one_third*q_pow_one_third
-    return a*0.49*q_pow_two_third/(0.6*q_pow_two_third + numpy.log(1.0 + q_pow_one_third))
 
 def give_binaries_and_stars(self,triple):
     ### the 'old' method ###

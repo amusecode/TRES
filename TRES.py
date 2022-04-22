@@ -333,6 +333,9 @@ class Triple_Class:
 #        self.secular_code.parameters.verbose = True
         
         self.secular_code.parameters.equations_of_motion_specification = 0
+        self.secular_code.parameters.roche_radius_specification = 0
+        #0: eccentric eggleton, 1: sepinsky, 2: classical circular eggleton
+
         self.secular_code.parameters.include_quadrupole_terms = True
         self.secular_code.parameters.include_octupole_terms = True        
         self.secular_code.parameters.include_inner_wind_terms = True
@@ -371,7 +374,6 @@ class Triple_Class:
 #        self.secular_code.parameters.relative_tolerance = 1.0e-10
 #        self.secular_code.parameters.threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero = 1.0e-12
         self.secular_code.parameters.threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero = 1.0e-7|units.Myr**-1
-
 
         self.secular_code.parameters.include_linear_mass_change = True #needed for Jspin conservation
         self.secular_code.parameters.include_linear_radius_change = True #needed for Jspin conservation

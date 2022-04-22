@@ -118,6 +118,7 @@ typedef struct {
     bool check_for_inner_collision,check_for_outer_collision;
     bool check_for_inner_RLOF,check_for_outer_RLOF;
     bool include_linear_mass_change,include_linear_radius_change;
+    int roche_radius_specification;
     
     
     /* addition Jan 2017 */
@@ -190,6 +191,8 @@ int get_threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequ
 int set_threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero(double value);
 int get_equations_of_motion_specification(int *value);
 int set_equations_of_motion_specification(int value);
+int get_roche_radius_specification(int *value);
+int set_roche_radius_specification(int value);
 int get_input_precision(double *input_precision_t);
 int set_input_precision(double input_precision_t);
 int get_linear_solver(int *linear_solver_t);
