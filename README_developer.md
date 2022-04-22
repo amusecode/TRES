@@ -114,11 +114,11 @@ amuse TRES.py --initial_time 2.5
 If you use this option, the stellar masses should reflect the masses on the zero-age main-sequence, while the orbital parameters should reflect values at the specified time. 
 For the moment this only works for pre-mass transfer systems. 
 
-To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code. 
+To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code to 0, 1, or 2: 
 ```
-0 Roche radius based on Eggleton's formula using the pericenter distance (i.e. including eccentricity factor)  [default]
-1 Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
-2 Roche radius based on Eggleton's classical formula. Watch out this is only valid for circularized & synchronised systems
+0  Roche radius based on Eggleton's formula using the pericenter distance (i.e. including eccentricity factor)  [default]
+1  Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
+2  Roche radius based on Eggleton's classical formula. Watch out this is only valid for circularized & synchronised systems
 ```
 
 ### Run TRES on cluster
