@@ -96,17 +96,60 @@ git push --set-upstream upstream (branch)
 Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
 
 ### Development tips & tricks
-To receive more output, there are a number of 'REPORT' statements (REPORT_DEBUG, REPORT_DT, REPORT_SN_EVOLUTION, REPORT_TRIPLE_EVOLUTION) that can be set to True on the top of TRES.py. For the most extensive and generic option choose REPORT_DEBUG. This option will also create pdfs a txt file with output at every global (TRES) timestep, as well as create pdf of the time evolution of many parameters. 
+1) TRES makes use of object oriented programming. The structure of the object is as follows:
+```
+- self contains simulations parameters such as the initial and final time
+- self.triple contains general parameters such as the time, the ID number 
+- self.triple can have 1 or 2 children. Each child can have 1 or 2 children. 
+- a child is either a star with parameters such as mass or radius, or a binary system with parameters such as semimajoraxis and eccentricity.
+- By default TRES starts the simulations with the structure below. 
+
+
+           Default triple 
+==============================================
+|                  self                      |                 
+|                   |                        | 
+|               self.triple                  |                 
+|                |      |                    | 
+|                |   self.triple.child1      |         
+|         self.triple.child2                 | 
+|              |      |                      | 
+|              |  self.triple.child2.child1  |  
+| self.triple.child2.child2                  | 
+==============================================
+
+where self.triple.child1 is the tertiary star, and self.triple.child2.child1 & self.triple.child2.child2 the inner two stars. self.triple.child 2 itself represents the inner binary, while self.triple the outer binary. 
+If the triple experiences a merger, and reduces to a binary system, the structure becomes: 
+
+
+               Binary
+==============================================
+|                self                        |              
+|                  |                         | 
+|              self.triple                   |                
+|               |      |                     | 
+|               |   self.triple.child1       |        
+|        self.triple.child2                  | 
+==============================================
+
+where self.triple.child1 and self.triple.child2 are two stars and self.triple represents the binary. 
+
+```
+
+
+
+
+2) To receive more output, there are a number of 'REPORT' statements (REPORT_DEBUG, REPORT_DT, REPORT_SN_EVOLUTION, REPORT_TRIPLE_EVOLUTION) that can be set to True on the top of TRES.py. For the most extensive and generic option choose REPORT_DEBUG. This option will also create pdfs a txt file with output at every global (TRES) timestep, as well as create pdf of the time evolution of many parameters. 
 
 To receive more output from SeBa, do the following: in setup_stellar_code(), comment out self.stellar_code = SeBa() and uncomment self.stellar_code = SeBa(redirection='none'). 
 
 To receive more output from the secular code, there are two options. 1) in setup_secular_code(), comment out self.stellar_code = SecularTriple() and uncomment self.stellar_code = SecularTriple(redirection='none'). 2) in setup_secular_code(), set self.secular_code.parameters.verbose to True. 
 
-To reduce the global (TRES) timestep (aka get more timestamps in the TRES terminal output, see above) set the maximum_time_step on the top of TRES.py
+3) To reduce the global (TRES) timestep (aka get more timestamps in the TRES terminal output, see above) set the maximum_time_step on the top of TRES.py
 
-To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True on the top of TRES.py
+4) To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True on the top of TRES.py
 
-To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr: 
+5) To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr: 
 
 ```
 amuse TRES.py --initial_time 2.5  
@@ -114,7 +157,7 @@ amuse TRES.py --initial_time 2.5
 If you use this option, the stellar masses should reflect the masses on the zero-age main-sequence, while the orbital parameters should reflect values at the specified time. 
 For the moment this only works for pre-mass transfer systems. 
 
-To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code to 0, 1, or 2: 
+6) To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code to 0, 1, or 2: 
 ```
 0  Roche radius based on Eggleton's formula using the pericenter distance (i.e. including eccentricity factor)  [default]
 1  Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
