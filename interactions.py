@@ -75,8 +75,7 @@ def roche_radius(bin, primary, self):
     if not bin.is_star and primary.is_star:
         return bin.semimajor_axis * roche_radius_dimensionless(primary.mass, self.get_mass(bin)-primary.mass)
 
-    print('Error: Roche radius can only be determined in a binary')
-    exit(1)
+    sys.exit('error in roche radius: Roche radius can only be determined in a binary')
 
 #for comparison with kozai timescale
 def stellar_evolution_timescale(star):
@@ -248,8 +247,7 @@ def perform_inner_collision(self):
         if self.has_donor():
             print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
             print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-            print('after adjust_triple_after_ce_in_inner_binary: RLOF')
-            exit(1)
+            sys.exit("error in adjusting triple after collision: RLOF")
             
         donor.is_donor = False
         bs.is_mt_stable = True
@@ -388,8 +386,7 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
         print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.child1.radius, self.triple.child2.child2.radius,self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
         print(self.triple.child2.child1.core_mass, self.triple.child2.child1.mass-self.triple.child2.child1.core_mass, self.triple.child2.child1.stellar_type)
         print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-        print('after adjust_triple_after_ce_in_inner_binary: RLOF')
-        exit(1)
+        sys.exit("error in adjusting triple after gamma CE: RLOF")
         
     donor.is_donor = False
     bs.is_mt_stable = True
@@ -458,8 +455,7 @@ def common_envelope_energy_balance(bs, donor, accretor, self):
     if self.has_donor():
         print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
         print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-        print('after adjust_triple_after_ce_in_inner_binary: RLOF')
-        exit(1)
+        sys.exit("error in adjusting triple after alpha CE: RLOF")
         
     donor.is_donor = False
     bs.is_mt_stable = True
@@ -534,8 +530,7 @@ def double_common_envelope_energy_balance(bs, donor, accretor, self):
     if self.has_donor():
         print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
         print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-        print('after adjust_triple_after_ce_in_inner_binary: RLOF')            
-        exit(1)
+        sys.exit("error in adjusting triple after double CE: RLOF")
         
     donor.is_donor = False
     bs.is_mt_stable = True
@@ -567,8 +562,7 @@ def common_envelope_phase(bs, donor, accretor, self):
             print(self.triple.child2.child1.radius, self.triple.child2.child2.radius,self.triple.child1.radius)
             print(self.secular_code.give_roche_radii(self.triple))
             print('binary Roche lobe radii:', roche_radius(bs, bs.child1, self), roche_radius(bs, bs.child2, self))
-            print('after adjust_triple_after_ce_in_inner_binary: RLOF')
-            exit(1)
+            sys.exit("error in adjusting system after CE: RLOF")
             
         donor.is_donor = False
         bs.is_mt_stable = True
@@ -736,11 +730,12 @@ def stable_mass_transfer(bs, donor, accretor, self):
     Ma_new = accretor.mass
     accretion_efficiency = (Ma_new-Ma)/(Md-Md_new)
     if abs(accretion_efficiency - 1.0) > numerical_error and abs(Md-Md_new - -1.*(Ma-Ma_new)) > numerical_error |units.MSun:
+        self.save_snapshot()
         print('stable_mass_transfer: non conservative mass transfer')
         print(Md, Ma, donor.previous_mass, accretor.previous_mass)
         print(Md_new, Ma_new, Md-Md_new, Ma-Ma_new, accretion_efficiency)
         print(donor.stellar_type, accretor.stellar_type)
-        exit(1)
+        sys.exit('error in stable mass transfer')
         
     bs.accretion_efficiency_mass_transfer = accretion_efficiency
 
@@ -912,9 +907,10 @@ def detached(bs, self):
 # check if this indeed is accreted conservatively        
 
     else:
+        self.save_snapshot()
         print('detached: type of system unknown')
         print( bs.child1.is_star, bs.child2.is_star)
-        exit(2)                    
+        sys.exit('error in detached')                    
               
     #reset parameters after mass transfer
 #    bs.mass_transfer_rate = 0.0 | units.MSun/units.yr
@@ -964,14 +960,12 @@ def perform_stellar_interaction(bs, self):
                 detached(bs, self)
                 
         else:
-            print('perform stellar interaction: type of system unknown')
             print(bs.is_star, bs.child1.is_star, bs.child2.is_star)
-            exit(2) 
+            sys.exit('error in perform stellar interaction, system type unknown') 
                                
    else:
-        print('perform stellar interaction: type of system unknown')
         print(bs.is_star, bs.child1.is_star, bs.child1.is_donor)
-        exit(2)  
+        sys.exit('error in perform stellar interaction, system type unknown') 
         
    return stopping_condition            
         
@@ -1072,9 +1066,9 @@ def mass_transfer_stability(binary, self):
             star = binary.child2
             companion = binary.child1
         else: 
-            print('Mass transfer stability: type of system unknown')
             print(bs.is_star, bs.child1.is_star, bs.child2.is_star)
-            exit(2) 
+            sys.exit('error in Mass transfer stability: type of system unknown') 
+
 
         
             
@@ -1119,9 +1113,7 @@ def mass_transfer_timescale(binary, star):
         print('Mass transfer timescale')
     
     if not star.is_star:
-        print('mass transfer timescale: type of system unknown')
-        print('donor star is not a star')
-        exit(2)
+        sys.exit('error in mass transfer timescale:  type of system unknown, donor star is not a star')
     
     #For now thermal timescale donor
     mtt = kelvin_helmholds_timescale(star)
