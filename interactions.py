@@ -1037,7 +1037,7 @@ def mass_transfer_stability(binary, self):
                 print("Mass transfer stability: Mdonor1>Macc*q_crit ")
             binary.mass_transfer_rate = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
             binary.is_mt_stable = False
-        elif binary.child2.is_donor and binary.child2.mass > binary.child1. qmass*q_crit(binary.child2, binary.child1):
+        elif binary.child2.is_donor and binary.child2.mass > binary.child1.mass*q_crit(binary.child2, binary.child1):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor2>Macc*q_crit ")
             binary.mass_transfer_rate= -1.* binary.child2.mass / dynamic_timescale(binary.child2) 
