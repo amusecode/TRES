@@ -153,7 +153,6 @@ int evolve(
     data->R2_convective_envelope = R2_convective_envelope;
     data->R3_convective_envelope = R3_convective_envelope;
 
-
     data->include_quadrupole_terms = include_quadrupole_terms;
     data->include_octupole_terms = include_octupole_terms;    
     data->include_1PN_inner_terms = include_1PN_inner_terms;
@@ -226,9 +225,6 @@ int evolve(
     data->check_for_outer_collision = check_for_outer_collision;
     data->check_for_inner_RLOF = check_for_inner_RLOF;
     data->check_for_outer_RLOF = check_for_outer_RLOF;
-    
-    
-    /* addition Jan 2017 */
     data->check_for_semisecular_regime = check_for_semisecular_regime;
     data->check_for_semisecular_regime_parameter = check_for_semisecular_regime_parameter;
 

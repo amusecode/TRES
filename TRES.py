@@ -60,10 +60,6 @@ maximum_time_step = np.inf|units.Myr
 kanonical_neutron_star_mass = 1.4|units.MSun
 fall_back_mass = 41 |units.MSun
 
-stellar_types_SN_remnants = [13,14,15]|units.stellar_type # remnant types created through a supernova
-stellar_types_remnants = [7,8,9,10,11,12,13,14,15]|units.stellar_type
-stellar_types_dr = [2,4,7,8,9,10,11,12,13,14,15]|units.stellar_type #stars which go through a instantaneous radius change at formation; hertzsprung gap stars (small envelope perturbation) + horizontal branch stars + remnants
-
 
 class Triple_Class:
     #-------
@@ -1468,7 +1464,7 @@ class Triple_Class:
 #             time_step_tides = self.determine_time_step_tides()  	
                 
         if REPORT_DT or REPORT_DEBUG:
-            print('time:', time_step_max, time_step_stellar_code, time_step_wind, time_step_radius_change, time_step_tides)
+            print('time:', self.triple.time, time_step_max, time_step_stellar_code, time_step_wind, time_step_radius_change, time_step_tides)
 
 
 
@@ -1725,7 +1721,8 @@ class Triple_Class:
         elif self.secular_code.parameters.ignore_tertiary == True:
             #SN kick in binary
             #not implemented currently
-            sys.exit("Supernova in binary at time = ",self.triple.time) 
+            print("Supernova in binary at time = ",self.triple.time) 
+            sys.exit("Supernova in binary at time = ")
         elif not self.is_triple():
             sys.exit('SN only implemented in triple')
                     
@@ -2078,7 +2075,9 @@ class Triple_Class:
         self.triple.time = self.previous_time
         self.secular_code.model_time = self.previous_time                       
         if self.fixed_timestep < 0.|units.yr:
-            sys.exit('fixed_timestep < 0: should not be possible', self.triple.time, self.secular_code.model_time, self.fixed_timestep)                   
+            print(self.triple.time, self.secular_code.model_time, self.fixed_timestep)      
+            sys.exit('fixed_timestep < 0: should not be possible')           
+            
         #rewind system
         self.stellar_code.particles.recall_memory_one_step()
         self.refresh_memory() 
@@ -2438,7 +2437,7 @@ class Triple_Class:
                     print(self.has_donor(), self.secular_code.triples[0].error_flag_secular)
                     break
                     
-                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached':
+                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and self.secular_code.model_time < self.triple.time-minimum_time_step:
                     self.determine_mass_transfer_timescale()            
                     if self.check_stopping_conditions_stellar()==False:
                         print('stopping conditions stellar 2')                    

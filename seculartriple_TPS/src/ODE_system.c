@@ -156,6 +156,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
      * q_end = q_begin + q_dot*dt, where dt is the global time-step
      * hence q(t) = q_end + q_dot*(t-dt) */
 
+
     double t_dif = t-global_time_step; // i.e., t-dt
     if (include_linear_mass_change == TRUE)
     {
@@ -1097,6 +1098,8 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     {
         /*	check for collision at periastron (inner binary)	*/
         gout[1] = rp_in - (R1 + R2);
+        //printf("collision %g %g %g %g\n",rp_in, R1, R2, gout[1]);
+        
     }
     
     if (check_for_outer_collision == TRUE)
@@ -1117,10 +1120,13 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         
         double roche_radius_pericenter_inner_star1 = roche_radius(rp_in, m1/m2, e_in, f1, roche_radius_specification);
         gout[3] = R1 - roche_radius_pericenter_inner_star1;
+        //printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
 
         double roche_radius_pericenter_inner_star2 = roche_radius(rp_in, m2/m1, e_in, f2, roche_radius_specification);
 
         gout[4] = R2 - roche_radius_pericenter_inner_star2;
+        //printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
+        
     }
     if (check_for_outer_RLOF == TRUE)
     {

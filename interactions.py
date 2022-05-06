@@ -21,6 +21,13 @@ const_common_envelope_efficiency_gamma = 1.75
 stellar_types_compact_objects = [10,11,12,13,14]|units.stellar_type
 stellar_types_giants = [2,3,4,5,6,8,9]|units.stellar_type
 stellar_types_planetary_objects = [18,19]|units.stellar_type # planets & brown dwarfs
+
+stellar_types_SN_remnants = [13,14,15]|units.stellar_type # remnant types created through a supernova
+stellar_types_remnants = [7,8,9,10,11,12,13,14,15]|units.stellar_type
+stellar_types_dr = [2,4,7,8,9,10,11,12,13,14,15]|units.stellar_type #stars which go through a instantaneous radius change at formation; hertzsprung gap stars (small envelope perturbation) + horizontal branch stars + remnants
+
+
+
 #q_crit = 3.
 #q_crit_giants_conv_env = 0.9
 nucleair_efficiency = 0.007 # nuc. energy production eff, Delta E = 0.007 Mc^2
@@ -986,7 +993,7 @@ def q_crit(donor, companion):
     elif donor.stellar_type == 1|units.stellar_type:
         return 1./0.625 #following claeys et al. 2014 based on de mink et al 2007
     elif donor.stellar_type in stellar_types_compact_objects:#eventhough ns & bh shouldn't be donors... 
-        return 0.628
+        return 0.0 #0.628
     elif donor.stellar_type in [18,19]|units.stellar_type:#planet or brown dwarf. 
         #metzger et al 2012,425,2778, 
         return 1. * (donor.radius/self.get_size(companion))**3
