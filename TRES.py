@@ -891,7 +891,7 @@ class Triple_Class:
         if star.is_star:
 
             if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
-                I = star.gyration_radius * (star.mass)*star.radius**2                     
+                I = star.gyration_radius**2 * (star.mass)*star.radius**2                     
             else: 
                 k2 = 0.1
                 k3 = 0.21
