@@ -1528,9 +1528,8 @@ class Triple_Class:
 
 
         time_step = max(time_step, minimum_time_step)  
-        time_step = min(time_step, maximum_time_step)  
-
-
+        if self.triple.time >= self.tinit:
+            time_step = min(time_step, maximum_time_step)  
 
 
 
@@ -2509,7 +2508,7 @@ class Triple_Class:
         self.save_snapshot()        
             
             
-        if REPORT_DEBUG:
+            if REPORT_DEBUG and self.triple.time >= self.tinit:
             # for plotting data
             e_in_array = np.array(e_in_array)
             g_in_array = np.array(g_in_array)
