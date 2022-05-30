@@ -2704,6 +2704,43 @@ def plot_function(triple, dir_plots):
 
 
 
+    figure = plt.figure(figsize=(10,13))
+    N_subplots = 4
+    
+    plot_e_in = figure.add_subplot(N_subplots,1,1)
+    plot_e_out = figure.add_subplot(N_subplots,1,2)
+    plot_i_relative = figure.add_subplot(N_subplots,1,3)
+    plot_a_in = figure.add_subplot(N_subplots,1,4)
+    
+    plot_e_in.plot(times_array_Myr,e_in_array, label= '$e_\mathrm{in}$')
+    plot_e_in.set_xlim(0,t_max_Myr)
+    plot_e_in.set_xlabel('$t/\mathrm{Myr}$')
+    plot_e_in.set_ylabel('$e$')
+    plot_e_in.legend(loc=0)
+
+    plot_e_out.plot(times_array_Myr,e_out_array, label= '$e_\mathrm{out}$')
+    plot_e_out.set_xlim(0,t_max_Myr)
+    plot_e_out.set_xlabel('$t/\mathrm{Myr}$')
+    plot_e_out.set_ylabel('$e$')
+    plot_e_out.legend(loc=0)
+
+    
+    plot_i_relative.plot(times_array_Myr,i_relative_array*180.0/np.pi)
+    plot_i_relative.set_xlim(0,t_max_Myr)
+    plot_i_relative.set_ylim(0.9*min(i_relative_array*180.0/np.pi),1.1*max(i_relative_array*180.0/np.pi))
+    plot_i_relative.set_xlabel('$t/\mathrm{Myr}$')
+    plot_i_relative.set_ylabel('$i_\mathrm{relative} ({}^\circ)$')
+    
+    plot_a_in.plot(times_array_Myr,a_in_array_AU)
+    plot_a_in.set_xlabel('$t/\mathrm{Myr}$')
+    plot_a_in.set_ylabel('$a_\mathrm{in}$')
+
+    
+    figure.subplots_adjust(left=0.2, right=0.85, top=0.8, bottom=0.15)
+    plt.savefig(dir_plots+'TRES2'+generic_name+'.pdf')
+#    plt.show()
+    plt.close()
+
 
 
 
