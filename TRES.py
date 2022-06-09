@@ -1726,15 +1726,9 @@ class Triple_Class:
             #only velocity kick needs to be taken into account here
             #not followed currently
             return False
-        elif self.secular_code.parameters.ignore_tertiary == True:
-            #SN kick in binary
-            #not implemented currently
-            print("Supernova in binary at time = ",self.triple.time) 
-            sys.exit("Supernova in binary at time = ")
         elif not self.is_triple():
             sys.exit('SN only implemented in triple')
                     
-           
         #SN in triple
         if self.triple.child1.is_star:
             star = self.triple.child1
@@ -1776,7 +1770,10 @@ class Triple_Class:
  
         self.save_snapshot()                    
  
- 
+         #reset orbital parameters tertiary in case of binary or ignore_tertiary
+        a_out_init = self.triple.semimajor_axis
+        e_out_init = self.triple.eccentricity              
+
         # determine stellar anomaly
         # mean anomaly increases uniformly from 0 to 2\pi radians during each orbit
         inner_ecc = bin.eccentricity
@@ -1785,14 +1782,11 @@ class Triple_Class:
         inner_eccentric_anomaly = optimize.brentq(self.anomaly_converter, 0., 2.*np.pi, args=(inner_ecc, inner_mean_anomaly))
         inner_true_anomaly = 2.* np.arctan2(np.sqrt(1-inner_ecc) * np.cos(inner_eccentric_anomaly/2.), np.sqrt(1+inner_ecc) * np.sin(inner_eccentric_anomaly/2.))
         # min teken verschil met cos_true_anomaly = (np.cos(eccentric_anomaly)-ecc) / (1-ecc*np.cos(eccentric_anomaly))
-        
-        
 
         outer_ecc = self.triple.eccentricity
         outer_mean_anomaly = np.random.uniform(0., 2.*np.pi)  
         outer_eccentric_anomaly = optimize.brentq(self.anomaly_converter, 0., 2.*np.pi, args=(outer_ecc, outer_mean_anomaly))
         outer_true_anomaly = 2.* np.arctan2(np.sqrt(1-outer_ecc) * np.cos(outer_eccentric_anomaly/2.), np.sqrt(1+outer_ecc) * np.sin(outer_eccentric_anomaly/2.))
-
 
         if REPORT_SN_EVOLUTION:
             print('before SN:', self.triple.number) 
@@ -1823,12 +1817,14 @@ class Triple_Class:
         bin.child2.radius = bin_child2_proper_radius
         star.radius =  star_proper_radius
 
+        if self.secular_code.parameters.ignore_tertiary:
+            self.triple.semimajor_axis = a_out_init
+            self.triple.eccentricity = e_out_init
 
         if REPORT_SN_EVOLUTION:
             print('after SN')
             print('eccentricity:', bin.eccentricity, self.triple.eccentricity)
             print('semi-major axis:', bin.semimajor_axis, self.triple.semimajor_axis)
-
 
         if bin.eccentricity >= 1.0 or bin.eccentricity < 0.0 or bin.semimajor_axis <=0.0|units.RSun or isnan(bin.semimajor_axis.value_in(units.RSun)):
             if REPORT_SN_EVOLUTION:
@@ -1868,7 +1864,6 @@ class Triple_Class:
         if star.stellar_type in stellar_types_SN_remnants:
             self.secular_code.parameters.include_spin_radius_mass_coupling_terms_star3 = False
 
-
         if self.stop_at_SN:
             if REPORT_SN_EVOLUTION:
                 print("Supernova at time = ",self.triple.time )
@@ -1879,7 +1874,6 @@ class Triple_Class:
             
         #check for rlof -> if rlof than stop?
 #        self.check_RLOF()
-
 
         return True
         
