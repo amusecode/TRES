@@ -23,12 +23,12 @@ from math import sqrt, isnan
 import numpy as np
 
 REPORT_USER_WARNINGS = True
+MAKE_PLOTS = False
 
 REPORT_DEBUG = False
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
 REPORT_TRIPLE_EVOLUTION = False 
-MAKE_PLOTS = False
 
 GET_GYRATION_RADIUS_FROM_STELLAR_CODE = False
 GET_AMC_FROM_STELLAR_CODE = False
@@ -567,6 +567,13 @@ class Triple_Class:
                 stellar_system.convective_envelope_mass = 1.e-10 |units.MSun    
                 stellar_system.convective_envelope_radius = 1.e-10 |units.RSun  
                                  
+            #When the GW inspiral time is shorter than the inner orbit, the numerical solver crashes
+            #This is only possible for BH & NS as other stars would fill their RL earlier
+            #To avoid this articially increase stellar radii of BH/NS in secular code 
+            #Does not affect any other processes
+            if stellar_system.stellar_type in stellar_types_SN_remnants:
+                stellar_system.radius = stellar_system.radius*10                
+                 
         else:
             self.update_stellar_parameters(stellar_system.child1)        
             self.update_stellar_parameters(stellar_system.child2)
@@ -1556,19 +1563,20 @@ class Triple_Class:
                 print('donor time:',  self.determine_time_step_stable_mt())
 
             t_donor = self.determine_time_step_stable_mt()*time_step_factor_stable_mt # extra small for safety
-            t_donor = max(minimum_time_step, min(time_step, t_donor))#
+            t_donor_lim = max(minimum_time_step, min(time_step, t_donor))#
             # although fixed_timestep < time_step, fixed_timestep can be > time_step_stable_mt
-            
-            if self.fixed_timestep < t_donor:
-                time_step = t_donor                
-                self.secular_code.parameters.check_for_inner_RLOF = False
-            else: 
+
+            if t_donor == np.inf|units.Myr:
+                #bh or ns donors
                 time_step = self.fixed_timestep
-                
+            elif self.fixed_timestep < t_donor_lim:
+                time_step = t_donor_lim
+                self.secular_code.parameters.check_for_inner_RLOF = False
+            else:
+                time_step = self.fixed_timestep
+                           
             self.fixed_timestep = -1|units.Myr
             return time_step # as previous timestep was effectively zero -> min increase is zero           
-            
-
 
         return time_step
     #-------
@@ -1867,8 +1875,8 @@ class Triple_Class:
                 print(self.triple.child2.child1.mass, self.triple.child2.child1.stellar_type)
                 print(self.triple.child2.child2.mass, self.triple.child2.child2.stellar_type)
                 print(self.triple.child1.mass, self.triple.child1.stellar_type)
-            return False            
-
+            return False   
+            
         #check for rlof -> if rlof than stop?
 #        self.check_RLOF()
 
@@ -2073,7 +2081,8 @@ class Triple_Class:
         #find beginning of RLOF
         self.fixed_timestep = self.secular_code.model_time - self.previous_time
         self.triple.time = self.previous_time
-        self.secular_code.model_time = self.previous_time                       
+        self.secular_code.model_time = self.previous_time      
+                         
         if self.fixed_timestep < 0.|units.yr:
             print(self.triple.time, self.secular_code.model_time, self.fixed_timestep)      
             sys.exit('fixed_timestep < 0: should not be possible')           
@@ -2631,33 +2640,33 @@ def plot_function(triple, dir_plots):
         f.write('\n')
     f.close()
     
-    for i_s in range(len(times_array_Myr)):
-        print(times_array_Myr[i_s], end = ' ')
-        print( a_in_array_AU[i_s], end = ' ')
-        print( g_in_array[i_s], end = ' ')
-        print( e_in_array[i_s], end = ' ')
-        print( i_relative_array[i_s], end = ' ')
-        print( o_in_array[i_s], end = ' ')
-        print( a_out_array_AU[i_s], end = ' ')
-        print( g_out_array[i_s], end = ' ')
-        print( e_out_array[i_s], end = ' ')
-        print( o_out_array[i_s], end = ' ')
-        print( m1_array[i_s], end = ' ')
-        print( m2_array[i_s], end = ' ')
-        print( m3_array[i_s], end = ' ')
-        print( spin1_array[i_s], end = ' ')
-        print( spin2_array[i_s], end = ' ')  
-        print( spin3_array[i_s], end = ' ')  
-        print( r1_array[i_s], end = ' ')    
-        print( r2_array[i_s], end = ' ')    
-        print( r3_array[i_s], end = ' ')
-        print( RL1_array[i_s], end = ' ')
-        print( RL2_array[i_s], end = ' ')
-        print( RL3_array[i_s], end = ' ')
-        print( moi1_array[i_s], end = ' ')   
-        print( moi2_array[i_s], end = ' ')   
-        print( moi3_array[i_s], end = ' ')
-        print( delta_e_in_array[i_s])
+#    for i_s in range(len(times_array_Myr)):
+#        print(times_array_Myr[i_s], end = ' ')
+#        print( a_in_array_AU[i_s], end = ' ')
+#        print( g_in_array[i_s], end = ' ')
+#        print( e_in_array[i_s], end = ' ')
+#        print( i_relative_array[i_s], end = ' ')
+#        print( o_in_array[i_s], end = ' ')
+#        print( a_out_array_AU[i_s], end = ' ')
+#        print( g_out_array[i_s], end = ' ')
+#        print( e_out_array[i_s], end = ' ')
+#        print( o_out_array[i_s], end = ' ')
+#        print( m1_array[i_s], end = ' ')
+#        print( m2_array[i_s], end = ' ')
+#        print( m3_array[i_s], end = ' ')
+#        print( spin1_array[i_s], end = ' ')
+#        print( spin2_array[i_s], end = ' ')  
+#        print( spin3_array[i_s], end = ' ')  
+#        print( r1_array[i_s], end = ' ')    
+#        print( r2_array[i_s], end = ' ')    
+#        print( r3_array[i_s], end = ' ')
+#        print( RL1_array[i_s], end = ' ')
+#        print( RL2_array[i_s], end = ' ')
+#        print( RL3_array[i_s], end = ' ')
+#        print( moi1_array[i_s], end = ' ')   
+#        print( moi2_array[i_s], end = ' ')   
+#        print( moi3_array[i_s], end = ' ')
+#        print( delta_e_in_array[i_s])
     
     
             
