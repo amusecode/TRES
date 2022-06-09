@@ -169,7 +169,7 @@ Running computationally expensive simulations on a computer cluster can save a l
 
 For starters, make sure if the pre-required packages for AMUSE are already installed. The easiest way to do this is try installing AMUSE and check where eventual errors occur. Unfortunately, on a cluster you will most likely not have sudo rights, so you'll have to figure out a way to install the missing packages. 
 
-Second, clusters work with slurm. To run a simulation you must create a bash file that can be sumbitted as a slurm job. Down below is an example bash script for the helios cluster with additional comments for clarification. If you are using a different cluster, change the script accordingly.
+Second, often clusters work with schedulers like slurm. To run a simulation you must create a bash file that can be sumbitted as a slurm job. Down below is an example bash script for the helios cluster with additional comments for clarification. If you are using a different cluster or scheduler, change the script accordingly.
 
 ```
 #!/bin/bash
