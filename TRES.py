@@ -28,6 +28,7 @@ REPORT_DEBUG = False
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
 REPORT_TRIPLE_EVOLUTION = False 
+MAKE_PLOTS = False
 
 GET_GYRATION_RADIUS_FROM_STELLAR_CODE = False
 GET_AMC_FROM_STELLAR_CODE = False
@@ -564,8 +565,8 @@ class Triple_Class:
                 sys.exit('convective_envelope_radius < 0')
             if stellar_system.convective_envelope_radius == 0|units.RSun:
                 stellar_system.convective_envelope_mass = 1.e-10 |units.MSun    
-                stellar_system.convective_envelope_radius = 1.e-10 |units.RSun   
-                 
+                stellar_system.convective_envelope_radius = 1.e-10 |units.RSun  
+                                 
         else:
             self.update_stellar_parameters(stellar_system.child1)        
             self.update_stellar_parameters(stellar_system.child2)
@@ -1563,10 +1564,10 @@ class Triple_Class:
                 self.secular_code.parameters.check_for_inner_RLOF = False
             else: 
                 time_step = self.fixed_timestep
+                
             self.fixed_timestep = -1|units.Myr
             return time_step # as previous timestep was effectively zero -> min increase is zero           
-
-           
+            
 
 
         return time_step
@@ -2251,7 +2252,7 @@ class Triple_Class:
     def evolve_model(self):
         start_time = time.time()
     
-        if REPORT_DEBUG:
+        if REPORT_DEBUG or MAKE_PLOTS:
             # for plotting data
             times_array = quantities.AdaptingVectorQuantity() 
             a_in_array = quantities.AdaptingVectorQuantity()
@@ -2475,7 +2476,7 @@ class Triple_Class:
             self.calculate_maximum_change_eccentricity()
 
 
-            if REPORT_DEBUG:
+            if REPORT_DEBUG or MAKE_PLOTS:
                 # for plotting data
                 times_array.append(self.triple.time)
                 e_in_array.append(self.triple.child2.eccentricity)
@@ -2508,7 +2509,7 @@ class Triple_Class:
         self.save_snapshot()        
             
             
-            if REPORT_DEBUG and self.triple.time >= self.tinit:
+        if (REPORT_DEBUG or MAKE_PLOTS) and self.triple.time >= self.tinit:
             # for plotting data
             e_in_array = np.array(e_in_array)
             g_in_array = np.array(g_in_array)
@@ -3430,7 +3431,7 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             print('Choose a different system. There is mass transfer in the given triple at initialization.')
     else:    
         triple_class_object.evolve_model()
-        if REPORT_DEBUG:
+        if REPORT_DEBUG or MAKE_PLOTS:
             plot_function(triple_class_object, dir_plots)
             triple_class_object.print_stellar_system()
     triple_class_object.stellar_code.stop()
@@ -3597,7 +3598,7 @@ if __name__ == '__main__':
             print('Choose a different system. There is mass transfer in the given triple at initialization.')
     else:    
         triple_class_object.evolve_model()
-        if REPORT_DEBUG:
+        if REPORT_DEBUG or MAKE_PLOTS:
             plot_function(triple_class_object, options['dir_plots'])
             triple_class_object.print_stellar_system()
 
