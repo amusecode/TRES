@@ -776,6 +776,8 @@ def semi_detached(bs, donor, accretor, self):
 #functions for mass transfer in a multiple / triple
 
 def triple_stable_mass_transfer(bs, donor, accretor, self):
+    # mass transfer of both inner and outer orbit is not yet considered here
+    
     # orbital evolution is being taken into account in secular_code        
     if REPORT_FUNCTION_NAMES:
         print('Triple stable mass transfer')
