@@ -231,6 +231,7 @@ cd $OUTPUT_FOLDER
 
 export FILE_NAME='TRES_'"$SLURM_ARRAY_TASK_ID"'.hdf'  # for each sbatch array, define your output filename
 export TRES="/home/fkummer/TRES"
+# Make sure that the value in the multiplication is the same as the value after "-n"
 python $TRES/TPS.py -n 10 -N $((10*SLURM_ARRAY_TASK_ID)) --M_max 100 --M_min 15 --Q_min 0.1 --A_distr 5 --q_min 0.1 --E_max 0.9 --E_distr 3 --e_max 0.9 --e_distr 3 -z 0.0001 -f $FILE_NAME
 
 export FOLDER_NAME="test_TRES/cpu_check"
