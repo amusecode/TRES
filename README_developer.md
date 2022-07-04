@@ -178,8 +178,8 @@ Second, often clusters work with schedulers like slurm. To run a simulation you 
 # this example uses the array functionality, which will submit an array of similar jobs that can be run simultaneously
 
 #SBATCH --nodes 1
-#SBATCH --tasks 1
-#SBATCH --cpus-per-task 1
+#SBATCH --ntasks 10                   ##adjust to size of job array
+#SBATCH --cpus-per-task 2
 #SBATCH --mem 1G
 #SBATCH --time 1:00:00
 #SBATCH -w helios-cn004
