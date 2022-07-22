@@ -311,7 +311,7 @@ For option 2:
 
 General information on the system: 
 ```
-Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular
+Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular, CPU_time
 ```
 Orbital information (inner binary | outer binary) :
 ```
