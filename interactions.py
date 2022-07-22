@@ -982,7 +982,7 @@ def perform_stellar_interaction(bs, self):
         
 #-------------------------
 #functions for the stability of mass transfer
-def q_crit(donor, companion):
+def q_crit(self, donor, companion):
     #following Hurley, Tout, Pols 2002
     if donor.stellar_type in [9]|units.stellar_type:
 #    if donor.stellar_type in [8,9]|units.stellar_type:
@@ -1035,12 +1035,12 @@ def mass_transfer_stability(binary, self):
             binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
             binary.is_mt_stable = False    
 
-        elif binary.child1.is_donor and binary.child1.mass > binary.child2.mass*q_crit(binary.child1, binary.child2):
+        elif binary.child1.is_donor and binary.child1.mass > binary.child2.mass*q_crit(self, binary.child1, binary.child2):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor1>Macc*q_crit ")
             binary.mass_transfer_rate = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
             binary.is_mt_stable = False
-        elif binary.child2.is_donor and binary.child2.mass > binary.child1.mass*q_crit(binary.child2, binary.child1):
+        elif binary.child2.is_donor and binary.child2.mass > binary.child1.mass*q_crit(self, binary.child2, binary.child1):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor2>Macc*q_crit ")
             binary.mass_transfer_rate= -1.* binary.child2.mass / dynamic_timescale(binary.child2) 
@@ -1094,7 +1094,7 @@ def mass_transfer_stability(binary, self):
             binary.mass_transfer_rate = -1.* star.mass / dynamic_timescale(star)
             binary.is_mt_stable = False          
             
-        elif star.is_donor and star.mass > self.get_mass(companion)*q_crit(star, companion):
+        elif star.is_donor and star.mass > self.get_mass(companion)*q_crit(self, star, companion):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor1>Macc*q_crit")
             binary.mass_transfer_rate = -1.* star.mass / dynamic_timescale(star)
