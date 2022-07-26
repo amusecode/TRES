@@ -47,23 +47,12 @@ bin_type = {
                 'contact': 'contact',    
                 'collision': 'collision',    
                 'semisecular': 'semisecular',    
-                  
                 'rlof': 'rlof',   #only used for stopping conditions
                 'stable_mass_transfer': 'stable_mass_transfer',
-                 
                 'common_envelope': 'common_envelope',     
-
                 'common_envelope_energy_balance': 'common_envelope_energy_balance',     
-                'ce_e': 'common_envelope_energy_balance',     
-                'ce_alpha': 'common_envelope_energy_balance',     
-
                 'common_envelope_angular_momentum_balance': 'common_envelope_angular_momentum_balance',
-                'ce_J': 'common_envelope_angular_momentum_balance',
-                'ce_gamma': 'common_envelope_angular_momentum_balance',
-
-                'double_common_envelope': 'double_common_envelope',
-                'dce': 'double_common_envelope',
-                
+                'double_common_envelope': 'double_common_envelope',                
                 
             }            
 
