@@ -683,7 +683,7 @@ class Triple_Class:
         else:
             if self.has_dynamical_instability(stellar_system.child1):
                 return True
-            if self.has_diynamical_instability(stellar_system.child2):
+            if self.has_dynamical_instability(stellar_system.child2):
                 return True
             if stellar_system.bin_type == bin_type['dyn_inst']:  
                 return True    
