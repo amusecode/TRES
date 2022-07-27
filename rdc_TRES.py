@@ -165,11 +165,6 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             snapshot_string = snapshot_string + print_to_string('|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass)
             snapshot_string = snapshot_string + print_to_string('|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
 
-            if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
-                correct_system = True
-
-            
-
         elif print_style == 1:
             print_particle(triple[0])
         
@@ -196,10 +191,10 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 #            snapshot_string = snapshot_string + '\n'
 
-            if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
-                correct_system = True
+        if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
+            correct_system = True
 
-        if i==0:
+        if i==0 and print_full==False:
             triple_string = triple_string + snapshot_string
             #in case triple[0].number in file doesn't start at 0
             triple_number = triple[0].number
@@ -210,7 +205,7 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
     triple_string = triple_string + snapshot_string
     if correct_system:
         print(triple_string)
-#    print(triple_string)
+
 
 def parse_arguments():
     from amuse.units.optparse import OptionParser
