@@ -996,7 +996,7 @@ def q_crit(self, donor, companion):
     elif donor.stellar_type == 1|units.stellar_type:
         return 1./0.625 #following claeys et al. 2014 based on de mink et al 2007
     elif donor.stellar_type in stellar_types_compact_objects:#eventhough ns & bh shouldn't be donors... 
-        return 100.0 #0.628
+        return 0.25 #0.628
     elif donor.stellar_type in [18,19]|units.stellar_type:#planet or brown dwarf. 
         #metzger et al 2012,425,2778, 
         return 1. * (donor.radius/self.get_size(companion))**3
