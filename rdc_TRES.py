@@ -20,13 +20,8 @@ bin_type = {
                 'stable_mass_transfer': 9, 
                 'common_envelope': 10,     
                 'common_envelope_energy_balance': 11,     
-                'ce_e': 12,     
-                'ce_alpha': 13,     
-                'common_envelope_angular_momentum_balance': 14,
-                'ce_J': 15,
-                'ce_gamma': 16,
-                'double_common_envelope': 17,
-                'dce': 18,
+                'common_envelope_angular_momentum_balance': 12,
+                'double_common_envelope': 13,
             }            
 
 
