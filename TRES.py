@@ -2142,10 +2142,14 @@ class Triple_Class:
             if self.stop_at_outer_mass_transfer and self.has_tertiary_donor():
                 if self.secular_code.model_time < self.triple.time:
                     self.triple.time = self.secular_code.model_time
-    
                 if REPORT_TRIPLE_EVOLUTION:
                     print('Mass transfer in outer binary of triple at time = ',self.triple.time)
-                self.triple.bin_type = bin_type['rlof']
+
+                if self.triple.is_mt_stable:
+                    self.triple.bin_type = bin_type['stable_mass_transfer']
+                else:
+                    self.triple.bin_type = bin_type['common_envelope']
+
                 return False                                   
             else:
                 if not self.check_stopping_conditions_stellar(stellar_system.child1):
@@ -2164,29 +2168,36 @@ class Triple_Class:
 
                 if self.secular_code.model_time < self.triple.time:
                     self.triple.time = self.secular_code.model_time
-            
                 if REPORT_TRIPLE_EVOLUTION:
                     print('Mass transfer in inner binary at time = ',self.triple.time)
-                    print(self.stop_at_mass_transfer,self.stop_at_stable_mass_transfer, self.stop_at_unstable_mass_transfer, self.stop_at_eccentric_stable_mass_transfer, self.stop_at_eccentric_unstable_mass_transfer, stellar_system.is_mt_stable)
+                    print(self.stop_at_mass_transfer,self.stop_at_stable_mass_transfer, self.stop_at_unstable_mass_transfer, self.stop_at_eccentric_stable_mass_transfer, self.stop_at_eccentric_unstable_mass_transfer, stellar_system.is_mt_stable)                       
+
                 if self.is_binary(self.triple.child2):
-                    self.triple.child2.bin_type = bin_type['rlof'] 
+                    if self.triple.child2.is_mt_stable:
+                        self.triple.child2.bin_type = bin_type['stable_mass_transfer']
+                    else:
+                        self.triple.child2.bin_type = bin_type['common_envelope']                
                 elif self.is_binary(self.triple.child1):
-                    self.triple.child1.bin_type = bin_type['rlof']    
+                    if self.triple.child1.is_mt_stable:
+                        self.triple.child1.bin_type = bin_type['stable_mass_transfer']
+                    else:
+                        self.triple.child1.bin_type = bin_type['common_envelope']                
                 else:
                     sys.exit('currently not implemented')                        
+
                 return False
             
         return True
         
             
+    #when these processes are implemented, also the bintypes need to be set in those functions
     def check_stopping_conditions(self):
         if self.check_stopping_conditions_stellar()==False:
             return False
-        
+
         if self.stop_at_dynamical_instability and self.triple.dynamical_instability == True:
             if self.secular_code.model_time < self.triple.time:
-                self.triple.time = self.secular_code.model_time
-            self.triple.dynamical_instability = True   
+                self.triple.time = self.secular_code.model_time  
             self.set_bintype_to_dynamical_instability()            
             if REPORT_TRIPLE_EVOLUTION:
                 print("Dynamical instability at time = ",self.triple.time)
