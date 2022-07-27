@@ -173,21 +173,15 @@ Second, often clusters work with schedulers like slurm. To run a simulation you 
 
 ```
 #!/bin/bash
-
-# first, we need to ask for resources with sbatch. The documentation can be found here: https://slurm.schedmd.com/sbatch.html
-# this example uses the array functionality, which will submit an array of similar jobs that can be run simultaneously
-
 #SBATCH --nodes 1
-#SBATCH --ntasks 10                   ##adjust to size of job array
-#SBATCH --cpus-per-task 2
-#SBATCH --mem 1G
+#SBATCH --partition=astera      # Request nodes from the specific partition
+#SBATCH --mem 250mb
 #SBATCH --time 1:00:00
-#SBATCH -w helios-cn004
 #SBATCH --job-name=TRES
 #SBATCH --output=logs/array_%A_%a.out
 #SBATCH --array=0-9
-#SBATCH --output=job.%J.out
-#SBATCH --error=job.%J.err
+#SBATCH --output=TRES_job.%J.out
+#SBATCH --error=TRES_job.%J.err
 
 function clean_up {
     echo "### Running Clean_up ###"
@@ -216,26 +210,35 @@ trap 'clean_up' EXIT
 
 ##### pipeline below #####
 
+
 # enter virtual environment
 # this environment contains the necessary python packages 
-. /home/fkummer/Amuse-env/bin/activate
+module purge 
+module load anaconda3/python3.7.3
+source /home/$USER/Amuse-env/bin/activate
 
-# openmpi was not installed on helios and needed to be imported through a module 
-module purge
-module load openmpi/3.1.6
+# create a directory on the node to store your data
+mkdir -p /hddstore/$USER
+OUTPUT_FOLDER=$(mktemp -d -p /hddstore/$USER)
 
+# for each sbatch array, define your output filename
+FILE_NAME='TRES_'"$SLURM_ARRAY_TASK_ID"'.hdf'
+echo   $OUTPUT_FOLDER $FILE_NAME $SLURMD_NODENAME.
+cd     $OUTPUT_FOLDER 
 
-mkdir -p /hddstore/$USER                              # create a directory on the node to store your data
-export OUTPUT_FOLDER="/hddstore/$USER"                # this simply creates an alias for the file/directory
-cd $OUTPUT_FOLDER
+# create a directory where the data should be stored (for helios this is the /zfs/helios/filer0/ directory)       
+STORAGE_FOLDER="TRES_data/TPS"
+mkdir -p /zfs/helios/filer0/$USER/$STORAGE_FOLDER       
 
-export FILE_NAME='TRES_'"$SLURM_ARRAY_TASK_ID"'.hdf'  # for each sbatch array, define your output filename
-export TRES="/home/fkummer/TRES"
-# Make sure that the value in the multiplication is the same as the value after "-n"
-python $TRES/TPS.py -n 10 -N $((10*SLURM_ARRAY_TASK_ID)) --M_max 100 --M_min 15 --Q_min 0.1 --A_distr 5 --q_min 0.1 --E_max 0.9 --E_distr 3 --e_max 0.9 --e_distr 3 -z 0.0001 -f $FILE_NAME
-
-export FOLDER_NAME="test_TRES/cpu_check"
-mkdir -p /zfs/helios/filer0/$USER/$FOLDER_NAME        # create a directory where the data should be stored (for helios this is the /zfs/helios/filer0/ directory)                             
-cp $FILE_NAME /zfs/helios/filer0/$USER/$FOLDER_NAME/  # copy the data from the node to the storage directory
+#perform simulation
+TRES_DIR=/home/stoonen1/TRES
+NUM_PER_JOB=3
+echo python $TRES_DIR/TPS.py -n $NUM_PER_JOB -N $((NUM_PER_JOB*SLURM_ARRAY_TASK_ID)) -f $FILE_NAME -T 1
+python $TRES_DIR/TPS.py -n $NUM_PER_JOB -N $((NUM_PER_JOB*SLURM_ARRAY_TASK_ID)) -f $FILE_NAME -T 1 
+                             
+# copy the data from the node to the storage directory
+cp $FILE_NAME /zfs/helios/filer0/$USER/$STORAGE_FOLDER/
+files=$(ls *)
+echo $files
 ```
 
