@@ -8,7 +8,7 @@ import io
 minimum_time_step = 1.e-9 |units.Myr
 
 
-bin_type = {    
+bin_type = {    'all': -1,
                 'unknown': 0,       
                 'merger': 1, 
                 'disintegrated': 2, 
@@ -25,7 +25,12 @@ bin_type = {
                 'double_common_envelope': 13,
             }            
 
-
+tr_type = {     'all': -1,
+                'hierarchical': 0, 
+                'dynamical_instability': 1, 
+                'semisecular_regime': 2, 
+                'error_flag_secular': 3, 
+            }
 
 lib_print_style = { 0: "TRES standard; selected parameters", 
                 1: "Full",
@@ -49,7 +54,7 @@ def print_to_string(*args, **kwargs):
 
        
 #for more info on mass transfer stability, see triple[0].is_mt_stable & triple[0].child2.is_mt_stable
-def rdc(file_name_root, print_style, print_full, print_init, line_number):
+def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, triple_type, triple_type_string):
 
     file_name = file_name_root + ".hdf"            
     if file_name_root[-4:]==".hdf":
@@ -73,6 +78,28 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number):
 
         return
 
+
+
+#    print(inner_bin_type, outer_bin_type, triple_type)
+#    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
+    correct_system = False
+    correct_system_previous = False
+    if inner_bin_type > -1 and bin_type[inner_bin_type_string] > -1 and inner_bin_type != bin_type[inner_bin_type_string] :
+        print('error: two different inner binary types requested')
+        return
+    if outer_bin_type > -1 and bin_type[outer_bin_type_string] > -1 and outer_bin_type != bin_type[outer_bin_type_string]:
+        print('error: two different outer binary types requested')
+        return
+    if triple_type > -1 and tr_type[triple_type_string] > -1 and triple_type != tr_type[triple_type_string] :
+        print('error: two different triple types requested')
+        return        
+    inner_bin_type = max(inner_bin_type, bin_type[inner_bin_type_string])    
+    outer_bin_type = max(outer_bin_type, bin_type[outer_bin_type_string]) 
+    triple_type = max(triple_type, tr_type[triple_type_string]) 
+#    print(inner_bin_type, outer_bin_type, triple_type)
+#    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
+
+    
     print(lib_print_style[print_style])
     triple_string = ''
     snapshot_string = '' 
@@ -86,18 +113,28 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number):
 #            print('\n\n')
 
         #which snapshots to save
-        if print_full: #all snapshots    
+        if print_full and correct_system: #all snapshots    
             triple_string = triple_string + snapshot_string   
         else: #first & last line 
 #            print(i, triple[0].number,triple_number, previous_triple_number)
-            if triple[0].number>triple_number: # last line
+            if triple[0].number>triple_number: # last line & correct_system
                  triple_string = triple_string + snapshot_string
                  triple_number = triple[0].number
-                 print(triple_string[:-2]) #prevents empty line
+                 if correct_system:
+                     print(triple_string[:-2]) #prevents empty line
                  triple_string = ''
+                 correct_system = False
+                 correct_system_previous = False 
             elif triple_number > previous_triple_number: #first line
                  triple_string = triple_string + snapshot_string
-                 previous_triple_number = triple_number                         
+                 previous_triple_number = triple_number  
+                 if correct_system == True:
+                    correct_system_previous = True
+            elif correct_system==True and correct_system_previous==False:
+                 triple_string = triple_string + snapshot_string
+                 previous_triple_number = triple_number  
+                 correct_system_previous = True
+                                                        
         snapshot_string = '' 
         
         if print_style == 2:
@@ -131,13 +168,14 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number):
 #            print('child2.child2',triple[0].child2.child2)
             exit(0)
         else:
-
+            
             snapshot_string = snapshot_string + print_to_string(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
             snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
             snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t')
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
+#            snapshot_string = snapshot_string + '\n'
 
 #            print(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
 #            print(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
@@ -147,18 +185,30 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number):
 #            print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 
 
-
-
+            if triple_type != tr_type['all']:
+                triple_type_snapshot = tr_type['hierarchical']
+                if triple[0].dynamical_instability:
+                    triple_type_snapshot = tr_type['dynamical_instability']
+#                if triple[0].semisecular_regime:
+#                    triple_type_snapshot = tr_type['semisecular_regime']
+                if triple[0].error_flag_secular:
+                    triple_type_snapshot = tr_type['error_flag_secular']
+                    
+            if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
+                correct_system = True
 
         if i==0:
             triple_string = triple_string + snapshot_string
             #in case triple[0].number in file doesn't start at 0
             triple_number = triple[0].number
-            previous_triple_number = triple_number                         
+            previous_triple_number = triple_number
+            if correct_system == True: 
+                correct_system_previous = True                         
     
     triple_string = triple_string + snapshot_string
-    print(triple_string)
-
+    if correct_system:
+        print(triple_string)
+#    print(triple_string)
 
 def parse_arguments():
     from amuse.units.optparse import OptionParser
@@ -174,6 +224,19 @@ def parse_arguments():
     parser.add_option("-l", dest="line_number", type="int", default = 0,
                       help="line number for printing initial conditions [%default]") #will only do something when print_init = True
 
+    #returns first instance where desired bin_type is reached 
+    parser.add_option("--btin", dest="inner_bin_type", type="int", default = -1,
+                      help="desired binary type of inner binary (int) [%default]") 
+    parser.add_option("--btout", dest="outer_bin_type", type="int", default = -1,
+                      help="desired binary type of inner binary (int) [%default]") 
+    parser.add_option("--btinstr", dest="inner_bin_type_string", default = "all",
+                      help="desired binary type of inner binary (string) [%default]")                      
+    parser.add_option("--btoutstr", dest="outer_bin_type_string", default = "all",
+                      help="desired binary type of outer binary (string) [%default]")                      
+    parser.add_option("--trt", dest="triple_type", type="int", default = -1,
+                      help="desired triple type (int) [%default]") 
+    parser.add_option("--trtstr", dest="triple_type_string", default = "all",
+                      help="desired triple type [%default]")                      
 
                       
     options, args = parser.parse_args()
