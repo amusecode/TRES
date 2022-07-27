@@ -133,11 +133,29 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             elif correct_system==True and correct_system_previous==False:
                  triple_string = triple_string + snapshot_string
                  previous_triple_number = triple_number  
-                 correct_system_previous = True
-                                                        
+                 correct_system_previous = True                                                
         snapshot_string = '' 
         
+        if triple_type != tr_type['all']:
+            triple_type_snapshot = tr_type['hierarchical']
+            if triple[0].dynamical_instability:
+                triple_type_snapshot = tr_type['dynamical_instability']
+#                if triple[0].semisecular_regime:
+#                    triple_type_snapshot = tr_type['semisecular_regime']
+            if triple[0].error_flag_secular:
+                triple_type_snapshot = tr_type['error_flag_secular']
+        
+        
         if print_style == 2:
+#            print(' ')
+#            print(i, triple[0].number, triple[0].time, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular, triple[0].CPU_time)
+#                  
+#            print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
+#            print( '|', triple[0].bin_type, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
+#            print( ' st: ',  triple[0].child2.child1.is_donor, triple[0].child2.child1.stellar_type, triple[0].child2.child1.mass,  triple[0].child2.child1.spin_angular_frequency, triple[0].child2.child1.radius, triple[0].child2.child1.core_mass,)
+#            print( '|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass, )
+#            print( '|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
+
             if i>0:
                 snapshot_string = snapshot_string + print_to_string(' ')
             snapshot_string = snapshot_string + print_to_string(i, triple[0].number, triple[0].time, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular, triple[0].CPU_time)
@@ -147,15 +165,9 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             snapshot_string = snapshot_string + print_to_string('|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass)
             snapshot_string = snapshot_string + print_to_string('|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
 
+            if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
+                correct_system = True
 
-#            print(' ')
-#            print(i, triple[0].number, triple[0].time, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular, triple[0].CPU_time)
-#                  
-#            print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
-#            print( '|', triple[0].bin_type, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
-#            print( ' st: ',  triple[0].child2.child1.is_donor, triple[0].child2.child1.stellar_type, triple[0].child2.child1.mass,  triple[0].child2.child1.spin_angular_frequency, triple[0].child2.child1.radius, triple[0].child2.child1.core_mass,)
-#            print( '|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass, )
-#            print( '|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
             
 
         elif print_style == 1:
@@ -166,8 +178,15 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
 #            print('child2',triple[0].child2)
 #            print('child2.child1',triple[0].child2.child1)
 #            print('child2.child2',triple[0].child2.child2)
-            exit(0)
+            sys.exit(0)
         else:
+#            print(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
+#            print(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
+#            print(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
+#            print(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
+#            print(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t' )
+#            print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
+  
             
             snapshot_string = snapshot_string + print_to_string(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
             snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
@@ -177,23 +196,6 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 #            snapshot_string = snapshot_string + '\n'
 
-#            print(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
-#            print(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
-#            print(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
-#            print(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
-#            print(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t' )
-#            print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
-
-
-            if triple_type != tr_type['all']:
-                triple_type_snapshot = tr_type['hierarchical']
-                if triple[0].dynamical_instability:
-                    triple_type_snapshot = tr_type['dynamical_instability']
-#                if triple[0].semisecular_regime:
-#                    triple_type_snapshot = tr_type['semisecular_regime']
-                if triple[0].error_flag_secular:
-                    triple_type_snapshot = tr_type['error_flag_secular']
-                    
             if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
                 correct_system = True
 

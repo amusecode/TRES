@@ -327,7 +327,7 @@ Which parameters are printed and in which style can be adjusted to your liking i
 Currently there are 3 options settable on the command line via -S (print_style):
 ```
 0      TRES standard - selected parameters
-1      Full - all possible parameters are printed (only for last line in hdf file)
+1      Full - all possible parameters are printed (sys.exit after first snapshot)
 2      Selected parameters are printed in a human readible way
 ```
 
