@@ -53,6 +53,7 @@ Then, from the root of the cloned respository compile the Makefile:
 ```
 
 cd seculartriple_TPS
+make clean
 make 
 
 ```
@@ -62,6 +63,7 @@ Note: for newer versions of amuse, you need an updated version of the Makefile. 
 (cd seculartriple_TPS)
 mv Makefile Makefile_old
 mv Makefile_new Makefile
+make clean
 make 
 
 ```
