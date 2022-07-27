@@ -292,15 +292,29 @@ The python script rdc_TRES.py reduce the TRES hdf output. The full list of avail
 
 ```
 -f      root of the name of the input file [TRES]
--F      extension of input file [hdf5]
 -S      printing style [0] 
+-F      print all snapshots. By default only the first & last lines are printed.
 ```
+
+You can also select specific types of triples. For these a single extra line is added on the first occasion the requirements are met. Options are:
+```
+--btin         binary type of inner binary [-1]
+--btout        binary type of outer binary [-1]
+--trt          triple type [-1]
+```
+or if you prefer to specify these in string format:
+```
+--btinstr      binary type of inner binary [all]
+--btoutstr     binary type of outer binary [all]
+--trtstr       triple type [all]
+```
+
 
 Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
 Currently there are 3 options settable on the command line via -S (print_style):
 ```
 0      TRES standard - selected parameters
-1      Full - all possible parameters are printed
+1      Full - all possible parameters are printed (only for last line in hdf file)
 2      Selected parameters are printed in a human readible way
 ```
 
@@ -311,12 +325,12 @@ For option 2:
 
 General information on the system: 
 ```
-Line 1: snapshot number, time, triple number, relative_inclination, dynamical_instability, kozai_type, error_flag_secular, CPU_time
+Line 1: snapshot number, triple number, time, relative_inclination, dynamical_instability, kozai_type, error_flag_secular, CPU_time
 ```
 Orbital information (inner binary | outer binary) :
 ```
-Line 2: 'bs:', binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
-        | binary type, stability, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
+Line 2: 'bs:', binary type, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
+        | binary type, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node 
 ```
 Stellar information (primary | secondary | tertiary)
 ```
@@ -327,7 +341,7 @@ Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, cor
 
 
 For option 0: 
-One line is printed for every snapshot with the parameters in the same order as above. The units are Solar Mass, Solar radius, Myr. 
+One line is printed for every snapshot with the parameters in the same order as above (excluding the snapshot number). The units are Solar Mass, Solar radius, Myr. 
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
@@ -355,20 +369,30 @@ The stellar types in TRES follow the standard terminology of AMUSE:
 
 The binary type is a classification for a specific orbit, e.g. the inner or the outer orbit of a triple. The following options exist:
 ```
-unknown
-merger
-disintegrated
-dynamical_instability
-detached
-contact
-collision
-semisecular
-rlof
-stable_mass_transfer
-common_envelope
-common_envelope_energy_balance (i.e. alpha-CE)
-common_envelope_angular_momentum_balance (i.e. gamma-CE)
-double_common_envelope
+-1  all
+0   unknown
+1   merger
+2   disintegrated
+3   dynamical_instability
+4   detached
+5   contact
+6   collision
+7   semisecular
+8   rlof
+9   stable_mass_transfer
+10  common_envelope
+11  common_envelope_energy_balance (i.e. alpha-CE)
+12  common_envelope_angular_momentum_balance (i.e. gamma-CE)
+13  double_common_envelope
+```
+
+And similarly for the triple as a whole:
+```
+-1  all
+0   hierarchical
+1   dynamical_instability 
+2   semisecular_regime (currently not in use)
+3   error_flag_secular 
 ```
 
 Do you want to rerun a system in your datafile? No need to copy all the parameters, simply run rdc_TRES.py with two extra parameters: 
