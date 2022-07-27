@@ -43,9 +43,8 @@ def print_particle(particle):
             print_particle(particle.child1)                
             print_particle(particle.child2)                
        
-
+#for more info on mass transfer stability, see triple[0].is_mt_stable & triple[0].child2.is_mt_stable
 def rdc(file_name_root, file_type, print_style, print_init, line_number):
-
 
     f_type = file_type
     if file_type == "hdf5":
@@ -75,6 +74,7 @@ def rdc(file_name_root, file_type, print_style, print_init, line_number):
         return
 
     print(lib_print_style[print_style])
+
     for i, triple in enumerate(triple.history):
 #        print(triple[0].number, triple[0].time)
 #        if triple[0].number == counter:
@@ -85,8 +85,8 @@ def rdc(file_name_root, file_type, print_style, print_init, line_number):
             print(' ')
             print(i, triple[0].number, triple[0].time, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular, triple[0].CPU_time)
                   
-            print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.is_mt_stable, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
-            print( '|', triple[0].bin_type, triple[0].is_mt_stable, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
+            print( ' bs: ', triple[0].child2.bin_type, triple[0].child2.semimajor_axis, triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node,)# triple[0].child2.mass_transfer_rate,
+            print( '|', triple[0].bin_type, triple[0].semimajor_axis, triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node)#, triple[0].mass_transfer_rate
             print( ' st: ',  triple[0].child2.child1.is_donor, triple[0].child2.child1.stellar_type, triple[0].child2.child1.mass,  triple[0].child2.child1.spin_angular_frequency, triple[0].child2.child1.radius, triple[0].child2.child1.core_mass,)
             print( '|', triple[0].child2.child2.is_donor,  triple[0].child2.child2.stellar_type, triple[0].child2.child2.mass, triple[0].child2.child2.spin_angular_frequency, triple[0].child2.child2.radius,triple[0].child2.child2.core_mass, )
             print( '|', triple[0].child1.is_donor, triple[0].child1.stellar_type, triple[0].child1.mass, triple[0].child1.spin_angular_frequency, triple[0].child1.radius, triple[0].child1.core_mass)
@@ -104,8 +104,8 @@ def rdc(file_name_root, file_type, print_style, print_init, line_number):
         else:
 
             print(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
-            print(bin_type[triple[0].child2.bin_type], int(triple[0].child2.is_mt_stable), triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
-            print(bin_type[triple[0].bin_type], int(triple[0].is_mt_stable), triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
+            print(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
+            print(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
             print(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
             print(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t' )
             print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
