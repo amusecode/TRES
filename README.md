@@ -57,6 +57,17 @@ make
 
 ```
 
+Note: for newer versions of amuse, you need an updated version of the Makefile. If the above line doesn't work, try:
+```
+(cd seculartriple_TPS)
+mv Makefile Makefile_old
+mv Makefile_new Makefile
+make 
+
+```
+
+
+
 ## Simple examples of runs
 
 To evolve a single system with the parameters:
