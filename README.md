@@ -379,7 +379,7 @@ The stellar types in TRES follow the standard terminology of AMUSE:
 18 Planet
 19 Brown Dwarf
 ```
-Note that stellar type 0 and 6 are not used in SeBa. All main-sequence stars are stellar type 1, and all AGB stars have the label stellar type 5 (both EAGB as TPAGB stars). 
+Note that stellar type 0, 6 & 8 are not used in SeBa. All main-sequence stars are stellar type 1, all AGB stars have the label stellar type 5 (both EAGB as TPAGB stars), and both helium hertzsprung gap stars as helium giants are labelled with stellar type 9.  
 
 The binary type is a classification for a specific orbit, e.g. the inner or the outer orbit of a triple. The following options exist:
 ```
