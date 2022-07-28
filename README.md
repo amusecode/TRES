@@ -311,12 +311,18 @@ The python script rdc_TRES.py reduce the TRES hdf output. The full list of avail
 
 You can also select specific types of triples. For these a single extra line is added on the first occasion the requirements are met. Options are:
 ```
+--st1          stellar type of inner binary primary star [-1]
+--st2          stellar type of inner binary secondary star [-1]
+--st3          stellar type of outer star [-1]
 --btin         binary type of inner binary [-1]
 --btout        binary type of outer binary [-1]
 --trt          triple type [-1]
 ```
 or if you prefer to specify these in string format:
 ```
+--st1str       stellar type of inner binary primary star [all]
+--st2str       stellar type of inner binary secondary star [all]
+--st3str       stellar type of outer star [all]
 --btinstr      binary type of inner binary [all]
 --btoutstr     binary type of outer binary [all]
 --trtstr       triple type [all]
@@ -358,28 +364,35 @@ One line is printed for every snapshot with the parameters in the same order as 
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
-0 deeply or fully convective low mass MS star
-1 Main Sequence star
-2 Hertzsprung Gap
-3 First Giant Branch
-4 Core Helium Burning
-5 Early Asymptotic Giant Branch
-6 Thermally Pulsating Asymptotic Giant Branch (not used in SeBa -> labelled as 5) 
-7 Main Sequence Naked Helium star
-8 Hertzsprung Gap Naked Helium star
-9 Giant Branch Naked Helium star
-10 Helium White Dwarf
-11 Carbon/Oxygen White Dwarf
-12 Oxygen/Neon White Dwarf
-13 Neutron Star
-14 Black Hole
-15 Massless Supernova
-16 Unknown stellar type
-17 Pre-main-sequence Star
-18 Planet
-19 Brown Dwarf
+0   lm_ms     deeply or fully convective low mass MS star
+1   ms        Main Sequence star
+2   hg        Hertzsprung Gap
+3   rgb       First Giant Branch
+4   cheb      Core Helium Burning
+5   eagb      Early Asymptotic Giant Branch
+6   tpagb     Thermally Pulsating Asymptotic Giant Branch (not used in SeBa -> labelled as 5) 
+7   hems      Main Sequence Naked Helium star
+8   hehg      Hertzsprung Gap Naked Helium star
+9   hergb     Giant Branch Naked Helium star
+10  hewd      Helium White Dwarf
+11  cowd      Carbon/Oxygen White Dwarf
+12  onewd     Oxygen/Neon White Dwarf
+13  ns        Neutron Star
+14  bh        Black Hole
+15  sn        Massless Supernova
+16  unknown   Unknown stellar type
+17  prems     Pre-main-sequence Star
+18  planet    Planet
+19  bd        Brown Dwarf
+```
+When selecting for stellar type, you can also use the following strings for combinations of startypes:
+```
+agb     eagb, tpagb             [5,6]
+heg     hehg, hergb             [8,9]
+wd      hewd, cowd, onewd       [10,11,12]            
 ```
 Note that stellar type 0, 6 & 8 are not used in SeBa. All main-sequence stars are stellar type 1, all AGB stars have the label stellar type 5 (both EAGB as TPAGB stars), and both helium hertzsprung gap stars as helium giants are labelled with stellar type 9.  
+
 
 The binary type is a classification for a specific orbit, e.g. the inner or the outer orbit of a triple. The following options exist:
 ```

@@ -7,7 +7,32 @@ import io
     
 minimum_time_step = 1.e-9 |units.Myr
 
-
+star_type = {   'all': -1,
+                'lm_ms': 0,
+                'ms': 1, 
+                'hg': 2,
+                'rgb': 3, 
+                'cheb': 4, 
+                'eagb': 5, 
+                'tpagb': 6, 
+                'agb':[5,6], 
+                'hems':7, 
+                'hehg':8, 
+                'hergb':9, 
+                'heg':[8,9], 
+                'hewd': 10, 
+                'cowd': 11, 
+                'onewd': 12, 
+                'wd': [10,11,12],
+                'ns': 13,
+                'bh': 14, 
+                'sn': 15,
+                'unknown': 16, 
+                'prems': 17, 
+                'planet': 18,
+                'bd': 19,
+            }
+                
 bin_type = {    'all': -1,
                 'unknown': 0,       
                 'merger': 1, 
@@ -54,7 +79,8 @@ def print_to_string(*args, **kwargs):
 
        
 #for more info on mass transfer stability, see triple[0].is_mt_stable & triple[0].child2.is_mt_stable
-def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, triple_type, triple_type_string):
+def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_primary_star_type, inner_secondary_star_type, outer_star_type, inner_primary_star_type_string, inner_secondary_star_type_string, outer_star_type_string, 
+inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, triple_type, triple_type_string):
 
     file_name = file_name_root + ".hdf"            
     if file_name_root[-4:]==".hdf":
@@ -79,11 +105,22 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
         return
 
 
-
-#    print(inner_bin_type, outer_bin_type, triple_type)
-#    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
     correct_system = False
     correct_system_previous = False
+#    print(inner_primary_star_type, inner_secondary_star_type, outer_star_type)
+#    print(star_type[inner_primary_star_type_string],star_type[inner_secondary_star_type_string],star_type[outer_star_type_string] )
+#    print(inner_bin_type, outer_bin_type, triple_type)
+#    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
+
+    if inner_primary_star_type != -1 and star_type[inner_primary_star_type_string] != -1 and inner_primary_star_type != star_type[inner_primary_star_type_string] :
+        print('error: two different inner primary star types requested')
+        return
+    if inner_secondary_star_type != -1 and star_type[inner_secondary_star_type_string] != -1 and inner_secondary_star_type != star_type[inner_secondary_star_type_string] :
+        print('error: two different inner secondary star types requested')
+        return
+    if outer_star_type != -1 and star_type[outer_star_type_string] != -1 and outer_star_type != star_type[outer_star_type_string] :
+        print('error: two different outer star types requested')
+        return
     if inner_bin_type > -1 and bin_type[inner_bin_type_string] > -1 and inner_bin_type != bin_type[inner_bin_type_string] :
         print('error: two different inner binary types requested')
         return
@@ -93,13 +130,22 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
     if triple_type > -1 and tr_type[triple_type_string] > -1 and triple_type != tr_type[triple_type_string] :
         print('error: two different triple types requested')
         return        
+        
+    if star_type[inner_primary_star_type_string] != -1:
+        inner_primary_star_type = star_type[inner_primary_star_type_string]
+    if star_type[inner_secondary_star_type_string] != -1:
+        inner_secondary_star_type = star_type[inner_secondary_star_type_string]
+    if star_type[outer_star_type_string] != -1:
+        outer_star_type = star_type[outer_star_type_string]
     inner_bin_type = max(inner_bin_type, bin_type[inner_bin_type_string])    
     outer_bin_type = max(outer_bin_type, bin_type[outer_bin_type_string]) 
     triple_type = max(triple_type, tr_type[triple_type_string]) 
+    
+#    print(inner_primary_star_type, inner_secondary_star_type, outer_star_type)
+#    print(star_type[inner_primary_star_type_string],star_type[inner_secondary_star_type_string],star_type[outer_star_type_string] )    
 #    print(inner_bin_type, outer_bin_type, triple_type)
 #    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
 
-    
     print(lib_print_style[print_style])
     triple_string = ''
     snapshot_string = '' 
@@ -191,7 +237,12 @@ def rdc(file_name_root, print_style, print_full, print_init, line_number, inner_
             snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 #            snapshot_string = snapshot_string + '\n'
 
-        if (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
+        if (inner_primary_star_type == star_type['all'] or triple[0].child2.child1.stellar_type.value_in(units.stellar_type) in np.array(inner_primary_star_type)) and \
+        (inner_secondary_star_type == star_type['all'] or triple[0].child2.child2.stellar_type.value_in(units.stellar_type) in np.array(inner_secondary_star_type)) and \
+        (outer_star_type == star_type['all'] or triple[0].child1.stellar_type.value_in(units.stellar_type) in np.array(outer_star_type)) and \
+        (inner_bin_type == bin_type['all'] or inner_bin_type == bin_type[triple[0].child2.bin_type]) and \
+        (outer_bin_type == bin_type['all'] or outer_bin_type == bin_type[triple[0].bin_type]) and \
+        (triple_type == tr_type['all'] or triple_type == triple_type_snapshot):
             correct_system = True
 
         if i==0 and print_full==False:
@@ -221,7 +272,19 @@ def parse_arguments():
     parser.add_option("-l", dest="line_number", type="int", default = 0,
                       help="line number for printing initial conditions [%default]") #will only do something when print_init = True
 
-    #returns first instance where desired bin_type is reached 
+    #returns first instance where desired star_type, bin_type & triple_type is reached 
+    parser.add_option("--st1", dest="inner_primary_star_type", type="int", default = -1,
+                      help="desired stellar type of inner binary primary star (int) [%default]") 
+    parser.add_option("--st2", dest="inner_secondary_star_type", type="int", default = -1,
+                      help="desired stellar type of inner binary secondary star (int) [%default]") 
+    parser.add_option("--st3", dest="outer_star_type", type="int", default = -1,
+                      help="desired stellar type of tertiary star (int) [%default]") 
+    parser.add_option("--st1str", dest="inner_primary_star_type_string", default = "all",
+                      help="desired stellar type of inner binary primary star (int) [%default]") 
+    parser.add_option("--st2str", dest="inner_secondary_star_type_string", default = "all",
+                      help="desired stellar type of inner binary secondary star (int) [%default]") 
+    parser.add_option("--st3str", dest="outer_star_type_string", default = "all",
+                      help="desired stellar type of tertiary star [%default]") 
     parser.add_option("--btin", dest="inner_bin_type", type="int", default = -1,
                       help="desired binary type of inner binary (int) [%default]") 
     parser.add_option("--btout", dest="outer_bin_type", type="int", default = -1,
