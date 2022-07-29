@@ -132,6 +132,12 @@ Depreciated (yet still functioning) parameters are given in {}.
         8:  Paczynski 1990, 348, 485 scaled down for bh by mass
         9:  Verbunt, Igoshev & Cator, 2017, 608, 57
         10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh by mass 
+        
+--CE    which type of modelling for common envelope evolution   default = 2
+        options:
+        0:  alpha-ce + alpha-dce
+        1:  gamma-ce + alpha-dce
+        2:  seba style; combination of gamma-ce, alpha-ce & alpha-dce    
 
 ```
 

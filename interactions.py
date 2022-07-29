@@ -10,10 +10,6 @@ numerical_error  = 1.e-6
 small_numerical_error  = 1.e-10
 minimum_eccentricity = 1.e-5
 
-which_common_envelope = 2
-#0 alpha + dce
-#1 gamma + dce
-#2 seba style
 const_common_envelope_efficiency = 4.0 #1.0, 4 for now for easier testing with SeBa
 const_envelope_structure_parameter = 0.5
 const_common_envelope_efficiency_gamma = 1.75
@@ -547,7 +543,7 @@ def common_envelope_phase(bs, donor, accretor, self):
     stopping_condition = True
     
     if REPORT_FUNCTION_NAMES:
-        print('Common envelope phase', which_common_envelope)
+        print('Common envelope phase', self.which_common_envelope)
         print('donor:', donor.stellar_type)
         print('accretor:', accretor.stellar_type)
 
@@ -581,17 +577,17 @@ def common_envelope_phase(bs, donor, accretor, self):
     
 
         
-    if which_common_envelope == 0:
+    if self.which_common_envelope == 0:
         if donor.stellar_type in stellar_types_giants and accretor.stellar_type in stellar_types_giants:
            stopping_condition = double_common_envelope(bs, donor, accretor, self)
         else:
             stopping_condition = common_envelope_energy_balance(bs, donor, accretor, self)
-    elif which_common_envelope == 1:
+    elif self.which_common_envelope == 1:
         if donor.stellar_type in stellar_types_giants and accretor.stellar_type in stellar_types_giants:
             stopping_condition = double_common_envelope(bs, donor, accretor, self)
         else:
             stopping_condition = common_envelope_angular_momentum_balance(bs, donor, accretor, self)
-    elif which_common_envelope == 2:
+    elif self.which_common_envelope == 2:
         Js_d = self.spin_angular_momentum(donor)
         Js_a = self.spin_angular_momentum(accretor)        
         Jb = self.orbital_angular_momentum(bs)

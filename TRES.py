@@ -78,6 +78,7 @@ class Triple_Class:
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
             stop_at_dynamical_instability, stop_at_semisecular_regime,  
             stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+            which_common_envelope,
             stop_at_CPU_time, max_CPU_time,
             file_name, file_type, dir_plots):
         
@@ -128,6 +129,7 @@ class Triple_Class:
         self.SN_kick_distr = SN_kick_distr
         self.impulse_kick_for_black_holes = impulse_kick_for_black_holes
         self.fallback_kick_for_black_holes = fallback_kick_for_black_holes
+        self.which_common_envelope = which_common_envelope
         self.max_CPU_time = max_CPU_time
 
         self.triple = bins[1]
@@ -3396,6 +3398,7 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
             stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, 
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
+            which_common_envelope = 2, 
             stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "triple.hdf", file_type = "hdf5", dir_plots = ""):
 
 
@@ -3427,6 +3430,7 @@ def main(inner_primary_mass= 1.3|units.MSun, inner_secondary_mass= 0.5|units.MSu
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
             stop_at_dynamical_instability, stop_at_semisecular_regime, 
             stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+            which_common_envelope,
             stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
 
@@ -3514,6 +3518,12 @@ def parse_arguments():
                       help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
     parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick with fallback  [%default]")                      
+
+    #0  alpha-ce + alpha-dce
+    #1  gamma-ce + alpha-dce
+    #2  seba style; combination of gamma-ce, alpha-ce & alpha-dce
+    parser.add_option("--CE", dest="which_common_envelope",  type="int", default = 2,
+                      help="which common envelope modeling [%default]")                      
 
     parser.add_option("-z", "-Z", dest="metallicity", type="float", default = 0.02,
                       help="metallicity [%default] %unit")

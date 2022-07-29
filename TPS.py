@@ -103,6 +103,13 @@ lib_SN_kick_distr = {0: "No kick",
                     5: "Verbunt", #Verbunt, Igoshev & Cator, 2017, 608, 57
                     } #default
 
+
+lib_CE = {  0: "alpha-ce + alpha-dce",
+            1: "gamma-ce + alpha-dce", 
+            2: "seba style; combination of gamma-ce, alpha-ce & alpha-dce", 
+}
+
+
          
 #not implemented yet
 ##            -s         random seed
@@ -726,6 +733,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
 
@@ -791,6 +799,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                     stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
                     impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
                     fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                    which_common_envelope = which_common_envelope,
                     stop_at_CPU_time = stop_at_CPU_time,
                     max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
@@ -831,6 +840,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
@@ -846,6 +856,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print('Outer aop: \t\t',                    outer_aop_distr, ' ',lib_outer_aop_distr[outer_aop_distr] )        
     print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
     print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
+    print('Common envelope model: \t',          which_common_envelope, ' ', lib_CE[which_common_envelope])
     print('Metallicity: \t\t',                  '-', ' ', metallicity.value_in(units.none))
     print('\n\n')
     
@@ -888,6 +899,7 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
+                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
@@ -1159,6 +1171,8 @@ def parse_arguments():
                       help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
     parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick with fallback  [%default]")                      
+    parser.add_option("--CE", dest="which_common_envelope",  type="int", default = 2,
+                      help="which common envelope modeling [%default]")                      
 
     parser.add_option("-z", "-Z",unit=units.none, 
                       dest="metallicity", type="float", default = 0.02|units.none,
