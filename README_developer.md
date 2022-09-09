@@ -163,6 +163,18 @@ For the moment this only works for pre-mass transfer systems.
 1  Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
 2  Roche radius based on Eggleton's classical formula. Watch out this is only valid for circularized & synchronised systems
 ```
+6) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. Lastly, when running the rdc_TRES.py script, you will get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
+
+```
+mkdir -p output
+for filename in  TRES_output/*.hdf; do
+    processed_name=$(cut -d’.' -f1 <<< “$filename”)
+    python rdc_TRES.py -F -f $filename > output”$(basename $processed_name.txt)”
+    for i in $(seq 11); do
+        sed -i ‘’ ‘$ d’ output/“$(basename $processed_name.txt)”
+    done
+done
+```
 
 ### Run TRES on cluster
 Running computationally expensive simulations on a computer cluster can save a lot of time. However, clusters work somewhat different than your personal computer. There are two points we'd like to draw your attention to.
