@@ -117,7 +117,7 @@ Depreciated (yet still functioning) parameters are given in {}.
 --dir_plots       directory for plots for debugging default = "" (current directory)
                   mode  (aka REPORT_DEBUG == True)
 --max_CPU_time    maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
-                                                default = 7200 (seconds)
+                                                default = 3600 (seconds)
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:
