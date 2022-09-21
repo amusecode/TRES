@@ -37,7 +37,11 @@ make clean
 make               # Here we compile all the C files
 ```
 
-It is very important to know that anytime the code is compiled, the source code will be downloaded again, meaning any changes to SeBa will be overwritten. To prevent this from happening, we need to comment out a line in the Makefile. In line 47, put a "#" before "download src/SeBa".
+Side note: To get the latest version of SeBa (if a later version exists) and compile it:
+```
+make download
+make
+```
 
 TRES can simply be installed by cloning the github repository in the terminal:
 
