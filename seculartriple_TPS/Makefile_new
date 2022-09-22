@@ -1,6 +1,10 @@
 ifeq ($(origin AMUSE_DIR), undefined)
   AMUSE_DIR := $(shell amusifier --get-amuse-dir)
 endif
+-include ${AMUSE_DIR}/config.mk
+
+MPICXX ?= mpicxx
+CXX ?= g++
 
 CODE_GENERATOR = $(AMUSE_DIR)/bin/amusifier
 
@@ -22,10 +26,10 @@ worker_code.cc: interface.py
 	$(CODE_GENERATOR) --type=c interface.py SecularTripleInterface -o $@
 
 worker_code: worker_code.cc $(OBJS)
-	g++ $(CXXFLAGS) $@.cc $(OBJS) -o $@
+	$(MPICXX) $(CXXFLAGS) $@.cc $(OBJS) -o $@
 
 .cc.o: $<
-	g++ $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 .c.o: $<
-	g++ $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
