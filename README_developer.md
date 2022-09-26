@@ -203,20 +203,27 @@ function clean_up {
     echo "### Running Clean_up ###"
     # all files should be deleted from the compute-node before job end
     # if there are more than one output files in the directory after the completion of one of the simulations, only delete the file
-    # corresponding to that simulation. Otherwise, remove the whole directory
+    # corresponding to that simulation. Otherwise, remove the whole directory    
+    files=$(ls *)
+    echo $files   
     num_files=$(ls *.hdf | wc -l)
     echo "$num_files"
-    if [ "$num_files" -eq "1" ]
-    then
-        rm -rf "/hddstore/$USER"
-        echo "Removed all files"
-    else
-        #rm -rf "/hddstore/$USER/$SLURM_ARRAY_TASK_ID"
-        rm "/hddstore/$USER/$FILE_NAME" 
-        echo 'Removed'"$FILE_NAME"''
-    fi
+    #if [ "$num_files" -eq "1" ]
+    #then
+    #    rm -rf "/hddstore/$USER"
+    #    echo "Removed all files"
+    #else
+    #    #rm -rf "/hddstore/$USER/$SLURM_ARRAY_TASK_ID"
+    #    rm "/hddstore/$USER/$FILE_NAME" 
+    #    echo 'Removed'"$FILE_NAME"''
+    #fi
+
+    # copy the data from the node to the storage directory
+    cp $FILE_NAME /zfs/helios/filer0/$USER/$STORAGE_FOLDER/
+    rm "/hddstore/$USER/$FILE_NAME" 
     echo "Finished"; date
-#    # - exit the script
+    
+    # exit the script
     exit
 }
 
@@ -252,9 +259,5 @@ NUM_PER_JOB=3
 echo python $TRES_DIR/TPS.py -n $NUM_PER_JOB -N $((NUM_PER_JOB*SLURM_ARRAY_TASK_ID)) -f $FILE_NAME -T 1
 python $TRES_DIR/TPS.py -n $NUM_PER_JOB -N $((NUM_PER_JOB*SLURM_ARRAY_TASK_ID)) -f $FILE_NAME -T 1 
                              
-# copy the data from the node to the storage directory
-cp $FILE_NAME /zfs/helios/filer0/$USER/$STORAGE_FOLDER/
-files=$(ls *)
-echo $files
 ```
 
