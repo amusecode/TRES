@@ -326,6 +326,9 @@ class Triple_Class:
         self.secular_code.parameters.verbose = False
 #        self.secular_code.parameters.verbose = True
         
+        #needed for initialisation in some circumstances 
+        self.secular_code.model_time = self.triple.time
+        
         self.secular_code.parameters.equations_of_motion_specification = 0
         self.secular_code.parameters.roche_radius_specification = 0
         #0: eccentric eggleton, 1: sepinsky, 2: classical circular eggleton
@@ -2448,8 +2451,8 @@ class Triple_Class:
                 if REPORT_DEBUG:
                     print('Secular evolution finished')
                 
-		# to differentiate between semi-detached and contact 
-		self.check_RLOF()
+                # to differentiate between semi-detached and contact 
+                self.check_RLOF()
 		
                 if self.triple.time - self.secular_code.model_time < -1*numerical_error|units.Myr and self.secular_code.triples[0].error_flag_secular >= 0:
                     print('triple time < sec time: should not be possible', self.triple.time, self.secular_code.model_time)
