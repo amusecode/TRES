@@ -470,7 +470,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
             
         }
         e_in_dot_tides = e_in_dot_tides_star1 + e_in_dot_tides_star2;
-        printf("e_in_dot_tides %g %g %g \n",e_in_dot_tides, e_in_dot_tides_star1, e_in_dot_tides_star2);
+//        printf("e_in_dot_tides %g %g %g \n",e_in_dot_tides, e_in_dot_tides_star1, e_in_dot_tides_star2);
     }
     
     /* mass transfer */
@@ -529,6 +529,7 @@ printf("e_in_dot %g %g %g %g %g %g\n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in
     /* combined */
 	double e_out_dot = e_out_dot_newtonian + e_out_dot_GR_25PN_out + e_out_dot_tides;
 	Ith(ydot,2) = -1.0*pow(10.0,-y)*e_out_dot/log(10.0);
+printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_out,e_out_dot_tides);
 
 
 
@@ -552,8 +553,8 @@ printf("e_in_dot %g %g %g %g %g %g\n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in
                 + cosphi*(3.0*A - 10.0*cositot_p2 + 2.0)));
 
 
-        printf("g_in_dot newtonian %g %g  %g \n", g_in_dot_newtonian,6.0*C2*((1.0/G_in)*(4.0*cositot_p2 + (5.0*cos_2g_in - 1.0)*(l_in_p2 - cositot_p2)) 
-                + (cositot/G_out)*(2.0 + e_in_p2*(3.0 - 5.0*cos_2g_in))) , C3*e_out*(e_in*((1.0/G_out) + (cositot/G_in))*(sin_g_in*sin_g_out*(10.0*(3.0*cositot_p2  - 1.0)*(1.0 - e_in_p2) + A) - 5.0*B*cositot*cosphi) - (l_in_p2/(e_in*G_in))*(sin_g_in*sin_g_out*10.0*cositot*sinitot_p2*(1.0 - 3.0*e_in_p2) + cosphi*(3.0*A - 10.0*cositot_p2 + 2.0))));
+//        printf("g_in_dot newtonian %g %g  %g \n", g_in_dot_newtonian,6.0*C2*((1.0/G_in)*(4.0*cositot_p2 + (5.0*cos_2g_in - 1.0)*(l_in_p2 - cositot_p2)) 
+//                + (cositot/G_out)*(2.0 + e_in_p2*(3.0 - 5.0*cos_2g_in))) , C3*e_out*(e_in*((1.0/G_out) + (cositot/G_in))*(sin_g_in*sin_g_out*(10.0*(3.0*cositot_p2  - 1.0)*(1.0 - e_in_p2) + A) - 5.0*B*cositot*cosphi) - (l_in_p2/(e_in*G_in))*(sin_g_in*sin_g_out*10.0*cositot*sinitot_p2*(1.0 - 3.0*e_in_p2) + cosphi*(3.0*A - 10.0*cositot_p2 + 2.0))));
 
 
     }
@@ -645,7 +646,7 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
     double g_out_dot = g_out_dot_newtonian + g_out_dot_GR_1PN_out + g_out_dot_GR_1PN_in_out + g_out_dot_tides;
 	Ith(ydot,4) = g_out_dot;
 	
-    printf("g_out_dot %g %g %g %g %g %g \n",g_out, g_out_dot, g_out_dot_newtonian, g_out_dot_GR_1PN_out, g_out_dot_GR_1PN_in_out, g_out_dot_tides);
+//    printf("g_out_dot %g %g %g %g %g %g \n",g_out, g_out_dot, g_out_dot_newtonian, g_out_dot_GR_1PN_out, g_out_dot_GR_1PN_in_out, g_out_dot_tides);
     
     
     /*******************************
@@ -689,7 +690,7 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
         double a_in_dot_tides_star2 = -6.0*(1.0+m1_div_m2)*m1_div_m2_times_R2_div_a_in_p6_times_k_div_T_tides_star2*R2_div_a_in_p2*a_in*pow(l_in,-15.0)*(f_tides1_in \
             - l_in_p3*f_tides2_in*spin_angular_frequency2_div_n_in);            
         a_in_dot_tides = a_in_dot_tides_star1 + a_in_dot_tides_star2;
-        printf("a_in_dot_tides %g %g %g \n",a_in_dot_tides, a_in_dot_tides_star1, a_in_dot_tides_star2);
+//        printf("a_in_dot_tides %g %g %g \n",a_in_dot_tides, a_in_dot_tides_star1, a_in_dot_tides_star2);
     }
 
     /* wind mass loss */
@@ -1081,6 +1082,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     double rp_out = a_out*(1.0 - e_out);
     
     int roche_radius_specification = data->roche_radius_specification;
+    int stability_limit_specification = data->stability_limit_specification;
     
     if (check_for_dynamical_stability == TRUE)
     {
@@ -1089,7 +1091,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         /*  in future other criteria could be implemented as well */
 
         double itot = acos(Ith(yev,9));
-        double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot);
+        double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot,stability_limit_specification);
         
         gout[0] = a_out/a_in - a_out_div_a_in_crit;///1.5;
     }
@@ -1098,7 +1100,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     {
         /*	check for collision at periastron (inner binary)	*/
         gout[1] = rp_in - (R1 + R2);
-        //printf("collision %g %g %g %g\n",rp_in, R1, R2, gout[1]);
+        printf("collision %g %g %g %g %g\n",a_in, rp_in, R1, R2, gout[1]);
         
     }
     
@@ -1120,12 +1122,12 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         
         double roche_radius_pericenter_inner_star1 = roche_radius(rp_in, m1/m2, e_in, f1, roche_radius_specification);
         gout[3] = R1 - roche_radius_pericenter_inner_star1;
-        //printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
+        printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
 
         double roche_radius_pericenter_inner_star2 = roche_radius(rp_in, m2/m1, e_in, f2, roche_radius_specification);
 
         gout[4] = R2 - roche_radius_pericenter_inner_star2;
-        //printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
+        printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
         
     }
     if (check_for_outer_RLOF == TRUE)
@@ -1166,15 +1168,19 @@ double a_out_div_a_in_semisecular_regime(double m1, double m2, double m3, double
     return a_out_div_a_in_crit;
 }
 
-double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double a_in, double a_out, double e_in, double e_out, double itot)
+double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double a_in, double a_out, double e_in, double e_out, double itot, int stability_limit_specification)
 {
     /* wrapper used in interface.py */
-    
-    return a_out_div_a_in_dynamical_stability_mardling_aarseth_01(m1,m2,m3,e_out,itot);
-//    return a_out_div_a_in_dynamical_stability_petrovich_15_simple(e_in,e_out);
-//    return a_out_div_a_in_dynamical_stability_petrovich_15(m1,m2,m3,e_in,e_out,a_in,a_out);
-//    return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);
-//    return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);
+    if (stability_limit_specification == 1){
+        return a_out_div_a_in_dynamical_stability_petrovich_15_simple(e_in,e_out);}
+    else if (stability_limit_specification == 2){
+        return a_out_div_a_in_dynamical_stability_petrovich_15(m1,m2,m3,e_in,e_out,a_in,a_out);}
+    else if (stability_limit_specification == 3){
+        return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);}        
+    else if (stability_limit_specification == 4){
+        return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);}         
+    else {
+        return a_out_div_a_in_dynamical_stability_mardling_aarseth_01(m1,m2,m3,e_out,itot);}
 
 }
 

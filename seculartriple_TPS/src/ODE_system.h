@@ -18,7 +18,7 @@ double f_a_dot_mass_variations_fast_and_isotropic_wind(double m_donor, double m_
 int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data);
 
 double a_out_div_a_in_semisecular_regime(double m1, double m2, double m3, double e_in, double e_out, double check_for_semisecular_regime_parameter);
-double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double a_in,double a_out,double e_in,double e_out, double itot);
+double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, double a_in,double a_out,double e_in,double e_out, double itot, int stability_limit_specification);
 double a_out_div_a_in_dynamical_stability_mardling_aarseth_01(double m1, double m2, double m3, double e_out, double itot);
 double a_out_div_a_in_dynamical_stability_petrovich_15_simple(double e_in, double e_out);
 double a_out_div_a_in_dynamical_stability_petrovich_15(double m1, double m2, double m3,double e_in,  double e_out, double a_in,  double a_out);

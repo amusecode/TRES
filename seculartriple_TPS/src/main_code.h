@@ -119,6 +119,7 @@ typedef struct {
     bool check_for_inner_RLOF,check_for_outer_RLOF;
     bool include_linear_mass_change,include_linear_radius_change;
     int roche_radius_specification;
+    int stability_limit_specification;
     
     
     /* addition Jan 2017 */
@@ -193,6 +194,8 @@ int get_equations_of_motion_specification(int *value);
 int set_equations_of_motion_specification(int value);
 int get_roche_radius_specification(int *value);
 int set_roche_radius_specification(int value);
+int get_stability_limit_specification(int *value);
+int set_stability_limit_specification(int value);
 int get_input_precision(double *input_precision_t);
 int set_input_precision(double input_precision_t);
 int get_linear_solver(int *linear_solver_t);

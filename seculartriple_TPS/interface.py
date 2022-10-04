@@ -287,6 +287,7 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('e_in', dtype='float64', direction=function.IN)
         function.addParameter('e_out', dtype='float64', direction=function.IN)
         function.addParameter('itot', dtype='float64', direction=function.IN)        
+        function.addParameter('stability_limit_specification', dtype='int32', direction=function.IN)
         function.result_type = 'float64'
         return function
 
@@ -312,6 +313,7 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('roche_radius_specification', dtype='int32', direction=function.IN)
         function.result_type = 'float64'
         return function
+
 
     @legacy_function
     def get_relative_tolerance():
@@ -420,6 +422,20 @@ class SecularTripleInterface(CodeInterface):
 
     @legacy_function
     def set_roche_radius_specification():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='int32',direction=function.IN,description = "...")
+        function.result_type = 'int32'
+        return function
+
+    @legacy_function
+    def get_stability_limit_specification():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='int32',direction=function.OUT,description = "...")
+        function.result_type = 'int32'
+        return function
+
+    @legacy_function
+    def set_stability_limit_specification():
         function = LegacyFunctionSpecification()
         function.addParameter('value', dtype='int32',direction=function.IN,description = "...")
         function.result_type = 'int32'
@@ -921,6 +937,13 @@ class SecularTriple(InCodeComponentImplementation):
             default_value = 0
         )
         object.add_method_parameter(
+            "get_stability_limit_specification",
+            "set_stability_limit_specification",
+            "stability_limit_specification",
+            "stability_limit_specification",
+            default_value = 0
+        )
+        object.add_method_parameter(
             "get_check_for_dynamical_stability",
             "set_check_for_dynamical_stability",
             "check_for_dynamical_stability",
@@ -1386,6 +1409,8 @@ class SecularTriple(InCodeComponentImplementation):
                 object.NO_UNIT,             ### e_in
                 object.NO_UNIT,             ### e_out
                 object.NO_UNIT,             ### itot -- NOTE: should be in radians
+                object.NO_UNIT,             ### stability_limit_specification
+                
             ),
             (
                 object.NO_UNIT,             ### a_out/a_in for dynamical stability
@@ -1460,6 +1485,16 @@ class SecularTriple(InCodeComponentImplementation):
         )
         object.add_method(
             "set_roche_radius_specification",
+            (object.NO_UNIT, ),
+            (object.ERROR_CODE,)
+        )
+        object.add_method(
+            "get_stability_limit_specification",
+            (),
+            (object.NO_UNIT, object.ERROR_CODE,)
+        )
+        object.add_method(
+            "set_stability_limit_specification",
             (object.NO_UNIT, ),
             (object.ERROR_CODE,)
         )
@@ -1574,7 +1609,7 @@ class SecularTriple(InCodeComponentImplementation):
             inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
             m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
             
-            a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in, e_out,triple.relative_inclination)
+            a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in, e_out,triple.relative_inclination, self.parameters.stability_limit_specification)
             if a_out/a_in <= a_out_div_a_in_dynamical_stability:
                 if self.parameters.verbose == True:
                     print('SecularTriple -- triple system is dynamically unstable: a_out/a_in = ',a_out/a_in,', whereas for dynamical stability, a_out/a_in should be > ',a_out_div_a_in_dynamical_stability)
@@ -2004,7 +2039,7 @@ def extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2
 
     ### if enabled, check for dynamical stability at initialisation ###
     if parameters.check_for_dynamical_stability_at_initialisation == True:
-        a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,triple.relative_inclination)
+        a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,triple.relative_inclination, self.parameters.stability_limit_specification)
         if a_out/a_in <= a_out_div_a_in_dynamical_stability:
             if self.parameters.verbose == True:
                 print( 'SecularTriple -- code parameter "check_for_dynamical_stability_at_initialisation" = True')

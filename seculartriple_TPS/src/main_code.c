@@ -26,6 +26,7 @@
 /*	interface parameters	*/
 int equations_of_motion_specification = 0;
 int roche_radius_specification = 0;
+int stability_limit_specification = 0;
 bool check_for_dynamical_stability;
 bool check_for_inner_collision,check_for_outer_collision;
 bool check_for_inner_RLOF,check_for_outer_RLOF;
@@ -220,6 +221,7 @@ int evolve(
     data->inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1 = inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1;    
 
     data->roche_radius_specification = roche_radius_specification;
+    data->stability_limit_specification = stability_limit_specification;
     data->check_for_dynamical_stability = check_for_dynamical_stability;
     data->check_for_inner_collision = check_for_inner_collision;
     data->check_for_outer_collision = check_for_outer_collision;
@@ -607,6 +609,16 @@ int get_roche_radius_specification(int *value)
 int set_roche_radius_specification(int value)
 {
     roche_radius_specification = value;
+    return 0;
+}
+int get_stability_limit_specification(int *value)
+{
+    *value = stability_limit_specification;
+    return 0;
+}
+int set_stability_limit_specification(int value)
+{
+    stability_limit_specification = value;
     return 0;
 }
 int get_relative_tolerance(double *value)
