@@ -117,6 +117,7 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 import TRES as TRES
 
+import sys
 from amuse.units.optparse import OptionParser
 from amuse.units import units, constants
 from amuse.support.console import set_printing_strategy
@@ -160,8 +161,7 @@ def eggleton_mass_distr(lower_mass, upper_mass):
 
 def powerlaw_distr(m_min, m_max, slope):    
     if slope == -1 or slope == 0:
-        return 'slope of powerlap distribution incorrect'
-        exit(1)
+        sys.exit('slope of powerlap distribution incorrect')
     slope1 = slope + 1
     factor = (pow(m_max / m_min, slope1) - 1.0 )
     x = np.random.uniform(0,1)
@@ -683,8 +683,7 @@ class Generate_initial_triple:
 
             return True
         else:
-            print('not possible')
-            exit(1)
+            sys.exit('not possible in eggleton distribution')
 
                  
 
@@ -903,140 +902,104 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
-        print('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
-        exit(1)
+        sys.exit('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
         
     if (inner_secondary_mass_max > absolute_max_mass) :
-        print('error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']')
-        exit(1)
-
+        sys.exit('error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']')
     
     if (outer_mass_max > absolute_max_mass) :
-        print('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
-        exit(1)
+        sys.exit('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
     
 #     if (inner_secondary_mass_min < absolute_min_mass) :
-#         print('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
-#         exit(1)
+#         sys.exit('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
 #     if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
-#         print('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
-#         exit(1)
+#         sys.exit('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
     
     if (inner_primary_mass_max < inner_primary_mass_min):
-        print('error: maximum inner primary mass smaller than minimum in primary mass')
-        exit(1)
+        sys.exit('error: maximum inner primary mass smaller than minimum in primary mass')
 
     if (inner_secondary_mass_max < inner_secondary_mass_min):
-        print('error: maximum inner secondary mass smaller than minimum in secondary mass')
-        exit(1)
+        sys.exit('error: maximum inner secondary mass smaller than minimum in secondary mass')
 
     if (outer_mass_max < outer_mass_min):
-        print('error: maximum outer mass smaller than minimum in outer mass')
-        exit(1)
+        sys.exit('error: maximum outer mass smaller than minimum in outer mass')
 
 
-        
     if (inner_mass_ratio_min < 0.) or (inner_mass_ratio_max > 1.):
-        print('error: inner mass ratio not in allowed range')
-        exit(1)
+        sys.exit('error: inner mass ratio not in allowed range')
         
     if (inner_mass_ratio_max < inner_mass_ratio_min):
-        print('error: maximum inner mass ratio smaller than minimum mass ratio')
-        exit(1)
+        sys.exit('error: maximum inner mass ratio smaller than minimum mass ratio')
 
 
     if (outer_mass_ratio_min < 0.) or (outer_mass_ratio_max > 1.):
-        print('error: outer mass ratio not in allowed range')
-        exit(1)
+        sys.exit('error: outer mass ratio not in allowed range')
         
     if (outer_mass_ratio_max < outer_mass_ratio_min):
-        print('error: maximum outer mass ratio smaller than minimum mass ratio')
-        exit(1)
-        
-        
+        sys.exit('error: maximum outer mass ratio smaller than minimum mass ratio')
+       
 
     if (inner_semi_min < 5.|units.RSun):
-        print('error: inner separation not in allowed range >5 RSun')
-        exit(1)
+        sys.exit('error: inner separation not in allowed range >5 RSun')
 
     if (outer_semi_min < 5.|units.RSun):
-        print('error: outer separation not in allowed range >5 RSun')
-        exit(1)
+        sys.exit('error: outer separation not in allowed range >5 RSun')
         
     if (inner_semi_max < inner_semi_min):
-        print('error: maximum inner separation smaller than minimum in separation')
-        exit(1)
+        sys.exit('error: maximum inner separation smaller than minimum in separation')
 
     if (outer_semi_max < outer_semi_min):
-        print('error: maximum outer separation smaller than minimum outer separation')
-        exit(1)
+        sys.exit('error: maximum outer separation smaller than minimum outer separation')
         
     if (inner_semi_min > outer_semi_max):
-        print('error: maximum outer separation smaller than minimum inner separation - no overlap for inner and outer orbit')
-        exit(1)
+        sys.exit('error: maximum outer separation smaller than minimum inner separation - no overlap for inner and outer orbit')
         
-        
-
 
     if (inner_ecc_min < 0.) or (inner_ecc_max > 1.):
-        print('error: inner eccentricity not in allowed range [0,1]')
-        exit(1)
+        sys.exit('error: inner eccentricity not in allowed range [0,1]')
 
     if (outer_ecc_min < 0.) or (outer_ecc_max > 1.):
-        print('error: outer eccentricity not in allowed range [0,1]')
-        exit(1)
+        sys.exit('error: outer eccentricity not in allowed range [0,1]')
 
     if (inner_ecc_max < inner_ecc_min):
-        print('error: maximum inner eccentricity smaller than minimum ecc')
-        exit(1)
+        sys.exit('error: maximum inner eccentricity smaller than minimum ecc')
 
     if (outer_ecc_max < outer_ecc_min):
-        print('error: maximum outer eccentricity smaller than minimum ecc')
-        exit(1)
+        sys.exit('error: maximum outer eccentricity smaller than minimum ecc')
 
 
     if (incl_min < 0.) or (incl_max > np.pi):
-        print('error: relative inclination not in allowed range [0, pi]')
-        exit(1)
+        sys.exit('error: relative inclination not in allowed range [0, pi]')
 
     if (incl_max < incl_min):
-        print('error: maximum relative inclination smaller than minimum relative inclination')
-        exit(1)
+        sys.exit('error: maximum relative inclination smaller than minimum relative inclination')
 
 
 
     if (inner_aop_min < -np.pi) or (inner_aop_max > np.pi):
-        print('error: inner argument of pericenter not in allowed range [-pi,pi]')
-        exit(1)
+        sys.exit('error: inner argument of pericenter not in allowed range [-pi,pi]')
 
     if (outer_aop_min < -np.pi) or (outer_aop_max > np.pi):
-        print('error: outer argument of pericenter not in allowed range [-pi,pi]')
-        exit(1)
+        sys.exit('error: outer argument of pericenter not in allowed range [-pi,pi]')
 
     if (inner_aop_max < inner_aop_min):
-        print('error: maximum inner argument of pericenter smaller than minimum argument of pericenter')
-        exit(1)
+        sys.exit('error: maximum inner argument of pericenter smaller than minimum argument of pericenter')
 
     if (outer_aop_max < outer_aop_min):
-        print('error: maximum outer argument of pericenter smaller than minimum argument of pericenter')
-        exit(1)
+        sys.exit('error: maximum outer argument of pericenter smaller than minimum argument of pericenter')
 
 
     if (inner_loan_min < -1*np.pi) or (inner_loan_max > np.pi):
-        print('error: inner longitude of ascending node not in allowed range [-pi,pi]')
-        exit(1)
+        sys.exit('error: inner longitude of ascending node not in allowed range [-pi,pi]')
 
     if (inner_loan_max < inner_loan_min):
-        print('error: maximum inner longitude of ascending node smaller than minimum argument of pericenter')
-        exit(1)
+        sys.exit('error: maximum inner longitude of ascending node smaller than minimum argument of pericenter')
 
     if (number < 1):
-        print('Requested number of systems < 1')
-        exit(1)
+        sys.exit('Requested number of systems < 1')
 
     if (initial_number < 0):
-        print('Initial number of system < 0')
-        exit(1)
+        sys.exit('Initial number of system < 0')
 
 
 def parse_arguments():
