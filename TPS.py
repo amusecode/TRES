@@ -15,12 +15,14 @@ lib_inner_primary_mass_distr = {0: "Kroupa", #default
 ##            --Q_min    lower limit for the inner mass ratio [0.]
 ##            --Q_distr  inner mass ratio option: 
 lib_inner_mass_ratio_distr = {0: "Uniform distribution", #default
-                            1: "Kroupa IMF",}
+                            1: "Kroupa IMF", #draws from mass distribution instead of mass ratio distribution
+                            2: "Galicher et al. 2016 powerlaw (M^-1.31)", } #draws from mass distribution instead of mass ratio distribution, appropriate for planets
 ##            --q_max    upper limit for the outer mass ratio [1.]
 ##            --q_min    lower limit for the mass of the outer star [0.]
 ##            --q_distr  outer mass ratio option: 
 lib_outer_mass_ratio_distr = {0: "Uniform distribution", #default
-                            1: "Kroupa IMF",}
+                            1: "Kroupa IMF", #draws from mass distribution instead of mass ratio distribution
+                            2: "Galicher et al. 2016 powerlaw (M^-1.31)", } #draws from mass distribution instead of mass ratio distribution, appropriate for planets
 ##            --A_max    upper limit for the inner semi-major axis [5e6 RSun]
 ##            --A_min    lower limit for the inner semi-major axis [5]
 ##            --A_distr  inner semi-major axcis option: 
@@ -29,7 +31,9 @@ lib_inner_semi_distr = {0: "Log Uniform distribution", #default
                    2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
                    3: "Lognormal mu = 10^3.5d, sigma = 2.3",
                    4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
-                   5: "Sana et al. 2012",}
+                   5: "Sana et al. 2012",
+                   6: "flat distribution",
+                   7: "Galicher et al. 2016 powerlaw (a^-0.61)",} #appropriate for planets
 ##            --a_max    upper limit for the outer semi-major axis [5e6 RSun]
 ##            --a_min    lower limit for the outer semi-major axis [5 RSun]
 ##            --a_distr  outer semi-major axis option: 
@@ -38,7 +42,9 @@ lib_outer_semi_distr = {0: "Log Uniform distribution", #default
                    2: "Tokovinin lognormal mu = 10^5d, sigma = 2.3",
                    3: "Lognormal mu = 10^3.5d, sigma = 2.3",
                    4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
-                   5: "Sana et al. 2012",}
+                   5: "Sana et al. 2012",
+                   6: "flat distribution",
+                   7: "Galicher et al. 2016 powerlaw (a^-0.61)",} #appropriate for planets
 ##            --E_max    upper limit for the inner eccentricity [0.9]
 ##            --E_min    lower limit for the inner eccentricity [0.]
 ##            --E_distr  inner eccentricity option: 
@@ -46,7 +52,8 @@ lib_inner_ecc_distr = {0: "Thermal", #default
                  1: "Constant eccentricity",
                  2: "Sana et al. 2012 e^-0.45", #-> close binaries
                  3: "Flat distribution",
-                 4: "Powerlaw e^0.5",}                                    
+                 4: "Powerlaw e^0.5",
+                 5: "Bowler et al. 2020 Beta distribution",}  #appropriate for planets                                  
 ##            --e_max    upper limit for the outer eccentricity [0.9]
 ##            --e_min    lower limit for the outer eccentricity [0.]
 ##            --e_distr  outer eccentricity option: 
@@ -54,7 +61,8 @@ lib_outer_ecc_distr = {0: "Thermal", #default
                  1: "Constant eccentricity",
                  2: "Sana et al. 2012 e^-0.45", #-> close binaries
                  3: "Flat distribution",
-                 4: "Powerlaw e^0.5",}     
+                 4: "Powerlaw e^0.5",
+                 5: "Bowler et al. 2020 Beta distribution",}  #appropriate for planets                                                      
 ##            --i_max    upper limit for the relative inclination [pi]
 ##            --i_min    lower limit for the relative inclination [0]
 ##            --i_distr  relative inclination option: 
@@ -123,6 +131,7 @@ from amuse.units import units, constants
 from amuse.support.console import set_printing_strategy
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.stats import beta as beta_distribution
 
 from amuse.ic.kroupa import new_kroupa_mass_distribution
 from amuse.ic.scalo import new_scalo_mass_distribution
@@ -132,8 +141,15 @@ from amuse.ic.flatimf import new_flat_mass_distribution
 
 precision = 1.e-10 
 min_mass = 0.08 |units.MSun # for primary stars
-absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
 absolute_max_mass = 100 |units.MSun
+
+EXCLUDE_SSO = True #in order to not simulate systems with exoplanet or brown dwarf secondaries and tertiaries
+if EXCLUDE_SSO:
+    absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
+else:
+    absolute_min_mass = 0.2|units.MJupiter     # for planetary objects
+
+
 REPORT = False 
 REPORT_USER_WARNINGS = False 
 
@@ -141,10 +157,8 @@ def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
 
 def log_flat_distr(lower, upper):
-    lower_RSun = lower.value_in(units.RSun)
-    upper_RSun = upper.value_in(units.RSun)
-    x= np.random.uniform(np.log10(lower_RSun), np.log10(upper_RSun))
-    return (10**x)|units.RSun 
+    x= np.random.uniform(np.log10(lower), np.log10(upper))
+    return 10**x
     
 def eggleton_mass_distr(lower_mass, upper_mass):
     turnover_mass = 0.3|units.MSun
@@ -166,6 +180,23 @@ def powerlaw_distr(m_min, m_max, slope):
     factor = (pow(m_max / m_min, slope1) - 1.0 )
     x = np.random.uniform(0,1)
     return m_min * (1.0 + factor*x) ** (1.0 / slope1)
+    
+    
+def beta_distr_SSOs(lower, upper, mass):    # (Bowler et al. 2020)
+    min_mass_BD = 16 |units.MJupiter        # brown dwarf boundary
+    if absolute_min_mass < mass <= min_mass_BD :
+        A, B = 30, 200      # for exoplanets 
+    elif min_mass_BD < mass < min_mass :
+        A, B = 2.30, 1.65   # for brown dwarfs 
+    else:
+        sys.exit('You may be using a SSOs distribution for a stellar object, exiting')
+
+    e_sample = beta_distribution.rvs( A, B)
+    if lower <= e_sample <= upper:
+        return e_sample
+        
+    return beta_distr_SSOs(lower, upper, mass)    # pick another sample within given bounds
+    
 
 class Generate_initial_triple:
     #-------
@@ -194,8 +225,8 @@ class Generate_initial_triple:
                                 inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min)                            
     
                             #Does not use boolean inner/outer _semi_latus_rectum_ min/max
-                            self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
-                            self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                            self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, self.inner_secondary_mass)
+                            self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, self.outer_mass)
                                 
 
                         else:    
@@ -215,7 +246,8 @@ class Generate_initial_triple:
                                     inner_semi_latus_rectum_max, outer_semi_latus_rectum_max, 
                                     inner_ecc_max, inner_ecc_min, 
                                     outer_ecc_max, outer_ecc_min,
-                                    inner_ecc_distr, outer_ecc_distr)
+                                    inner_ecc_distr, outer_ecc_distr, 
+                                    self.inner_secondary_mass, self.outer_mass)
 
 
                         self.generate_incl(incl_max, incl_min, incl_distr)
@@ -266,8 +298,10 @@ class Generate_initial_triple:
                 self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_secondary_mass_max)[0]
 #                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass_max)[0]
 #                self.inner_secondary_mass = new_kroupa_mass_distribution(1, mass_min=inner_secondary_mass_min, mass_max=inner_primary_mass)[0]
+            elif inner_mass_ratio_distr == 2:   # Galicher et al 2016  
+                self.inner_secondary_mass = powerlaw_distr( m_min= inner_secondary_mass_min, m_max= inner_secondary_mass_max, slope= -1.31)            
             else: # flat distribution  
-               inner_mass_ratio = flat_distr(max(inner_mass_ratio_min, inner_secondary_mass_min / self.inner_primary_mass), inner_mass_ratio_max)
+               inner_mass_ratio = flat_distr(max(inner_mass_ratio_min, inner_secondary_mass_min/self.inner_primary_mass), min(inner_mass_ratio_max, inner_secondary_mass_max/self.inner_primary_mass))
                self.inner_secondary_mass = inner_mass_ratio * self.inner_primary_mass        
        
 
@@ -278,6 +312,8 @@ class Generate_initial_triple:
         else: 
             if outer_mass_ratio_distr == 1:# Kroupa 2001 
                 self.outer_mass = new_kroupa_mass_distribution(1, mass_min=outer_mass_min, mass_max=outer_mass_max)[0]
+            elif outer_mass_ratio_distr == 2:   # Galicher et al 2016  
+                self.outer_mass = powerlaw_distr( m_min= outer_mass_min, m_max= outer_mass_max, slope= -1.31)            
             else: # flat distribution
                inner_mass_tot = self.inner_primary_mass + self.inner_secondary_mass
                outer_mass_ratio = flat_distr(max(outer_mass_ratio_min,outer_mass_min/inner_mass_tot), min(outer_mass_ratio_max, outer_mass_max/inner_mass_tot))
@@ -293,12 +329,13 @@ class Generate_initial_triple:
                         inner_semi_latus_rectum_max, outer_semi_latus_rectum_max, 
                         inner_ecc_max, inner_ecc_min, 
                         outer_ecc_max, outer_ecc_min,
-                        inner_ecc_distr, outer_ecc_distr):
+                        inner_ecc_distr, outer_ecc_distr, 
+                        inner_secondary_mass, outer_mass):
         if REPORT:
             print('generate_semi_and_ecc')
-                        
-        self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
-        self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                                
+        self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
+        self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, outer_mass)
 
         inner_semi_min = inner_semi_min_orig
         if inner_semi_latus_rectum_min:
@@ -327,7 +364,7 @@ class Generate_initial_triple:
             elif inner_semi_distr == 2: #Tokovinin Lognormal mu=10^5.5d, sigma=2.3
                 self.inner_semi = 0.|units.RSun
                 while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
-                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
                    inner_semi_min = inner_semi_min_orig
                    if inner_semi_latus_rectum_min:
                        inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
@@ -340,7 +377,7 @@ class Generate_initial_triple:
             elif inner_semi_distr == 3: #Lognormal mu=10^3.5d, sigma=2.3
                 self.inner_semi = 0.|units.RSun
                 while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
-                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
                    inner_semi_min = inner_semi_min_orig
                    if inner_semi_latus_rectum_min:
                        inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
@@ -356,7 +393,7 @@ class Generate_initial_triple:
             elif inner_semi_distr == 4: #Rizzuto et al 2013, 436, 1694, Lognormal mu=10^0.95AU, sigma=1.35 
                 self.inner_semi = 0.|units.RSun
                 while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
-                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
                    inner_semi_min = inner_semi_min_orig
                    if inner_semi_latus_rectum_min:
                        inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
@@ -373,7 +410,7 @@ class Generate_initial_triple:
                self.inner_semi = 0.|units.RSun
                # (logP)^-0.55
                while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):               
-                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr)
+                   self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
                    inner_semi_min = inner_semi_min_orig
                    if inner_semi_latus_rectum_min:
                        inner_semi_min = inner_semi_min_orig /(1-self.inner_ecc**2)                       
@@ -389,11 +426,17 @@ class Generate_initial_triple:
                    P0 = 10**logP|units.day
                    M_inner = self.inner_primary_mass + self.inner_secondary_mass
                    self.inner_semi = ((P0/2./np.pi)**2 * M_inner*constants.G ) ** (1./3.)                
+
+            elif inner_semi_distr == 6:     # flat distr (uniform)
+                self.inner_semi = flat_distr( inner_semi_min.value_in(units.RSun), inner_semi_max.value_in(units.RSun))|units.RSun
+            elif inner_semi_distr == 7:     # Galicher 2016: powerlaw, slope -0.61
+                self.inner_semi = powerlaw_distr( inner_semi_min, inner_semi_max, slope= -0.61)
+
             else: # log flat distribution
                 maximal_semi = min(inner_semi_max, outer_semi_max)
                 if inner_semi_min > maximal_semi: #possible for extreme eccentricities
                     return False
-                self.inner_semi = log_flat_distr(inner_semi_min, maximal_semi)
+                self.inner_semi = log_flat_distr(inner_semi_min.value_in(units.RSun), maximal_semi.value_in(units.RSun))|units.RSun
                         
         
                         
@@ -408,7 +451,7 @@ class Generate_initial_triple:
             elif outer_semi_distr == 2: #Tokovinin Lognormal mu=10^5.5d, sigma=2.3
                 self.outer_semi = 0.|units.RSun
                 while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
-                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, outer_mass)
                     outer_semi_min = outer_semi_min_orig
                     if outer_semi_latus_rectum_min:
                        outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
@@ -427,7 +470,7 @@ class Generate_initial_triple:
             elif outer_semi_distr == 3: #Lognormal mu=10^3.5d, sigma=2.3
                 self.outer_semi = 0.|units.RSun
                 while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
-                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                    self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, outer_mass)
                     outer_semi_min = outer_semi_min_orig
                     if outer_semi_latus_rectum_min:
                        outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
@@ -446,7 +489,7 @@ class Generate_initial_triple:
             elif outer_semi_distr == 4: #Rizzuto et al 2013, 436, 1694, Lognormal mu=10^0.95AU, sigma=1.35 
                 self.outer_semi = 0.|units.RSun
                 while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
-                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, outer_mass)
                    outer_semi_min = outer_semi_min_orig
                    if outer_semi_latus_rectum_min:
                        outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
@@ -463,7 +506,7 @@ class Generate_initial_triple:
                self.outer_semi = 0.|units.RSun
                # (logP)^-0.55
                while (self.outer_semi < outer_semi_min or self.outer_semi > outer_semi_max):
-                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr)
+                   self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, outer_mass)
                    outer_semi_min = outer_semi_min_orig
                    if outer_semi_latus_rectum_min:
                        outer_semi_min = outer_semi_min_orig /(1-self.outer_ecc**2)                       
@@ -480,10 +523,15 @@ class Generate_initial_triple:
                    mass_tot = self.inner_primary_mass + self.inner_secondary_mass + self.outer_mass
                    self.outer_semi = ((P0/2./np.pi)**2 * mass_tot*constants.G) ** (1./3.)                
                                                          
+            elif outer_semi_distr == 6:     # flat distr (uniform)
+                self.outer_semi = flat_distr( outer_semi_min.value_in(units.RSun), outer_semi_max.value_in(units.RSun))|units.RSun
+            elif outer_semi_distr == 7:     # Galicher 2016: powerlaw, slope -0.61
+                self.outer_semi = powerlaw_distr( outer_semi_min, outer_semi_max, slope= -0.61)
+
             else: # log flat distribution
                 if outer_semi_min > outer_semi_max: #possible for extreme eccentricities
                     return False
-                self.outer_semi = log_flat_distr(outer_semi_min, outer_semi_max)
+                self.outer_semi = log_flat_distr(outer_semi_min.value_in(units.RSun), outer_semi_max.value_in(units.RSun))|units.RSun
                        
                      
         if inner_semi_distr == outer_semi_distr and inner_semi_min_orig == outer_semi_min_orig and inner_semi_max == outer_semi_max and self.outer_semi < self.inner_semi and inner_ecc_distr == outer_ecc_distr and inner_ecc_min == outer_ecc_min and inner_ecc_max == outer_ecc_max:
@@ -499,7 +547,7 @@ class Generate_initial_triple:
         return True
 
 
-    def generate_ecc_1d(self, ecc_max, ecc_min, ecc_distr):
+    def generate_ecc_1d(self, ecc_max, ecc_min, ecc_distr, mass):
         if REPORT:
             print('generate_ecc_1d')
                         
@@ -517,6 +565,8 @@ class Generate_initial_triple:
                 return flat_distr(ecc_min, ecc_max)
             elif ecc_distr == 4: #Powerlaw
                 return powerlaw_distr(ecc_min+precision, ecc_max, 0.5)
+            elif ecc_distr == 5: # Beta distribution    
+                return beta_distr_SSOs(ecc_min, ecc_max, mass)
             else: #Thermal distribution
                  return np.sqrt(np.random.uniform(ecc_min, ecc_max))
                  
@@ -762,10 +812,16 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
 
 
 
-        if (min_mass > triple_system.inner_primary_mass) or (min_mass > triple_system.inner_secondary_mass) or (min_mass > triple_system.outer_mass):
+        if (min_mass > triple_system.inner_primary_mass):
+            if REPORT:
+                    print('non-star primary included: ', triple_system.inner_primary_mass)
+            continue
+        
+        if EXCLUDE_SSO: 
+            if (min_mass > triple_system.inner_secondary_mass) or (min_mass > triple_system.outer_mass):
                 if REPORT:
-                    print('non-star included: ', triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass)
-                continue
+                    print('non-star secondary & tertiary included: ', triple_system.inner_secondary_mass, triple_system.outer_mass)
+            continue
 
         number_of_system = initial_number + i_n
         if REPORT:

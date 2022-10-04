@@ -207,12 +207,14 @@ Depreciated (yet still functioning) parameters are given in {}.
 --Qin_min      {--Q_min}    lower limit for the inner mass ratio [0.]
 --Qin_distr    {--Q_distr}  inner mass ratio option: 
        0: "Uniform distribution", #default
-        1: "Kroupa IMF",
+       1: "Kroupa IMF",
+       2: "Galicher et al. 2016 powerlaw (M^-1.31)", #draws from mass distribution instead of mass ratio distribution, 
 --Qout_max     {--q_max}    upper limit for the outer mass ratio [1.]
 --Qout_min     {--q_min}    lower limit for the mass of the outer star [0.]
 --Qout_distr   {--q_distr}  outer mass ratio option: 
        0: "Uniform distribution", #default
-        1: "Kroupa IMF",
+       1: "Kroupa IMF",
+       2: "Galicher et al. 2016 powerlaw (M^-1.31)", #draws from mass distribution instead of mass ratio distribution, 
 --Ain_max      {--A_max}    upper limit for the inner semi-major axis [5e6 RSun]
 --Ain_min      {--A_min}    lower limit for the inner semi-major axis [5]
 --Ain_distr    {--A_distr}  inner semi-major axis option: 
@@ -222,6 +224,8 @@ Depreciated (yet still functioning) parameters are given in {}.
         3: "Lognormal mu = 10^3.5d, sigma = 2.3",
         4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
         5: "Sana et al. 2012",
+        6: "flat distribution",
+        7: "Galicher et al. 2016 powerlaw (a^-0.61)", #appropriate for planets
 --Aout_max     {--a_max}    upper limit for the outer semi-major axis [5e6 RSun]
 --Aout_min     {--a_min}    lower limit for the outer semi-major axis [5 RSun]
 --Aout_distr   {--a_distr}  outer semi-major axis option: 
@@ -231,6 +235,8 @@ Depreciated (yet still functioning) parameters are given in {}.
         3: "Lognormal mu = 10^3.5d, sigma = 2.3",
         4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
         5: "Sana et al. 2012",
+        6: "flat distribution",
+        7: "Galicher et al. 2016 powerlaw (a^-0.61)", #appropriate for planets
 --Ein_max      {--E_max}    upper limit for the inner eccentricity [1.]
 --Ein_min      {--E_min}    lower limit for the inner eccentricity [0.]
 --Ein_distr    {--E_distr}  inner eccentricity option: 
@@ -238,7 +244,8 @@ Depreciated (yet still functioning) parameters are given in {}.
         1: "Constant eccentricity",
         2: "Sana et al. 2012 e^-0.45", #-> close binaries
         3: "Flat distribution",
-        4: "Powerlaw e^0.5",                                   
+        4: "Powerlaw e^0.5",   
+        5: "Bowler et al. 2020 Beta distribution", #appropriate for planets                                                                          
 --Eout_max     {--e_max}    upper limit for the outer eccentricity [1.]
 --Eout_min     {--e_min}    lower limit for the outer eccentricity [0.]
 --Eout_distr   {--e_distr}  outer eccentricity option: 
@@ -247,6 +254,7 @@ Depreciated (yet still functioning) parameters are given in {}.
         2: "Sana et al. 2012 e^-0.45", #-> close binaries
         3: "Flat distribution",
         4: "Powerlaw e^0.5",
+        5: "Bowler et al. 2020 Beta distribution", #appropriate for planets                                          
 --i_max                     upper limit for the relative inclination [pi]
 --i_min                     lower limit for the relative inclination [0]
 --i_distr                   relative inclination option: 
