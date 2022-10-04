@@ -958,18 +958,18 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
-        sys.exit('error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']')
+        sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'")
         
     if (inner_secondary_mass_max > absolute_max_mass) :
-        sys.exit('error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']')
+        sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'")
     
     if (outer_mass_max > absolute_max_mass) :
-        sys.exit('error: outer mass not in allowed range [ < ', absolute_max_mass, ']')
+        sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'")
     
-#     if (inner_secondary_mass_min < absolute_min_mass) :
-#         sys.exit('error: inner secondary mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
-#     if (outer_mass_min < absolute_min_mass) & (outer_mass_max > absolute_max_mass) :
-#         sys.exit('error: outer mass not in allowed range [', absolute_min_mass, ',', absolute_max_mass, ']')
+    if (inner_secondary_mass_min < absolute_min_mass) :
+         sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'")
+    if (outer_mass_min < absolute_min_mass)  :
+         sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'")
     
     if (inner_primary_mass_max < inner_primary_mass_min):
         sys.exit('error: maximum inner primary mass smaller than minimum in primary mass')
