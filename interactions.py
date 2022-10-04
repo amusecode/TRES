@@ -128,6 +128,10 @@ def lang_spin_angular_frequency(star):
     w = 45.35 * v_rot/star.radius.value_in(units.RSun)
     return w|1./units.yr
 
+def break_up_angular_frequency(object):
+    return np.sqrt( constants.G * object.mass / object.radius ) / object.radius
+
+
 def copy_outer_orbit_to_inner_orbit(bs, self):
     if REPORT_FUNCTION_NAMES:
         print('Copy_outer_orbit_to_inner_orbit')

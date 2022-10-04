@@ -446,8 +446,11 @@ class Triple_Class:
 
         self.previous_time = self.triple.time
         if stellar_system.is_star:
-            stellar_system.spin_angular_frequency = lang_spin_angular_frequency(stellar_system)
-#            stellar_system.spin_angular_frequency = corotating_spin_angular_frequency_binary(stellar_system.parent.semimajor_axis, self.get_mass(stellar_system.parent.child1), self.get_mass(stellar_system.parent.child2))
+            if stellar_system.stellar_type in stellar_types_planetary_objects:  
+                stellar_system.spin_angular_frequency = 0.125 * break_up_angular_frequency(stellar_system)  
+            else:
+                stellar_system.spin_angular_frequency = lang_spin_angular_frequency(stellar_system)
+    #            stellar_system.spin_angular_frequency = corotating_spin_angular_frequency_binary(stellar_system.parent.semimajor_axis, self.get_mass(stellar_system.parent.child1), self.get_mass(stellar_system.parent.child2))
         else:
             self.initial_angular_frequency(stellar_system.child1)        
             self.initial_angular_frequency(stellar_system.child2)
@@ -2686,11 +2689,12 @@ def plot_function(triple, dir_plots):
     ### plots to test secular code ###
     import amuse.plot as aplt
     import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 16})    
     
 #    generic_name = '_M'+str(m1_array[0]) + '_m'+str(m2_array[0]) +'_n'+str(m3_array[0]) + '_a'+str(a_in_array_AU[0]) + '_A'+str(a_out_array_AU[0]) + '_e'+str(e_in_array[0]) + '_E'+str(e_out_array[0]) + '_i'+str(i_relative_array[0]/np.pi*180.0) + '_g'+str(g_in_array[0]) + '_G'+str(g_out_array[0]) + '_o'+str(o_in_array[0]) + '_O'+str(o_out_array[0]) + '_t'+str(t_max_Myr) + '_maxdr'+str(triple.maximum_radius_change_factor)+'_edr'+str(error_dr)
     generic_name = ''
 
-    figure = plt.figure(figsize=(10,13))
+    figure = plt.figure(figsize=(10,13), tight_layout=True)
     N_subplots = 4
     
     plot_e = figure.add_subplot(N_subplots,1,1)
@@ -2727,7 +2731,7 @@ def plot_function(triple, dir_plots):
 
 
 
-    figure = plt.figure(figsize=(10,13))
+    figure = plt.figure(figsize=(10,13), tight_layout=True)
     N_subplots = 4
     
     plot_e_in = figure.add_subplot(N_subplots,1,1)
@@ -2768,7 +2772,7 @@ def plot_function(triple, dir_plots):
 
 
 
-    figure = plt.figure(figsize=(10,13))
+    figure = plt.figure(figsize=(10,13), tight_layout=True)
     N_subplots = 4
 
     plot_e_in = figure.add_subplot(N_subplots,1,1)
