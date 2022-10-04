@@ -1,5 +1,6 @@
 from amuse.units import units, constants, quantities
 import numpy as np
+import sys 
 
 REPORT_BINARY_EVOLUTION = False
 REPORT_FUNCTION_NAMES = False
