@@ -58,11 +58,11 @@ make
 
 ```
 
-Note: for newer versions of amuse, you need an updated version of the Makefile. If the above line doesn't work, try:
+Note: If the above line doesn't work, which may be the case for older versions of amuse, try:
 ```
 (cd seculartriple_TPS)
-mv Makefile Makefile_old
-mv Makefile_new Makefile
+mv Makefile Makefile_new
+mv Makefile_old Makefile
 make clean
 make 
 
