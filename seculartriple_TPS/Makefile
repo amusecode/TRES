@@ -6,7 +6,7 @@ endif
 MPICXX ?= mpicxx
 CXX ?= g++
 
-CODE_GENERATOR = $(AMUSE_DIR)/build.py
+CODE_GENERATOR = $(AMUSE_DIR)/bin/amusifier
 
 CXXFLAGS = -Wall -g -DTOOLBOX  $(MUSE_INCLUDE_DIR)
 LDFLAGS = -lm $(MUSE_LD_FLAGS)
@@ -26,7 +26,7 @@ worker_code.cc: interface.py
 	$(CODE_GENERATOR) --type=c interface.py SecularTripleInterface -o $@
 
 worker_code: worker_code.cc $(OBJS)
-	$(MPICXX) $@.cc $(OBJS) -o $@
+	$(MPICXX) $(CXXFLAGS) $@.cc $(OBJS) -o $@
 
 .cc.o: $<
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
