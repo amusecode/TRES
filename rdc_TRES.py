@@ -255,7 +255,7 @@ inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, tr
     
     triple_string = triple_string + snapshot_string
     if correct_system:
-        print(triple_string)
+        print(triple_string, end='')
 
 
 def parse_arguments():
