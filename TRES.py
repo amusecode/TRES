@@ -2096,7 +2096,7 @@ class Triple_Class:
         #rewind system
         self.stellar_code.particles.recall_memory_one_step()
         self.refresh_memory() 
-                                   
+                                           
             
     def check_stopping_conditions_stellar_interaction(self):             
         if self.stop_at_merger and self.has_merger():
@@ -2370,6 +2370,8 @@ class Triple_Class:
                 
             if self.triple.time <self.tinit:
                 self.instantaneous_evolution = True
+
+
                             
             #do stellar evolution 
             if not no_stellar_evolution: 
@@ -2466,7 +2468,9 @@ class Triple_Class:
                     print(self.has_donor(), self.secular_code.triples[0].error_flag_secular)
                     break
                     
-                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and self.secular_code.model_time < self.triple.time-minimum_time_step:
+                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and self.secular_code.model_time < self.triple.time-max(minimum_time_step, 0.01*self.determine_time_step_stable_mt()):
+                    #factor 0.01 times time_step_stable_mt as used mass_transfer_timescale from previous timestep
+                    
                     self.determine_mass_transfer_timescale()            
                     if self.check_stopping_conditions_stellar()==False:
                         print('stopping conditions stellar 2')                    
@@ -2480,6 +2484,9 @@ class Triple_Class:
                     self.triple.child2.child1.spin_angular_frequency = previous_spin1
                     self.triple.child2.child2.spin_angular_frequency = previous_spin2
                     continue
+                elif self.has_donor() and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached':
+                    #time difference secular code & tres small enough to continue mass transfer 
+                    self.secular_code.model_time = self.triple.time
                                   
                 self.channel_from_secular.copy() 
 
