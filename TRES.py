@@ -104,8 +104,7 @@ class Triple_Class:
             
         outer_longitude_of_ascending_node = inner_longitude_of_ascending_node - np.pi
                         
-        stars = self.make_stars(inner_primary_mass, inner_secondary_mass, outer_mass,
-            inner_semimajor_axis, outer_semimajor_axis)
+        stars = self.make_stars(inner_primary_mass, inner_secondary_mass, outer_mass)
         bins = self.make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
             inner_eccentricity, outer_eccentricity,
             inner_argument_of_pericenter, outer_argument_of_pericenter,
@@ -200,7 +199,7 @@ class Triple_Class:
             stop_at_dynamical_instability, stop_at_semisecular_regime, stop_at_SN, stop_at_CPU_time):
 
         if stop_at_disintegrated == False:
-            sys.exit('stop_at_disintegrated = False not possible yet. After the disintegration of the triple, further evolution can be done with SeBa directly. ')
+            sys.exit('stop_at_disintegrated = False not possible yet. After the disintegration of the triple, further evolution can be done with stellar code directly. ')
         if stop_at_outer_mass_transfer == False:
             sys.exit('stop_at_outer_mass_transfer = False not possible yet. Methodology is as of yet non-existent.' )
         if stop_at_outer_collision == False:
@@ -228,7 +227,7 @@ class Triple_Class:
         self.stop_at_SN = stop_at_SN
         self.stop_at_CPU_time = stop_at_CPU_time
     
-    def make_stars(self, inner_primary_mass, inner_secondary_mass, outer_mass, inner_semimajor_axis, outer_semimajor_axis):
+    def make_stars(self, inner_primary_mass, inner_secondary_mass, outer_mass):
         stars = Particles(3)
         stars.is_star = True
         stars.is_donor = False
@@ -2276,7 +2275,7 @@ class Triple_Class:
 #-------------------------    
 
     def evolve_model(self):
-        start_time = time.time()
+        CPU_start_time = time.time()
     
         if REPORT_DEBUG or MAKE_PLOTS:
             # for plotting data
@@ -2343,9 +2342,9 @@ class Triple_Class:
         while self.triple.time<self.tend: 
 		    
 	    # if the maximum CPU time has been exceeded for the system, stop the evolution and continue with the next system
-            end_time = time.time()
-            self.triple.CPU_time = end_time - start_time
-            if (self.stop_at_CPU_time == True) and float(end_time - start_time) > self.max_CPU_time:
+            CPU_end_time = time.time()
+            self.triple.CPU_time = CPU_end_time - CPU_start_time
+            if (self.stop_at_CPU_time == True) and float(CPU_end_time - CPU_start_time) > self.max_CPU_time:
                 print('stopping conditions maximum CPU time')
                 print("CPU time: ", self.triple.CPU_time)
                 break
