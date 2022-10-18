@@ -177,7 +177,8 @@ For the moment this only works for pre-mass transfer systems.
 ```
 option 0 is for stellar systems, options 1-4 are for planetary systems.
 
-8) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 1)run the rdc_TRES.py script multiple times. You will, however, get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
+8) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 
+Option 1:run the rdc_TRES.py script multiple times. You will, however, get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
 
 ```
 mkdir -p output
@@ -189,7 +190,7 @@ for filename in  TRES_output/*.hdf; do
     done
 done
 ```
-2) run the rdc_TPS.py script. See top of that file for how to run it. 
+Option 2: run the rdc_TPS.py script. See top of that file for how to run it. 
 
 9) Running computationally expensive simulations on a computer cluster can save a lot of time. However, clusters work somewhat different than your personal computer. There are two points we'd like to draw your attention to.
 
