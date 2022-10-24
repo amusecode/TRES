@@ -3,12 +3,14 @@
 # More specifically TRES_[i].pdf, TRES_[i+1].hdf, ..., TRES_[j].hdf
 # -n sets value of i
 # -N sets value of j
+# --dir_data name of directory to retrieve data 
 
 from optparse import OptionParser
 import rdc_TRES as rdc
 
-def rdc_TPS(startnr, nr_of_files):
-    file_name_root = "TRES"
+def rdc_TPS(startnr, nr_of_files, dir_data):
+
+    file_name_root = dir_data+"/TRES"
     print_style = 0
     print_full = True
     
@@ -29,7 +31,7 @@ def rdc_TPS(startnr, nr_of_files):
     triple_type_string="all"
     
     for i in range(nr_of_files):
-        print(file_name_root+'_'+str(i+startnr))
+        # print(file_name_root+'_'+str(i+startnr))
         rdc.rdc(file_name_root+'_'+str(i+startnr), print_style, print_full, print_init, line_number, inner_primary_star_type, inner_secondary_star_type, outer_star_type, inner_primary_star_type_string, inner_secondary_star_type_string, outer_star_type_string, inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, triple_type, triple_type_string)
 
 
@@ -41,6 +43,9 @@ def parse_arguments():
                       help="number of first file [%default]")
     parser.add_option("-N", "--nr_of_files", dest="nr_of_files", type="int", default = 50,
                       help="total number of files [%default]")
+    parser.add_option("--dir_data", dest="dir_data", type ="string", default = "",
+                      help="directory to retrieve and save data [%default]")
+                      
 
 
 
