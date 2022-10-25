@@ -1077,7 +1077,7 @@ def mass_transfer_stability(binary, self):
             star = binary.child2
             companion = binary.child1
         else: 
-            print(bs.is_star, bs.child1.is_star, bs.child2.is_star)
+            print(binary.is_star, binary.child1.is_star, binary.child2.is_star)
             sys.exit('error in Mass transfer stability: type of system unknown') 
 
 
