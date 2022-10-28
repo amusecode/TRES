@@ -124,6 +124,10 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 
 import TRES as TRES
+from amuse.community.seba.interface import SeBa
+stellar_code = SeBa()
+#stellar_code = SeBa(redirection='none')
+
 
 import sys
 from amuse.units.optparse import OptionParser
@@ -791,6 +795,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
     nr_iss = 0 #number of systems that is dynamically unstable at initialisation
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
+
     while i_n < number:
         triple_system = Generate_initial_triple(inner_primary_mass_max, inner_primary_mass_min, 
                     inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max,
@@ -810,8 +815,6 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
         if REPORT:
            triple_system.print_triple()
 
-
-
         if (min_mass > triple_system.inner_primary_mass):
             if REPORT:
                     print('non-star primary included: ', triple_system.inner_primary_mass)
@@ -827,51 +830,56 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
         if REPORT:
             print('number of system = ', number_of_system)
 
-
         tr = None
-        tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
-                    inner_secondary_mass = triple_system.inner_secondary_mass, 
-                    outer_mass = triple_system.outer_mass, 
-                    inner_semimajor_axis = triple_system.inner_semi, 
-                    outer_semimajor_axis = triple_system.outer_semi, 
-                    inner_eccentricity = triple_system.inner_ecc, 
-                    outer_eccentricity = triple_system.outer_ecc, 
-                    relative_inclination = triple_system.incl, 
-                    inner_argument_of_pericenter = triple_system.inner_aop, 
-                    outer_argument_of_pericenter = triple_system.outer_aop, 
-                    inner_longitude_of_ascending_node = triple_system.inner_loan,                      
-                    metallicity = metallicity, tend = tend, number = number_of_system,
-                    stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
-                    stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
-                    stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
-                    stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
-                    stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
-                    stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
-                    stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                    stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
-                    stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                    stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                    stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
-                    impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
-                    fallback_kick_for_black_holes = fallback_kick_for_black_holes,
-                    which_common_envelope = which_common_envelope,
-                    stop_at_CPU_time = stop_at_CPU_time,
-                    max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)                        
 
-        if tr.triple.correct_params == False:
+        correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.incl, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan)
+        triple_system.inner_ecc = inner_eccentricity
+        triple_system.outer_ecc = outer_eccentricity
+
+        if correct_params == False:
+            if REPORT:
+                print('Incorrect parameters')
             nr_cp += 1
-        elif tr.triple.semisecular_regime_at_initialisation == True:
-            nr_iss +=1
-        elif tr.triple.dynamical_instability_at_initialisation == True:
-            nr_ids +=1
-        elif tr.triple.mass_transfer_at_initialisation == True:
-            nr_imt +=1
         else:
-            i_n += 1            
+            stars = TRES.make_stars(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass)
+            bins = TRES.make_bins(stars, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan, triple_system.inner_loan-np.pi)
+       
+            stellar_code.parameters.metallicity = metallicity
+            stellar_code.particles.add_particles(stars)
+    
+            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, 
+                        relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
+                        stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
+                        stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
+                        stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
+                        stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
+                        stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
+                        stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
+                        stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
+                        stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
+                        stop_at_dynamical_instability = stop_at_dynamical_instability, 
+                        stop_at_semisecular_regime = stop_at_semisecular_regime,  
+                        stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
+                        impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
+                        fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                        which_common_envelope = which_common_envelope,
+                        stop_at_CPU_time = stop_at_CPU_time,
+                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+        
+            if tr.triple.semisecular_regime_at_initialisation == True:
+                nr_iss +=1
+            elif tr.triple.dynamical_instability_at_initialisation == True:
+                nr_ids +=1
+            elif tr.triple.mass_transfer_at_initialisation == True:
+                nr_imt +=1
+            else:
+                i_n += 1            
+
+            stellar_code.particles.remove_particles(stars)
+            del stars, bins, tr
 
     if REPORT:
       print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
-
 
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
@@ -1271,7 +1279,10 @@ if __name__ == '__main__':
     test_initial_parameters(**options)
     print_distr(**options)
     evolve_model(**options)
-
+    
+    stellar_code.stop()
+#    secular_code.stop()
+    
     print('\nYou have used the TRES triple evolution code. Literature reference:')
     print('** Toonen, Hamers & Portegies Zwart 2016, ComAC, 3, 6T:')
     print('... "The evolution of hierarchical triple star-systems" ')
