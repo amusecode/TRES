@@ -96,7 +96,7 @@ def example_4():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     stars = TRES.make_stars(M1,M2,M3)
     bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
     
@@ -136,7 +136,7 @@ def example_5():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     stars = TRES.make_stars(M1,M2,M3)
     bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
     
@@ -187,7 +187,7 @@ def example_6():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     stars = TRES.make_stars(M1,M2,M3)
     bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
     
@@ -249,7 +249,7 @@ def example_7():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     stars = TRES.make_stars(M1,M2,M3)
     bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
     
@@ -298,7 +298,7 @@ def example_8():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     stars = TRES.make_stars(M1,M2,M3)
     bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
     
