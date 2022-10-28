@@ -7,7 +7,7 @@ import numpy as np
 from amuse.datamodel import Particles
 from amuse.units import units
 from amuse.community.seba.interface import SeBa
-import TRES_3 as TRES
+import TRES as TRES
 
 
 #simplest way of running TRES
