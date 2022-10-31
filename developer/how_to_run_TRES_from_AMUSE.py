@@ -32,6 +32,7 @@ def example_1():
 #stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer, 
 #stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer, 
 #stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, 
+#stop_at_no_CHE, include_CHE,
 #stop_at_merger, stop_at_disintegrated,
 #stop_at_inner_collision, stop_at_outer_collision,
 #stop_at_dynamical_instability, 
@@ -45,6 +46,7 @@ def example_1():
 #stop_at_CPU_time,
 #max_CPU_time, 
 #file_name, file_type, dir_plots
+
 def example_2():
 
     M1 = 1.5|units.MSun

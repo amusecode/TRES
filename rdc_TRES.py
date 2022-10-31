@@ -43,11 +43,12 @@ bin_type = {    'all': -1,
                 'collision': 6,    
                 'semisecular': 7,      
                 'rlof': 8,   #only used for stopping conditions
-                'stable_mass_transfer': 9, 
-                'common_envelope': 10,     
-                'common_envelope_energy_balance': 11,     
-                'common_envelope_angular_momentum_balance': 12,
-                'double_common_envelope': 13,
+                'olof': 9,   #only used for stopping conditions
+                'stable_mass_transfer': 10, 
+                'common_envelope': 11,     
+                'common_envelope_energy_balance': 12,     
+                'common_envelope_angular_momentum_balance': 13,
+                'double_common_envelope': 14,
             }            
 
 tr_type = {     'all': -1,

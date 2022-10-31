@@ -116,8 +116,12 @@ Depreciated (yet still functioning) parameters are given in {}.
 -F                type of output file (hdf5/txt)          default = hdf5
 --dir_plots       directory for plots for debugging default = "" (current directory)
                   mode  (aka REPORT_DEBUG == True)
---max_CPU_time    maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
-                                                default = 3600 (seconds)
+
+--CE    which type of modelling for common envelope evolution   default = 2
+        options:
+        0:  alpha-ce + alpha-dce
+        1:  gamma-ce + alpha-dce
+        2:  seba style; combination of gamma-ce, alpha-ce & alpha-dce    
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:
@@ -133,11 +137,8 @@ Depreciated (yet still functioning) parameters are given in {}.
         9:  Verbunt, Igoshev & Cator, 2017, 608, 57
         10:  Verbunt, Igoshev & Cator, 2017, 608, 57 scaled down for bh by mass 
         
---CE    which type of modelling for common envelope evolution   default = 2
-        options:
-        0:  alpha-ce + alpha-dce
-        1:  gamma-ce + alpha-dce
-        2:  seba style; combination of gamma-ce, alpha-ce & alpha-dce    
+--max_CPU_time    maximum CPU time allowed (only works in combination with "stop_at_CPU_time")    
+                                                default = 3600 (seconds)
 
 ```
 
@@ -155,7 +156,6 @@ action items                                    add these to:
 --stop_at_unstable_mass_transfer                avoid stopping the simulation at the onset of unstable mass transfer in the inner binary (leading to common-envelope evolution)
 --stop_at_eccentric_stable_mass_transfer        avoid stopping the simulation at the onset of stable mass transfer in the inner binary if the orbit is eccentric
 --stop_at_eccentric_unstable_mass_transfer      avoid stopping the simulation at the onset of unstable mass transfer in the inner binary if the orbit is eccentric
-
 --no_stop_at_merger                             avoid stopping the simulation after a merger
 --no_stop_at_inner_collision                    avoid stopping the simulation after a collision in the inner binary
 --no_stop_at_outer_collision                    avoid stopping the simulation after a collision involving the outer star
