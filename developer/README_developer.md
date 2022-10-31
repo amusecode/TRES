@@ -198,3 +198,23 @@ For starters, make sure if the pre-required packages for AMUSE are already insta
 
 Second, often clusters work with schedulers like slurm. To run a simulation you must create a bash file that can be sumbitted as a slurm job. The file run_TPS.sh is an example bash script for the helios cluster with additional comments for clarification. If you are using a different cluster or scheduler, change the script accordingly.
 
+10) It is now possible to simulate chemically homogenously evolving stars in TRES(!) when using SeBa for the stellar evolution. To do this set the parameter include_CHE to True in TRES and in SeBa - both need to be set to True for it to work. The former can be done through the input parameter include_CHE (e.g. python TRES.py --include_CHE). The latter can be done in SeBa's constants.C in the directory sstar/starclass. To access this file you need to have AMUSE installed in developer mode. When including CHE in TRES, the initial ZAMS stellar spins are set to corotation by default. You can exclude triples where none of the stars experience CHE with the stop_at_no_CHE option (e.g. python TRES.py --stop_at_no_CHE). 
+
+11) How is the stability of mass transfer determined in TRES? Follow the decision tree:
+```
+a star is transferring mass to a:
+- another star (e.g. an inner binary of a triple). In case of:
+	- Darwin-Riemann instability   									-> unstable mass transfer
+	- (elif) contact: both stars fill their Roche lobe. In case of:
+		- both donors overflow their outer Roche lobe (OLOF+OLOF) 	->	unstable mass transfer
+		- (elif) both donors are on the main-sequence 				-> 	stable mass transfer (modelled by equalisation the masses 
+		   (RLOF+RLOF & RLOF+OLOF)										instantaneously, and changing the orbit accordingly)
+		- (else) (RLOF+RLOF & RLOF+OLOF)							-> unstable mass transfer 
+	- (elif) semi-detached: one star overflows its Roche lobe. In case of:
+		 - M_donor/M_accretor > q_crit    							->   unstable mass transfer 
+		 - (else) M_donor/M_accretor <= q_crit    					->   stable mass transfer 
+- a binary system  (e.g. a tertiary transferring mass to an inner binary). In case of:
+	- Darwin-Riemann instability   									->   unstable mass transfer
+	- (elif) M_donor/M_binary > q_crit    							->   unstable mass transfer 
+	- (elif) M_donor/M_binary <= q_crit   							->   stable mass transfer  
+```

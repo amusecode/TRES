@@ -95,6 +95,7 @@ lib_inner_loan_distr = {0: "Circular niform distribution",
 ##            --stop_at_eccentric_stable_mass_transfer      stopping condition at eccentric stable mass transfer 
 ##            --stop_at_unstable_mass_transfer              stopping condition at unstable mass transfer 
 ##            --stop_at_eccentric_unstable_mass_transfer    stopping condition at eccentric unstable mass transfer 
+##            --stop_at_no_CHE                              stopping condition if no chemically homogeneous evolution 
 
 ##            --no_stop_at_merger                           stopping condition at merger 
 ##            --no_stop_at_disintegrated                    stopping condition at disintegration 
@@ -782,11 +783,11 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                         metallicity, tend, number, initial_number, seed,
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+                        stop_at_no_CHE, include_CHE,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
 
@@ -831,7 +832,6 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             print('number of system = ', number_of_system)
 
         tr = None
-
         correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.incl, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan)
         triple_system.inner_ecc = inner_eccentricity
         triple_system.outer_ecc = outer_eccentricity
@@ -899,11 +899,11 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         metallicity, tend, number, initial_number, seed,
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+                        stop_at_no_CHE, include_CHE, 
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     print('Based on the following distributions:')        
@@ -918,12 +918,17 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print('Inner aop: \t\t',                    inner_aop_distr, ' ',lib_inner_aop_distr[inner_aop_distr] )        
     print('Outer aop: \t\t',                    outer_aop_distr, ' ',lib_outer_aop_distr[outer_aop_distr] )        
     print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
-    print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
     print('Common envelope model: \t',          which_common_envelope, ' ', lib_CE[which_common_envelope])
+    print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
     print('Metallicity: \t\t',                  '-', ' ', metallicity.value_in(units.none))
-    print('\n\n')
-    
-    print('Stopping conditions:')
+    print('\n')
+
+
+    print('Based on the following assumptions:')
+    print('Include CHE: \t\t',                  include_CHE) 
+    print('\n')
+        
+    print('Based on the following stopping conditions:')
     print(stop_at_mass_transfer, '\t Stop at mass transfer')
     print(stop_at_init_mass_transfer, '\t Stop at mass transfer initially')
     print(stop_at_outer_mass_transfer, '\t Stop at outer mass transfer')
@@ -931,6 +936,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print(stop_at_eccentric_stable_mass_transfer, '\t Stop at eccentric stable mass transfer')
     print(stop_at_unstable_mass_transfer, '\t Stop at unstable mass transfer')
     print(stop_at_eccentric_unstable_mass_transfer, '\t Stop at eccentric unstable mass transfer')
+    print(stop_at_no_CHE, '\t Stop if no chemically homogeneous evolution')
     print(stop_at_merger, '\t Stop at merger')
     print(stop_at_disintegrated, '\t Stop at disintegration')
     print(stop_at_inner_collision, '\t Stop at collision in inner binary')
@@ -938,7 +944,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
     print(stop_at_dynamical_instability, '\t Stop at dynamical instability')
     print(stop_at_semisecular_regime, '\t Stop at semisecular regime')
     print(stop_at_CPU_time, '\t Stop at maximum CPU time')
-    print('\n\n')
+    print('\n')
 
 
 def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min, 
@@ -958,11 +964,11 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         metallicity, tend, number, initial_number, seed,
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer,
+                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+                        stop_at_no_CHE, include_CHE,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        which_common_envelope,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
@@ -1191,16 +1197,7 @@ def parse_arguments():
                       help="maximum of inner longitude of ascending node [rad] [%default]")
     parser.add_option("--O_distr",  "--Oin_distr",dest="inner_loan_distr", type="int", default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
-
-    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
-                      help="which supernova kick distribution [%default]")                      
-    parser.add_option("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
-                      help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
-    parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
-                      help="do not rescale the BH SN kick with fallback  [%default]")                      
-    parser.add_option("--CE", dest="which_common_envelope",  type="int", default = 2,
-                      help="which common envelope modeling [%default]")                      
-
+
     parser.add_option("-z", "-Z",unit=units.none, 
                       dest="metallicity", type="float", default = 0.02|units.none,
                       help="metallicity [%default] %unit")                     
@@ -1234,6 +1231,13 @@ def parse_arguments():
                     default = False, help="stop at unstable mass transfer [%default] %unit")
     parser.add_option("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer", 
                     action="store_true", default = False, help="stop at eccentric unstable mass transfer [%default] %unit")
+    parser.add_option("--CE", dest="which_common_envelope",  type="int", default = 2,
+                      help="which common envelope modeling [%default]")                      
+
+    parser.add_option("--stop_at_no_CHE",dest="stop_at_no_CHE", action="store_true", default = False,
+                      help="stop if no chemically homogeneous evolution [%default] %unit") 
+    parser.add_option("--include_CHE", dest="include_CHE", 
+                    action="store_true", default = False, help="include chemically homogeneous evolution in the stellar evolution [%default] %unit")
 
     parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
                       help="stop at merger [%default] %unit")
@@ -1247,8 +1251,16 @@ def parse_arguments():
                       help="stop at dynamical instability [%default] %unit")
     parser.add_option("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
                       help="stop at semisecular regime [%default] %unit")
+
     parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
                       help="stop at supernova [%default] %unit")
+    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
+                      help="which supernova kick distribution [%default]")                      
+    parser.add_option("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
+    parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
+                      help="do not rescale the BH SN kick with fallback  [%default]")                      
+
     parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
                       help="stop at CPU time [%default] %unit")
     parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 3600.0,

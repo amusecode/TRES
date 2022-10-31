@@ -45,6 +45,7 @@ bin_type = {
                 'collision': 'collision',    
                 'semisecular': 'semisecular',    
                 'rlof': 'rlof',   #only used for stopping conditions
+                'olof' : 'olof',  #only used for stopping conditions 
                 'stable_mass_transfer': 'stable_mass_transfer',
                 'common_envelope': 'common_envelope',     
                 'common_envelope_energy_balance': 'common_envelope_energy_balance',     
@@ -69,6 +70,21 @@ def roche_radius(bin, primary, self):
         return bin.semimajor_axis * roche_radius_dimensionless(primary.mass, self.get_mass(bin)-primary.mass)
 
     sys.exit('error in roche radius: Roche radius can only be determined in a binary')
+
+def L2_radius_dimensionless(M,m):
+    # approximation for l2 overflow
+    # see Marchant+ 2016 equation 2
+    q = M/m
+    rl1 = roche_radius_dimensionless(M, m)
+    rl2_div_rl1 = 0.299 * np.arctan(1.83*q**0.397) + 1 
+    return rl2_div_rl1 * rl1
+
+def L2_radius(bin, primary, self):
+    # note: this prescription is based on the Eggleton approximation for how to adjust a circular RL to an eccentric one
+    # may not be consistent with Sepinsky's method for eccentric RL (L1)
+    if not bin.is_star and primary.is_star:
+        return bin.semimajor_axis * L2_radius_dimensionless(primary.mass, self.get_mass(bin)-primary.mass)*(1-bin.eccentricity)
+    sys.exit('Error: L2 radius can only be determined in a binary')
 
 #for comparison with kozai timescale
 def stellar_evolution_timescale(star):
@@ -131,6 +147,19 @@ def lang_spin_angular_frequency(star):
 
 def break_up_angular_frequency(object):
     return np.sqrt( constants.G * object.mass / object.radius ) / object.radius
+
+
+def criticial_angular_frequency_CHE(m, Z):
+    #angular frequency of spin for CHE threshold
+    #Fitting formula for CHE from Riley+ 2021
+
+    a_coeff = np.array([5.7914 * 10 ** - 4, -1.9196 * 10 ** - 6,
+                        -4.0602 * 10 ** - 7, 1.0150 * 10 ** - 8,
+                        -9.1792 * 10 ** - 11, 2.9051 * 10 ** - 13])
+    mass_power = np.linspace(0,5,6)
+    omega_at_z_0d004 = np.sum(a_coeff * m.value_in(units.MSun)** mass_power / m.value_in(units.MSun) ** 0.4)
+    omega_crit = omega_at_z_0d004/(0.09 * np.log(Z/0.004) + 1) |1./units.s
+    return omega_crit
 
 
 def copy_outer_orbit_to_inner_orbit(bs, self):
@@ -276,7 +305,7 @@ def perform_inner_merger(bs, donor, accretor, self):
     donor.moment_of_inertia_of_star = self.moment_of_inertia(donor)        
     
     #assuming conservation of total angular momentum of the inner binary
-    spin_angular_frequency = J_spin_new / donor.moment_of_inertia_of_star                
+    spin_angular_momentum = J_spin_new / donor.moment_of_inertia_of_star                
     critical_spin_angular_frequency = np.sqrt(constants.G * donor.mass/donor.radius**3)
     donor.spin_angular_frequency = min(spin_angular_frequency, critical_spin_angular_frequency)
         
@@ -612,23 +641,7 @@ def common_envelope_phase(bs, donor, accretor, self):
             stopping_condition = common_envelope_angular_momentum_balance(bs, donor, accretor, self)   
 
     return stopping_condition
-
-def contact_system(bs, star1, star2, self):
-    if REPORT_FUNCTION_NAMES:
-        print("Contact system")
-
-    bs.bin_type = bin_type['contact']                
-    self.save_snapshot()        
-
-    #for now no W Ursae Majoris evolution
-    #so for now MS-MS contact binaries merge in common_envelope_phase
-    #if stable mass transfer is implemented, then also the timestep needs to be adjusted
-    if star1.mass >= star2.mass:
-        stopping_condition = common_envelope_phase(bs, star1, star2, self)  
-    else:
-        stopping_condition = common_envelope_phase(bs, star2, star1, self)  
-
-    return stopping_condition        
+    
 
 def adiabatic_expansion_due_to_mass_loss(a_i, Md_f, Md_i, Ma_f, Ma_i):
 
@@ -773,6 +786,67 @@ def semi_detached(bs, donor, accretor, self):
     #possible problem if companion or tertiary accretes significantly from this
 #    self.update_previous_stellar_parameters() #previous_mass, previous_radius for safety check
 #-------------------------
+#functions for contact mass transfer in a multiple / triple
+
+#change parameters assuming fully conservative mass transfer
+def perform_mass_equalisation_for_contact(bs, donor, accretor, self):
+    if REPORT_FUNCTION_NAMES:
+        print('perform_mass_equalisation_for_contact')
+    if REPORT_BINARY_EVOLUTION:
+        print('Start of stable mass transfer of contact systems' ) 
+
+    if donor.mass != accretor.mass: 
+    # if abs(donor.mass - accretor.mass)> 1e-4|units.MSun: #could be better. see if problems arise
+        new_mass = 0.5*(donor.mass + accretor.mass)
+        bs.semimajor_axis = bs.semimajor_axis * (donor.mass * accretor.mass / new_mass ** 2) ** 2
+
+        delta_mass_donor = new_mass - donor.mass
+        delta_mass_accretor = new_mass - accretor.mass
+        donor_in_stellar_code = donor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+        accretor_in_stellar_code = accretor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+
+        donor_in_stellar_code.change_mass(delta_mass_donor, -1.0|units.yr)
+        accretor_in_stellar_code.change_mass(delta_mass_accretor, -1.0|units.yr)
+        self.stellar_code.evolve_model(minimum_time_step) #to get updates radii, not just inflation of stars due to accretion
+        self.copy_from_stellar()                     
+        self.update_stellar_parameters() #makes secular code use update values: mass equalisation happens instantaneously
+        
+        #set to synchronization
+        if self.include_CHE:
+            corotating_frequency = corotating_spin_angular_frequency_binary(bs.semimajor_axis, donor.mass, accretor.mass)
+            donor.spin_angular_frequency = corotating_frequency
+            accretor.spin_angular_frequency = corotating_frequency
+            donor.rotation_period = (2*np.pi/donor.spin_angular_frequency)
+            accretor.rotation_period = (2*np.pi/accretor.spin_angular_frequency)
+            self.channel_to_stellar.copy_attributes(['rotation_period']) #only defined when include_CHE
+
+        self.secular_code.parameters.include_inner_RLOF_terms = False 
+        self.secular_code.parameters.include_outer_RLOF_terms = False 
+
+
+
+def contact_system(bs, star1, star2, self):
+    #if this implementation changes, then also change the is_mt_stable
+    if REPORT_FUNCTION_NAMES:
+        print("Contact system")
+
+    bs.bin_type = bin_type['contact']                
+    self.save_snapshot()        
+    self.check_RLOF() #@andris: is this necessary?
+
+    #for now no W Ursae Majoris evolution
+    #so for now contact binaries merge in common_envelope_phase, and MS-MS contact binaries will have mass equalisation
+    if bs.is_mt_stable: # happens when star1 & star2 are both on MS 
+        perform_mass_equalisation_for_contact(bs, bs.child1, bs.child2, self)
+        stopping_condition = True 
+    else:
+        if star1.mass >= star2.mass:
+            stopping_condition = common_envelope_phase(bs, star1, star2, self)
+        else:
+            stopping_condition = common_envelope_phase(bs, star2, star1, self)
+
+    return stopping_condition       
+
 
 #-------------------------
 #functions for mass transfer in a multiple / triple
@@ -1030,13 +1104,38 @@ def mass_transfer_stability(binary, self):
             binary.is_mt_stable = False
             
         elif binary.child1.is_donor and binary.child2.is_donor:
-            if REPORT_MASS_TRANSFER_STABILITY:
-                print("Mass transfer stability: Contact")
-            mt1 = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
-            mt2 = -1.* binary.child2.mass / dynamic_timescale(binary.child2)  
-            binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
-            binary.is_mt_stable = False    
-
+            if binary.child1.is_OLOF_donor and binary.child2.is_OLOF_donor:
+                if REPORT_MASS_TRANSFER_STABILITY:
+                    print("Mass transfer stability: Unstable OLOF contact")
+                mt1 = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
+                mt2 = -1.* binary.child2.mass / dynamic_timescale(binary.child2)  
+                binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
+                binary.is_mt_stable = False
+            #already included in next elif + mass transfer rate doesn't matter for olof     
+            # elif binary.child1.is_OLOF_donor and binary.child1.stellar_type <= 1|units.stellar_type:
+            #     if REPORT_MASS_TRANSFER_STABILITY:
+            #         print("Mass transfer stability: Stable OLOF")
+            #     binary.mass_transfer_rate = -1.* binary.child1.mass / nuclear_evolution_timescale(binary.child1)
+            #     binary.is_mt_stable = True
+            # elif binary.child2.is_OLOF_donor and binary.child2.stellar_type <= 1|units.stellar_type:
+            #     if REPORT_MASS_TRANSFER_STABILITY:
+            #         print("Mass transfer stability: Stable OLOF")
+            #     binary.mass_transfer_rate = -1.* binary.child2.mass / nuclear_evolution_timescale(binary.child2)
+            #     binary.is_mt_stable = True 
+            elif binary.child1.stellar_type <= 1|units.stellar_type and binary.child2.stellar_type <= 1|units.stellar_type:
+                if REPORT_MASS_TRANSFER_STABILITY:
+                    print("Mass transfer stability: stable case A contact")
+                mt1 = -1.* binary.child1.mass / nuclear_evolution_timescale(binary.child1)         
+                mt2 = -1.* binary.child2.mass / nuclear_evolution_timescale(binary.child2)         
+                binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
+                binary.is_mt_stable = False
+            else:
+                if REPORT_MASS_TRANSFER_STABILITY:
+                    print("Mass transfer stability: Unstable contact")
+                mt1 = -1.* binary.child1.mass / dynamic_timescale(binary.child1)
+                mt2 = -1.* binary.child2.mass / dynamic_timescale(binary.child2)  
+                binary.mass_transfer_rate = min(mt1, mt2) # minimum because mt<0
+                binary.is_mt_stable = False
         elif binary.child1.is_donor and binary.child1.mass > binary.child2.mass*q_crit(self, binary.child1, binary.child2):
             if REPORT_MASS_TRANSFER_STABILITY:
                 print("Mass transfer stability: Mdonor1>Macc*q_crit ")
@@ -1047,7 +1146,6 @@ def mass_transfer_stability(binary, self):
                 print("Mass transfer stability: Mdonor2>Macc*q_crit ")
             binary.mass_transfer_rate= -1.* binary.child2.mass / dynamic_timescale(binary.child2) 
             binary.is_mt_stable = False
-            
             
         elif binary.child1.is_donor:
             if REPORT_MASS_TRANSFER_STABILITY:
@@ -1080,8 +1178,6 @@ def mass_transfer_stability(binary, self):
             print(binary.is_star, binary.child1.is_star, binary.child2.is_star)
             sys.exit('error in Mass transfer stability: type of system unknown') 
 
-
-        
             
         if REPORT_MASS_TRANSFER_STABILITY:
             print("Mass transfer stability: Binary ")
