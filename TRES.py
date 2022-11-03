@@ -218,6 +218,7 @@ def make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
 def setup_stellar_code(metallicity, stars):
     stellar_code = SeBa()
 #    stellar_code = SeBa(redirection='none')
+#    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
 
     #stopping conditions:
 #    stellar_code.stopping_conditions.supernova_detection.enable()        
@@ -234,6 +235,7 @@ def setup_stellar_code(metallicity, stars):
 def setup_secular_code(triple_set, triple_time, stop_at_semisecular_regime):
     secular_code = SecularTriple()
 #    secular_code = SecularTriple(redirection='none')
+#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
     secular_code.triples.add_particles(triple_set)
     secular_code.parameters.verbose = False
 #    secular_code.parameters.verbose = True
