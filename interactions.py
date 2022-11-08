@@ -1,6 +1,7 @@
 from amuse.units import units, constants, quantities
 import numpy as np
 import sys 
+import scipy.integrate as integrate
 
 REPORT_BINARY_EVOLUTION = False
 REPORT_FUNCTION_NAMES = False
@@ -1227,6 +1228,138 @@ def mass_transfer_timescale(binary, star):
 #    mtt = nuclear_evolution_timescale(star)
     return mtt
 #-------------------------
+
+# Mass loss recipes for the energy limited photoevaporation of planets.
         
+# X-ray luminosity fraction as prescripted by Wright 2011, based on the Rossby number.
+def Rx_wright11(mass, p_rot):
+    Rx_sat = 10**(-3.13)
+    Ro_sat = 0.16
+    tau_conv = 10**(1.16 - 1.49* np.log(mass.value_in(units.MSun)) - 0.54*(np.log(mass.value_in(units.MSun)))**2)
+    Ro = p_rot/tau_conv
+    if Ro > Ro_sat:
+        B = -2.70
+        R_X = Rx_sat * (Ro / Ro_sat)**B
+    else:
+        R_X = Rx_sat
+    return R_X
+
+# compute the specific flux of a BB, in erg/s /m3 (/sterad)
+def blackbody(wavel, T):
+    h = constants.h.value_in( units.erg * units.s )
+    c = constants.c.value_in( units.m / units.s )
+    KB = constants.kB.value_in( units.erg / units.K )
+    B_l = (2* h * c**2 / wavel**5) / (np.exp( h*c/(wavel*KB*T), dtype=np.float128) - 1)
+    return B_l
         
     
+# Compute the high energy luminosity from the bolometric one.
+def xuv_luminosity(star):
+    L_bol = star.luminosity.value_in(units.erg/units.s)	
+
+    #silvia: right now WDs+NS, should it just be wds? include bhs? 
+    if star.stellar_type.value in [10,11,12]:     # we have a WD, we integrate a Black Body from 1 nm to 91.2 nm
+        F_xuv = integrate.quad(blackbody, 1e-09, 9.12e-08, args=(star.temperature.value_in(units.K)))[0]
+        L_XUV = 4*np.pi**2 * star.radius.value_in(units.m)**2 * F_xuv
+        # print('M WD:', star.mass, '\t T WD:', star.temperature)
+        return L_XUV    # erg/s
+    elif star.stellar_type in stellar_types_planetary_objects:
+        return 0; 
+    elif star.stellar_type in stellar_types_SN_remnants: #NS, BH or massless SN
+        return 0; 
+    else: 
+        if (star.mass <= 2|units.MSun):
+            p_rot_star = 2*np.pi / star.spin_angular_frequency.value_in(1/units.s)
+            L_X = L_bol * Rx_wright11(star.mass, p_rot_star)             # Rossby number approach, Wright 2011
+            L_EUV = 10**4.8 * L_X**0.86                 # Sanz-Forcada 2011 
+        elif 2|units.MSun < star.mass <= 3|units.MSun:
+            if star.stellar_type.value in [1,2,7,8]: #ms & hg : radiative envelope            
+                L_X = 10**(-3.5) * L_bol 	            # Flaccomio 2003   
+            elif star.stellar_type.value in [3,4,5,6,9]:  # during giant phases, rossby approach again, having convective envelopes
+                p_rot_star = 2*np.pi / star.spin_angular_frequency.value_in(1/units.s)
+                L_X = L_bol * Rx_wright11(star.mass, p_rot_star)
+            else: 
+                sys.exit('stellar type unknown in xuv_luminosity')
+            L_EUV = 10**4.8 * L_X**0.86                 # Sanz-Forcada 2011
+
+        elif 3|units.MSun < star.mass < 10|units.MSun:
+            L_X = 1e-06 * L_bol  # 10**31 	# erg/s     #Flaccomio 2003
+            L_EUV = L_X 	# actually EUV should be stronger than X emission in this mass range
+        else:
+            # Star mass out of implemented range for evaporation: default factor employed
+            L_X = 1e-06 * L_bol
+            L_EUV = 1e-06 * L_bol
+        
+        return (L_X + L_EUV ) #|units.erg/units.s		# erg/s
+    
+    
+# Compute instantaneous flux at time t from given star, for a planet in circular orbit.
+# lum input has to be erg/s
+def flux_inst(t, r_plan, a_st_i, P_plan, P_binary, lum, star_number, i_orb ):
+    phi = 2*np.pi * t / P_plan                              # planet's phase angle (inclined)
+    st_ang = 2*np.pi* t / P_binary + star_number * np.pi      # star phase angle (on plane)
+    d_z2 = ( r_plan * np.sin(phi) * np.sin(i_orb) )**2
+    d_p2 = ( r_plan *np.cos(phi) - a_st_i *np.cos(st_ang) )**2 + ( r_plan *np.sin(phi)*np.cos(i_orb) - a_st_i *np.sin(st_ang) )**2
+    distance_sq = d_p2 + d_z2
+    return lum/distance_sq
+    
+    
+def mass_lost_due_to_evaporation_tertiary(stellar_system, dt, outer_planet, inner_binary, self):
+    if REPORT_FUNCTION_NAMES:
+        print("Mass lost due to evaporation tertiary")
+    
+    e_pl = stellar_system.eccentricity
+    a_pl = stellar_system.semimajor_axis						
+    P_pl = self.orbital_period(stellar_system)
+    i_orbits = stellar_system.relative_inclination
+    # time-averaged circular radius of elliptical orbits
+    r_pl = a_pl * ( 1 + 0.5* e_pl**2 )          
+
+    a_bin = inner_binary.semimajor_axis
+    P_bin = self.orbital_period(inner_binary)
+    M_bin = self.get_mass(inner_binary)        
+    xi = roche_radius_dimensionless(outer_planet.mass, M_bin) * a_pl / outer_planet.radius
+    #Erkaev (2007) escape factor
+    K_Erk = 1 - 1.5/xi + 0.5* xi**(-3)		
+
+    # compute the high-energy flux average from the two stars
+    t_start = 0.
+    #average on one orbital period of the outer planet (~ 5 P_binary)
+    t_end = P_pl.value_in(units.Myr)		
+
+    L_xuv1_erg_s = xuv_luminosity(inner_binary.child1)
+    a_st_1 = a_bin/(1+inner_binary.child1.mass/inner_binary.child2.mass)
+    F1 = integrate.quad(flux_inst, t_start, t_end, args=(r_pl.value_in(units.RSun), a_st_1.value_in(units.RSun), P_pl.value_in(units.Myr), P_bin.value_in(units.Myr), L_xuv1_erg_s, 0, i_orbits), limit=100, full_output=1)[0]
+
+    L_xuv2_erg_s = xuv_luminosity(inner_binary.child2)
+    a_st_2 = a_bin/(1+inner_binary.child2.mass/inner_binary.child1.mass)
+    F2 = integrate.quad(flux_inst, t_start, t_end, args=(r_pl.value_in(units.RSun), a_st_2.value_in(units.RSun), P_pl.value_in(units.Myr), P_bin.value_in(units.Myr), L_xuv2_erg_s, 1, i_orbits), limit=100, full_output=1)[0]
+    
+    Flux_XUV = (F1+F2)/(4*np.pi* (t_end-t_start) )  | (units.erg/units.s / units.RSun**2)
+    eta = 0.2 # evaporation efficiency parameter
+    M_dot = eta * np.pi * (outer_planet.radius)**3 * Flux_XUV / ( constants.G * outer_planet.mass * K_Erk )
+    mass_lost = M_dot * dt
+    return mass_lost
+
+
+def mass_lost_due_to_evaporation_in_binary(stellar_system, dt, planet, star, self):
+    if REPORT_FUNCTION_NAMES:
+        print("Mass lost due to evaporation binary")
+
+    e_pl = stellar_system.eccentricity
+    a_pl = stellar_system.semimajor_axis						
+    P_pl = self.orbital_period(stellar_system)
+    i_orbits = stellar_system.relative_inclination
+    # time-averaged circular radius of elliptical orbits
+    r_pl = a_pl * ( 1 + 0.5* e_pl**2 )          
+
+    xi = roche_radius_dimensionless(planet.mass, star.mass) * a_pl / planet.radius
+    #Erkaev (2007) escape factor
+    K_Erk = 1 - 1.5/xi + 0.5* xi**(-3)		
+    Flux_XUV = star.luminosity / r_pl**2 
+
+    eta = 0.2 # evaporation efficiency parameter
+    M_dot = eta * np.pi * (planet.radius)**3 * Flux_XUV / ( constants.G * planet.mass * K_Erk )
+    mass_lost = M_dot * dt
+    return mass_lost
+

@@ -2038,6 +2038,62 @@ class Triple_Class:
 
     #-------
     #evolution
+ 
+    # uses instantaneous eccentricity (from global timestep) to calculate an orbit averaged stellar flux, 
+    # that can evaporise part of the planetary envelope. 
+    # would be best to do in secular code instead, such that eccentricity variations due to KL are taken into account properly
+    def planetary_mass_evaporation(self, dt, stellar_system = None):        
+        if stellar_system == None:
+           stellar_system = self.triple
+        
+        if stellar_system.is_star:
+            return
+        elif self.is_binary(stellar_system):
+            if stellar_system.child1.stellar_type in stellar_types_planetary_objects and stellar_system.child2.stellar_type not in stellar_types_planetary_objects:
+                donor = stellar_system.child1
+                dm = mass_lost_due_to_evaporation_in_binary(stellar_system, dt, donor, stellar_system.child2, self) 
+                donor.previous_mass = donor.mass
+                donor_in_stellar_code = donor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+                donor_in_stellar_code.change_mass(-1*dm, 0.|units.yr)
+                print("mass lost child1:", dm)
+            elif stellar_system.child2.stellar_type in stellar_types_planetary_objects and stellar_system.child1.stellar_type not in stellar_types_planetary_objects:
+                donor = stellar_system.child2
+                dm = mass_lost_due_to_evaporation_in_binary(stellar_system, dt, donor, stellar_system.child1, self) 
+                donor.previous_mass = donor.mass
+                donor_in_stellar_code = donor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+                donor_in_stellar_code.change_mass(-1*dm, 0.|units.yr)
+                print("mass lost child2:", dm)
+        elif self.is_triple(stellar_system):
+            if stellar_system.child1.is_star: #child1 is the tertiary
+                # effect on tertiary
+                if stellar_system.child1.stellar_type in stellar_types_planetary_objects: #evaporation if tertiary is a planet
+                    donor = stellar_system.child1
+                    dm = mass_lost_due_to_evaporation_tertiary(stellar_system, dt, donor, stellar_system.child2, self) 
+                    donor.previous_mass = donor.mass
+                    donor_in_stellar_code = donor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+                    donor_in_stellar_code.change_mass(-1*dm, 0.|units.yr)
+                    print("mass lost child1:", dm)
+                # check the inner binary: for now we only take into account evaporation due the closest stellar companion 
+                self.planetary_mass_evaporation(dt, stellar_system.child2) 
+            elif self.child2.is_star: #child2 is the tertiary
+                # effect on tertiary
+                if self.child2.stellar_type in stellar_types_planetary_objects: #evaporation if tertiary is a planet
+                    donor = stellar_system.child2
+                    dm = mass_lost_due_to_evaporation_tertiary(stellar_system, dt, donor, stellar_system.child1, self) 
+                    donor.previous_mass = donor.mass
+                    donor_in_stellar_code = donor.as_set().get_intersecting_subset_in(self.stellar_code.particles)[0]
+                    donor_in_stellar_code.change_mass(-1*dm, 0.|units.yr)
+                    print("mass lost child2:", dm)
+                # check the inner binary: for now we only take into account evaporation due the closest stellar companion 
+                self.planetary_mass_evaporation(dt, stellar_system.child1) 
+            else:             
+                sys.exit('planetary_mass_evaporation: structure stellar system unknown')
+    
+        else:         
+            sys.exit('planetary_mass_evaporation: structure stellar system unknown')
+                 
+    
+    
     def resolve_stellar_interaction(self, stellar_system = None):
     # the most inner binary is calculated first, and then move outwards
 
@@ -2522,6 +2578,8 @@ class Triple_Class:
 
                 if self.include_CHE:#only needed when including CHE
                     self.channel_to_stellar.copy_attributes(['rotation_period'])
+                
+                self.planetary_mass_evaporation(dt)                    
                 self.stellar_code.evolve_model(self.triple.time)
                 self.copy_from_stellar()
                 self.update_stellar_parameters() 
