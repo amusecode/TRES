@@ -244,10 +244,8 @@ def perform_inner_collision(self):
         critical_spin_angular_frequency = np.sqrt(constants.G * donor.mass/donor.radius**3)
         donor.spin_angular_frequency = min(spin_angular_frequency, critical_spin_angular_frequency)
 
-            
         self.stellar_code.particles.remove_particle(accretor)
         accretor.mass = 0|units.MSun # necessary for adjust_system_after_ce_in_inner_binary
-    
         #adjust outer orbit, needs to be before the system becomes a binary
         #and copy to inner orbit 
         # weird structure necessary for secular code -> outer orbit is redundant
@@ -311,12 +309,10 @@ def perform_inner_merger(bs, donor, accretor, self):
     donor.spin_angular_frequency = min(spin_angular_frequency, critical_spin_angular_frequency)
         
     self.stellar_code.particles.remove_particle(accretor)
-    accretor.mass = 0|units.MSun # necessary for adjust_system_after_ce_in_inner_binary
-            
+    accretor.mass = 0|units.MSun # necessary for adjust_system_after_ce_in_inner_binary   
     #adjust outer orbit, needs to be before the system becomes a binary
     #and copy to inner orbit 
     # weird structure necessary for secular code -> outer orbit is redundant
-
     adjust_system_after_ce_in_inner_binary(bs, self)                    
     copy_outer_orbit_to_inner_orbit(bs, self)
     copy_outer_star_to_accretor(self)
@@ -404,20 +400,21 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
         donor.spin_angular_frequency = corotating_frequency
         accretor.spin_angular_frequency = corotating_frequency
         
-#        adjusting of stellar system
-        adjust_system_after_ce_in_inner_binary(bs, self)                    
+        self.check_RLOF()       
+        if self.has_donor():
+            print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.child1.radius, self.triple.child2.child2.radius,self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
+            print(self.triple.child2.child1.core_mass, self.triple.child2.child1.mass-self.triple.child2.child1.core_mass, self.triple.child2.child1.stellar_type)
+            print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
 
+#           sys.exit("error in adjusting triple after gamma CE: RLOF")
+            stopping_condition = perform_inner_merger(bs, donor, accretor, self)
+            if not stopping_condition: #stellar interaction
+            return False#        adjusting of stellar system
+#        in previous case of merger, the adjustment is done there as mass may be lost during the merger
+        adjust_system_after_ce_in_inner_binary(bs, self) 
+                           
 
-    self.check_RLOF()       
-    if self.has_donor():
-        print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.child1.radius, self.triple.child2.child2.radius,self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
-        print(self.triple.child2.child1.core_mass, self.triple.child2.child1.mass-self.triple.child2.child1.core_mass, self.triple.child2.child1.stellar_type)
-        print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-
-#        sys.exit("error in adjusting triple after gamma CE: RLOF")
-        stopping_condition = perform_inner_merger(bs, donor, accretor, self)
-        if not stopping_condition: #stellar interaction
-           return False        
+        
     donor.is_donor = False
     bs.is_mt_stable = True
     bs.bin_type = bin_type['detached']
@@ -478,18 +475,19 @@ def common_envelope_energy_balance(bs, donor, accretor, self):
         donor.spin_angular_frequency = corotating_frequency
         accretor.spin_angular_frequency = corotating_frequency
 
-#        adjusting of stellar system
+
+        self.check_RLOF()       
+        if self.has_donor():
+            print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
+            print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
+    
+    #        sys.exit("error in adjusting triple after alpha CE: RLOF")
+            stopping_condition = perform_inner_merger(bs, donor, accretor, self)
+            if not stopping_condition: #stellar interaction
+               return False#        adjusting of stellar system
+#        in previous case of merger, the adjustment is done there as mass may be lost during the merger
         adjust_system_after_ce_in_inner_binary(bs, self)                    
-
-    self.check_RLOF()       
-    if self.has_donor():
-        print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
-        print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-
-#        sys.exit("error in adjusting triple after alpha CE: RLOF")
-        stopping_condition = perform_inner_merger(bs, donor, accretor, self)
-        if not stopping_condition: #stellar interaction
-           return False        
+        
     donor.is_donor = False
     bs.is_mt_stable = True
     bs.bin_type = bin_type['detached']
@@ -555,19 +553,18 @@ def double_common_envelope_energy_balance(bs, donor, accretor, self):
         donor.spin_angular_frequency = corotating_frequency
         accretor.spin_angular_frequency = corotating_frequency
 
-#        adjusting of stellar system
+        self.check_RLOF()       
+        if self.has_donor():
+            print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
+            print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
+    
+    #        sys.exit("error in adjusting triple after double CE: RLOF")
+            stopping_condition = perform_inner_merger(bs, donor, accretor, self)
+            if not stopping_condition: #stellar interaction
+               return False#        adjusting of stellar system
+#        in previous case of merger, the adjustment is done there as mass may be lost during the merger
         adjust_system_after_ce_in_inner_binary(bs, self)                    
 
-            
-    self.check_RLOF()       
-    if self.has_donor():
-        print(self.triple.child2.child1.mass, self.triple.child2.child2.mass, self.triple.child2.semimajor_axis, self.triple.child2.eccentricity, self.triple.child2.child1.is_donor, self.triple.child2.child2.is_donor)
-        print(self.triple.child1.mass, self.triple.semimajor_axis, self.triple.eccentricity, self.triple.child1.is_donor)
-
-#        sys.exit("error in adjusting triple after double CE: RLOF")
-        stopping_condition = perform_inner_merger(bs, donor, accretor, self)
-        if not stopping_condition: #stellar interaction
-           return False        
     donor.is_donor = False
     bs.is_mt_stable = True
     bs.bin_type = bin_type['detached']
