@@ -611,12 +611,12 @@ def common_envelope_phase(bs, donor, accretor, self):
         
     if self.which_common_envelope == 0:
         if donor.stellar_type in stellar_types_giants and accretor.stellar_type in stellar_types_giants:
-           stopping_condition = double_common_envelope(bs, donor, accretor, self)
+           stopping_condition = double_common_envelope_energy_balance(bs, donor, accretor, self)
         else:
             stopping_condition = common_envelope_energy_balance(bs, donor, accretor, self)
     elif self.which_common_envelope == 1:
         if donor.stellar_type in stellar_types_giants and accretor.stellar_type in stellar_types_giants:
-            stopping_condition = double_common_envelope(bs, donor, accretor, self)
+            stopping_condition = double_common_envelope_energy_balance(bs, donor, accretor, self)
         else:
             stopping_condition = common_envelope_angular_momentum_balance(bs, donor, accretor, self)
     elif self.which_common_envelope == 2:

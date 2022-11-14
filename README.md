@@ -121,7 +121,8 @@ Depreciated (yet still functioning) parameters are given in {}.
         options:
         0:  alpha-ce + alpha-dce
         1:  gamma-ce + alpha-dce
-        2:  seba style; combination of gamma-ce, alpha-ce & alpha-dce    
+        2:  seba style; combination of gamma-ce, alpha-ce & alpha-dce  
+Note that in all cases a double common-envelope is calculated using the alpha-ce.           
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:
