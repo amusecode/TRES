@@ -46,7 +46,8 @@ bin_type = {
                 'collision': 'collision',    
                 'semisecular': 'semisecular',    
                 'rlof': 'rlof',   #only used for stopping conditions
-                'olof' : 'olof',  #only used for stopping conditions 
+                'olof' : 'olof',  #only used for stopping conditions
+ 
                 'stable_mass_transfer': 'stable_mass_transfer',
                 'common_envelope': 'common_envelope',     
                 'common_envelope_energy_balance': 'common_envelope_energy_balance',     
@@ -409,7 +410,9 @@ def common_envelope_angular_momentum_balance(bs, donor, accretor, self):
 #           sys.exit("error in adjusting triple after gamma CE: RLOF")
             stopping_condition = perform_inner_merger(bs, donor, accretor, self)
             if not stopping_condition: #stellar interaction
-            return False#        adjusting of stellar system
+                return False
+
+#        adjusting of stellar system
 #        in previous case of merger, the adjustment is done there as mass may be lost during the merger
         adjust_system_after_ce_in_inner_binary(bs, self) 
                            
@@ -484,7 +487,9 @@ def common_envelope_energy_balance(bs, donor, accretor, self):
     #        sys.exit("error in adjusting triple after alpha CE: RLOF")
             stopping_condition = perform_inner_merger(bs, donor, accretor, self)
             if not stopping_condition: #stellar interaction
-               return False#        adjusting of stellar system
+               return False
+
+#        adjusting of stellar system
 #        in previous case of merger, the adjustment is done there as mass may be lost during the merger
         adjust_system_after_ce_in_inner_binary(bs, self)                    
         
@@ -561,7 +566,9 @@ def double_common_envelope_energy_balance(bs, donor, accretor, self):
     #        sys.exit("error in adjusting triple after double CE: RLOF")
             stopping_condition = perform_inner_merger(bs, donor, accretor, self)
             if not stopping_condition: #stellar interaction
-               return False#        adjusting of stellar system
+               return False
+
+#        adjusting of stellar system
 #        in previous case of merger, the adjustment is done there as mass may be lost during the merger
         adjust_system_after_ce_in_inner_binary(bs, self)                    
 
@@ -599,7 +606,8 @@ def common_envelope_phase(bs, donor, accretor, self):
 #            sys.exit("error in adjusting system after CE: RLOF")
             stopping_condition = perform_inner_merger(bs, donor, accretor, self)
             if not stopping_condition: #stellar interaction
-               return False            
+               return False
+            
         donor.is_donor = False
         bs.is_mt_stable = True
         bs.bin_type = bin_type['detached']
