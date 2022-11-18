@@ -1160,9 +1160,11 @@ class Triple_Class:
         elif self.is_triple():
             # for disrupted binary
             if self.triple.child1.is_star:
+		star = self.triple.child1
                 bin = self.triple.child2
             else:
-                bin = self.triple.child1
+		star = self.triple.child2
+		bin = self.triple.child1
         
             Rl2_1 = L2_radius(bin, bin.child1, self)
             Rl2_2 = L2_radius(bin, bin.child2, self)
@@ -2383,7 +2385,13 @@ class Triple_Class:
                 if REPORT_TRIPLE_EVOLUTION:
                     print('Mass transfer in inner binary at time = ',self.triple.time)
                     print(self.stop_at_mass_transfer,self.stop_at_stable_mass_transfer, self.stop_at_unstable_mass_transfer, self.stop_at_eccentric_stable_mass_transfer, self.stop_at_eccentric_unstable_mass_transfer, stellar_system.is_mt_stable)                       
-                return False    
+
+                if stellar_system.is_mt_stable:
+                    stellar_system.bin_type = bin_type['stable_mass_transfer']
+                else:
+                    stellar_system.bin_type = bin_type['common_envelope']
+			
+		return False    
             else:
                 return True
             
