@@ -12,6 +12,7 @@ import TRES as TRES
 
 #simplest way of running TRES
 def example_1():
+    print('TRES example 1')
     tr = TRES.main()
     print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
 
@@ -48,6 +49,7 @@ def example_1():
 #file_name, file_type, dir_plots
 
 def example_2():
+    print('TRES example 2')
 
     M1 = 1.5|units.MSun
     M2 = 0.6|units.MSun
@@ -64,10 +66,14 @@ def example_2():
     tr.secular_code.stop()
 
 
+
+
+
 #simple way of running TRES with adjusting input parameters
 # evolves just the stars to 625Myr (without changing the triple), and continues the triple simulation until 630Myr
 # useful in case of starting the simulation with evolved stars 
 def example_3():
+    print('TRES example 3')
 
     M1 = 2.5|units.MSun
     tinit = 625|units.Myr
@@ -79,11 +85,15 @@ def example_3():
     tr.stellar_code.stop()
     tr.secular_code.stop()
            
-           
+
+
+# example of Kozai-Lidov cycles in a triple with plotting
 # advanced level
 # uses TRES.main_developer() in stead of TRES.main()
-# evolve the triple to multiple timestamps: 2Myr, 3Myr, 5Myr
+# evolve the triple to multiple timestamps
 def example_4():    
+    print('TRES example 4')
+
     M1 = 1.3|units.MSun
     M2 = 0.5|units.MSun
     M3 = 0.5|units.MSun
@@ -98,32 +108,139 @@ def example_4():
     Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
-    stars = TRES.make_stars(M1,M2,M3)
-    bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
-    #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
     stellar_code.particles.add_particles(stars)
     
-    #make triple object and evolve unil 2Myr
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=2|units.Myr)
-    #continue evolution until 3 myr
-    tr.evolve_model(3|units.Myr)
-    #continue evolution until 5 myr
-    tr.evolve_model(5|units.Myr)
+    inner_eccentricity_array = []
+    outer_eccentricity_array = []
+    n_steps = 150
+    time_array = (np.arange(n_steps)+1)*5|units.Myr/n_steps
+    
+    #make triple object and evolve for small timestep
+    #needs to be bigger then 1e-4|units.Myr for secular code 
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr)
+    
+    for i in range(len(time_array)):
+        tr.evolve_model(time_array[i])
+        inner_eccentricity_array.append(tr.triple.child2.eccentricity)
+        outer_eccentricity_array.append(tr.triple.eccentricity)
 
-    print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+        if tr.check_stopping_conditions()==False or tr.check_stopping_conditions_stellar()==False or tr.check_stopping_conditions_stellar_interaction()==False:
+            print('stopping conditions reached')
+            time_array = time_array[:len(inner_eccentricity_array)]
+            time_array[-1] = tr.triple.time
+            break 
+
+    plt.plot(time_array.value_in(units.Myr), inner_eccentricity_array, label='inner eccentricity')
+    plt.plot(time_array.value_in(units.Myr), outer_eccentricity_array, label='outer eccentricity')
+    plt.plot(time_array.value_in(units.Myr), inner_eccentricity_array, 'k.')
+    plt.xlabel('time (Myr)')
+    plt.ylabel('eccentricity')
+    plt.legend(loc=0)
+    plt.show()
+    
+    tr.stellar_code.stop()
+    tr.secular_code.stop()
+
+
+# example of triple with wind mass loss & calculating through mass transfer, with plotting 
+# advanced level
+# uses TRES.main_developer() in stead of TRES.main()
+def example_5():    
+    print('TRES example 5')
+
+    M1 = 3.|units.MSun
+    M2 = 0.5|units.MSun
+    M3 = 0.5|units.MSun
+    Ain = 825|units.RSun
+    Aout = 80000|units.RSun
+    Ein = 0.0
+    Eout = 0.5
+    incl = 0.0
+    Gin = 0.1
+    Gout = 0.5
+    Oin = 0.
+    metallicity = 0.02
+
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    
+    stellar_code = SeBa()
+    stellar_code.parameters.metallicity = metallicity
+    stellar_code.particles.add_particles(stars)
+    
+    inner_semimajor_axis_array = np.array([])
+    outer_semimajor_axis_array = np.array([])
+    radius_primary_array = np.array([])
+    stellar_type_primary_array = np.array([])
+    
+    time_array = (np.arange(25)+1)/25.*370
+    time_array = np.append(time_array, (np.arange(100)+1)/100.*100 + 370)
+    time_array = np.append(time_array, (np.arange(100)+1)/100.*10 + 470)
+    time_array = time_array|units.Myr
+    
+    #make triple object and evolve for small timestep
+    #needs to be bigger then 1e-4|units.Myr for secular code 
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr, stop_at_mass_transfer=False)
+    
+    for i in range(len(time_array)):
+        tr.evolve_model(time_array[i])
+        print(time_array[i], tr.triple.child2.bin_type, tr.instantaneous_evolution,tr.triple.child2.child1.stellar_type)
+        inner_semimajor_axis_array = np.append(inner_semimajor_axis_array, tr.triple.child2.semimajor_axis.value_in(units.RSun))
+        outer_semimajor_axis_array = np.append(outer_semimajor_axis_array, tr.triple.semimajor_axis.value_in(units.RSun))
+        radius_primary_array = np.append(radius_primary_array, tr.triple.child2.child1.radius.value_in(units.RSun))
+        stellar_type_primary_array = np.append(stellar_type_primary_array, tr.triple.child2.child1.stellar_type.value_in(units.stellar_type))
+        
+        if tr.check_stopping_conditions()==False or tr.check_stopping_conditions_stellar()==False or tr.check_stopping_conditions_stellar_interaction()==False:
+            print('stopping conditions reached')
+            time_array = time_array[:len(inner_semimajor_axis_array)]
+            time_array[-1] = tr.triple.time
+            break 
+        
+
+    plt.semilogy(time_array.value_in(units.Myr), inner_semimajor_axis_array, label='inner semimajor axis')
+    plt.semilogy(time_array.value_in(units.Myr), outer_semimajor_axis_array, label='outer semimajor axis')
+    plt.xlabel('time (Myr)')
+    plt.ylabel('semimajor axis (RSun)')
+    plt.legend(loc=0)
+    plt.show()
+    
+    w_ms = np.arange(len(stellar_type_primary_array))[stellar_type_primary_array<=1]
+    w_hg = np.arange(len(stellar_type_primary_array))[stellar_type_primary_array==2]
+    w_gb = np.arange(len(stellar_type_primary_array))[stellar_type_primary_array==3]
+    w_cheb = np.arange(len(stellar_type_primary_array))[stellar_type_primary_array==4]
+    w_agb = np.arange(len(stellar_type_primary_array))[stellar_type_primary_array==5]
+    w_wd = np.arange(len(stellar_type_primary_array))[(stellar_type_primary_array>=10) & (stellar_type_primary_array<=12)]
+
+    plt.semilogy(time_array.value_in(units.Myr), radius_primary_array, 'k')
+    plt.semilogy(time_array.value_in(units.Myr)[w_ms], radius_primary_array[w_ms], '.', label='MS')
+    plt.semilogy(time_array.value_in(units.Myr)[w_hg], radius_primary_array[w_hg], '.', label='HG')
+    plt.semilogy(time_array.value_in(units.Myr)[w_gb], radius_primary_array[w_gb], '.', label='GB')
+    plt.semilogy(time_array.value_in(units.Myr)[w_cheb], radius_primary_array[w_cheb], '.', label='CHeB')
+    plt.semilogy(time_array.value_in(units.Myr)[w_agb], radius_primary_array[w_agb], '.', label='AGB')
+    plt.semilogy(time_array.value_in(units.Myr)[w_wd], radius_primary_array[w_wd], '.', label='WD')
+    plt.xlabel('time (Myr)')
+    plt.ylabel('primary radius (RSun)')
+    plt.legend(loc=0)
+    plt.show()
+    
 
     tr.stellar_code.stop()
     tr.secular_code.stop()
+
+       
+
+    
 
                    
 # advanced level
 # uses TRES.main_developer() in stead of TRES.main()
 # evolve the triple to 2Myr, 3Myr, 5Myr, then evolves just the stars to 8Myr (without changing the triple), and continues the triple simulation until 9Myr
-def example_5():    
+def example_6():    
+    print('TRES example 6')
+
     M1 = 1.3|units.MSun
     M2 = 0.5|units.MSun
     M3 = 0.5|units.MSun
@@ -135,12 +252,9 @@ def example_5():
     Gin = 0.1
     Gout = 0.5
     Oin = 0.
-    Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
-    stars = TRES.make_stars(M1,M2,M3)
-    bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
@@ -174,7 +288,9 @@ def example_5():
 # uses TRES.main_developer() in stead of TRES.main()
 # evolve the triple to 2Myr, 3Myr, 5Myr, then evolves just the stars to 8Myr (without changing the triple), and continues the triple simulation until 9Myr
 #at 9Myr, some mass is removed from one star (without changing the triple), then the triple is evolved until 10 Myr
-def example_6():    
+def example_7():    
+    print('TRES example 7')
+
     M1 = 1.3|units.MSun
     M2 = 0.5|units.MSun
     M3 = 0.5|units.MSun
@@ -186,12 +302,9 @@ def example_6():
     Gin = 0.1
     Gout = 0.5
     Oin = 0.
-    Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
-    stars = TRES.make_stars(M1,M2,M3)
-    bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
@@ -236,7 +349,9 @@ def example_6():
 # useful in case of starting the simulation with evolved stars, stripped stars, or compact objects 
 # note that the same can be achieved very simply with  tr = TRES.main(tinit = 8|units.Myr, tend = 9|units.Myr) - see example_3. 
 # below option provides more flexibility
-def example_7():    
+def example_8():    
+    print('TRES example 8')
+
     M1 = 1.3|units.MSun
     M2 = 0.5|units.MSun
     M3 = 0.5|units.MSun
@@ -248,12 +363,9 @@ def example_7():
     Gin = 0.1
     Gout = 0.5
     Oin = 0.
-    Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
-    stars = TRES.make_stars(M1,M2,M3)
-    bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
@@ -285,7 +397,9 @@ def example_7():
 # make triple, but don't evolve it.  evolves just the stars to 8Myr (without changing the triple), and continues the triple simulation until 9Myr
 # useful in case of starting the simulation with evolved stars, stripped stars, or compact objects 
 #at 9Myr, some mass is removed from one star (without changing the triple), then the triple is evolved until 10 Myr
-def example_8():    
+def example_9():    
+    print('TRES example 9')
+
     M1 = 1.3|units.MSun
     M2 = 0.5|units.MSun
     M3 = 0.5|units.MSun
@@ -297,12 +411,9 @@ def example_8():
     Gin = 0.1
     Gout = 0.5
     Oin = 0.
-    Oout = Oin - np.pi
     metallicity = 0.02
         
-    correct_params, Ein, Eout = TRES.test_initial_parameters(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
-    stars = TRES.make_stars(M1,M2,M3)
-    bins = TRES.make_bins(stars, Ain, Aout, Ein, Eout, Gin, Gout, Oin, Oout)
+    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
@@ -342,9 +453,10 @@ def example_8():
 #example_1()
 #example_2()
 #example_3()
-#example_4()
+example_4()
 #example_5()
 #example_6()
-example_7()
+#example_7()
 #example_8()
+#example_9()
 
