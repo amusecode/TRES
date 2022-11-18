@@ -243,7 +243,7 @@ def perform_inner_collision(self):
         #assuming conservation of total angular momentum of the inner binary
         spin_angular_frequency = J_spin_new / donor.moment_of_inertia_of_star                
         critical_spin_angular_frequency = np.sqrt(constants.G * donor.mass/donor.radius**3)
-        donor.spin_angular_frequency = min(spin_angular_frequency, critical_spin_angular_frequency)
+        donor.spin_angular_frequency = min(donor.spin_angular_frequency, critical_spin_angular_frequency)
 
         self.stellar_code.particles.remove_particle(accretor)
         accretor.mass = 0|units.MSun # necessary for adjust_system_after_ce_in_inner_binary
@@ -307,7 +307,7 @@ def perform_inner_merger(bs, donor, accretor, self):
     #assuming conservation of total angular momentum of the inner binary
     spin_angular_momentum = J_spin_new / donor.moment_of_inertia_of_star                
     critical_spin_angular_frequency = np.sqrt(constants.G * donor.mass/donor.radius**3)
-    donor.spin_angular_frequency = min(spin_angular_frequency, critical_spin_angular_frequency)
+    donor.spin_angular_frequency = min(donor.spin_angular_frequency, critical_spin_angular_frequency)
         
     self.stellar_code.particles.remove_particle(accretor)
     accretor.mass = 0|units.MSun # necessary for adjust_system_after_ce_in_inner_binary   
