@@ -274,6 +274,7 @@ def example_6():
     channel_from_stellar.copy()
     #pickup triple evolution at 8Myr
     tr.triple.time = 8|units.Myr
+    tr.secular_code.model_time = 8|units.Myr #not redundant!
         
 #    continue triple evolution until 9Myr
     tr.evolve_model(9|units.Myr)
@@ -324,6 +325,7 @@ def example_7():
     channel_from_stellar.copy()
     #pickup triple evolution at 8Myr
     tr.triple.time = 8|units.Myr
+    tr.secular_code.model_time = 8|units.Myr #not redundant!
         
 #    continue triple evolution until 9Myr
     tr.evolve_model(9|units.Myr)
@@ -332,6 +334,8 @@ def example_7():
 #    in this case remove some mass of the envelope (without effect on triple)
     donor_in_stellar_code = stars[0].as_set().get_intersecting_subset_in(stellar_code.particles)[0]
     donor_in_stellar_code.change_mass(-0.2|units.MSun, 0.|units.yr)    
+    minimum_time_step = 1.e-9 |units.Myr
+    stellar_code.evolve_model(tr.triple.time+minimum_time_step) #to get updated radii    
     channel_from_stellar.copy()
     
 #    continue triple evolution until 10Myr
@@ -382,6 +386,7 @@ def example_8():
     channel_from_stellar.copy()
     #pickup triple evolution at 8Myr
     tr.triple.time = 8|units.Myr
+    tr.secular_code.model_time = 8|units.Myr #not redundant!
         
 #    continue triple evolution until 9Myr
     tr.evolve_model(9|units.Myr)
@@ -430,6 +435,7 @@ def example_9():
     channel_from_stellar.copy()
     #pickup triple evolution at 8Myr
     tr.triple.time = 8|units.Myr
+    tr.secular_code.model_time = 8|units.Myr #not redundant!
         
 #    continue triple evolution until 9Myr
     tr.evolve_model(9|units.Myr)
@@ -438,6 +444,8 @@ def example_9():
 #    in this case remove some mass of the envelope (without effect on triple)
     donor_in_stellar_code = stars[0].as_set().get_intersecting_subset_in(stellar_code.particles)[0]
     donor_in_stellar_code.change_mass(-0.2|units.MSun, 0.|units.yr)    
+    minimum_time_step = 1.e-9 |units.Myr
+    stellar_code.evolve_model(tr.triple.time+minimum_time_step) #to get updated radii    
     channel_from_stellar.copy()
 
 #    continue triple evolution until 10Myr
