@@ -832,18 +832,14 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             print('number of system = ', number_of_system)
 
         tr = None
-        correct_params, inner_eccentricity, outer_eccentricity = TRES.test_initial_parameters(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.incl, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan)
-        triple_system.inner_ecc = inner_eccentricity
-        triple_system.outer_ecc = outer_eccentricity
+        
+        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.incl, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan)
 
         if correct_params == False:
             if REPORT:
                 print('Incorrect parameters')
             nr_cp += 1
         else:
-            stars = TRES.make_stars(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass)
-            bins = TRES.make_bins(stars, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan, triple_system.inner_loan-np.pi)
-       
             stellar_code.parameters.metallicity = metallicity
             stellar_code.particles.add_particles(stars)
     
@@ -1197,7 +1193,8 @@ def parse_arguments():
                       help="maximum of inner longitude of ascending node [rad] [%default]")
     parser.add_option("--O_distr",  "--Oin_distr",dest="inner_loan_distr", type="int", default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
-
+
+
     parser.add_option("-z", "-Z",unit=units.none, 
                       dest="metallicity", type="float", default = 0.02|units.none,
                       help="metallicity [%default] %unit")                     
