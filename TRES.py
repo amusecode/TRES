@@ -1160,11 +1160,11 @@ class Triple_Class:
         elif self.is_triple():
             # for disrupted binary
             if self.triple.child1.is_star:
-		star = self.triple.child1
+                star = self.triple.child1
                 bin = self.triple.child2
             else:
-		star = self.triple.child2
-		bin = self.triple.child1
+                star = self.triple.child2
+                bin = self.triple.child1
         
             Rl2_1 = L2_radius(bin, bin.child1, self)
             Rl2_2 = L2_radius(bin, bin.child2, self)
@@ -2391,7 +2391,7 @@ class Triple_Class:
                 else:
                     stellar_system.bin_type = bin_type['common_envelope']
 			
-		return False    
+                return False    
             else:
                 return True
             
@@ -2620,8 +2620,6 @@ class Triple_Class:
                     #note that 'previous' parameters cannot be reset 
                     #resetting is_donor in determine_time_step                                    
                     continue
-
-                                         
 
             #needed for nucleair timescale 
             self.update_time_derivative_of_radius() 
