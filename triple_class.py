@@ -126,7 +126,6 @@ class Triple_Class:
             self.triple.semisecular_regime = True        
             return
 
-
         # if stop_at_semisecular_regime == True:                   
         #     self.secular_code.check_for_semisecular_regime()
         #     if self.secular_code.triples[0].semisecular_regime == True:

@@ -102,7 +102,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     return triple_class_object
 
 
-def main_developer(stars, bins, correct_params, stellar_code,
+def main_developer(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination = 80.0*np.pi/180.0, 
             metallicity = 0.02, tend = 5.0 |units.Myr, tinit = 0.0 |units.Myr, 
             number = 0, maximum_radius_change_factor = 0.005,
@@ -130,18 +130,17 @@ def main_developer(stars, bins, correct_params, stellar_code,
     bins.longitude_of_ascending_node[1] = float(bins.longitude_of_ascending_node[1])    
     relative_inclination = float(relative_inclination)
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, 
-            relative_inclination, tend, tinit,
-            number, maximum_radius_change_factor,  
-            stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-            stop_at_no_CHE, include_CHE,
-            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-            stop_at_dynamical_instability, stop_at_semisecular_regime, 
-            stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-            
-            stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
+                                       relative_inclination, tend, tinit,
+                                       number, maximum_radius_change_factor,  
+                                       stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+                                       stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+                                       stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+                                       stop_at_no_CHE, include_CHE,
+                                       stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+                                       stop_at_dynamical_instability, stop_at_semisecular_regime, 
+                                       stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+                                       stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
 
     if triple_class_object.triple.correct_params == False:
