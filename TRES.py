@@ -13,14 +13,73 @@ import numpy as np
 from amuse.units import units
 from amuse.support.console import set_printing_strategy
 
+from amuse.community.seba.interface import SeBa
+from seculartriple_TPS.interface import SecularTriple
+
+
 from triple_class import Triple_Class
-from tres_plotting import plot_data_container, plot_function
-from tres_setup import make_particle_sets, setup_stellar_code
-from tres_options import REPORT_DEBUG, \
+from TRES_plotting import plot_data_container, plot_function
+from TRES_setup import make_particle_sets, setup_stellar_code
+from TRES_options import REPORT_DEBUG, \
                          REPORT_TRIPLE_EVOLUTION, \
-                         MAKE_PLOTS
+                         MAKE_PLOTS, \
+                         REPORT_USER_WARNINGS
 
 
+def initialize_triple_class(stars, bins, correct_params,
+                            stellar_code, secular_code, relative_inclination = 80.0*np.pi/180.0,
+                            metallicity = 0.02, tend = 5.0 |units.Myr, tinit = 0.0|units.Myr, 
+                            number = 0, maximum_radius_change_factor = 0.005,
+                            stop_at_mass_transfer = True, stop_at_init_mass_transfer = True, stop_at_outer_mass_transfer = True,
+                            stop_at_stable_mass_transfer = True, stop_at_eccentric_stable_mass_transfer = True,
+                            stop_at_unstable_mass_transfer = False, stop_at_eccentric_unstable_mass_transfer = False, which_common_envelope = 2,
+                            stop_at_no_CHE = False, include_CHE = False, 
+                            stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
+                            stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, 
+                            stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True, 
+                            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = ""):
+
+    triple = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
+                          relative_inclination, tend, tinit,
+                          number, maximum_radius_change_factor,  
+                          stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+                          stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+                          stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+                          stop_at_no_CHE, include_CHE, 
+                          stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+                          stop_at_dynamical_instability, stop_at_semisecular_regime, 
+                          stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+                          stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+    triple.stellar_code.parameters.metallicity = metallicity
+
+    return triple
+
+
+def run_triple(triple_class, tend, dir_plots=""):
+
+    if triple_class.triple.correct_params == False:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. The parameters of the given triple are incorrect.')
+        return triple_class # no codes initialized yet
+    elif triple_class.stop_at_semisecular_regime == True and triple_class.triple.semisecular_regime_at_initialisation == True:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. The given triple is in the semisecular regime at initialization.')
+    elif triple_class.triple.dynamical_instability_at_initialisation == True:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. The given triple is dynamically unstable at initialization.')
+    elif triple_class.triple.mass_transfer_at_initialisation == True:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. There is mass transfer in the given triple at initialization.')
+    elif triple_class.stop_at_no_CHE == True and triple_class.triple.CHE_at_initialisation == False:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. No chemically homogeneous evolution at initialization')
+    else:    
+        triple_class.evolve_model(tend)
+        if REPORT_DEBUG or MAKE_PLOTS:
+            plot_function(triple_class, dir_plots)
+            triple_class.print_stellar_system()
+    triple_class.stellar_code.stop()
+    triple_class.secular_code.stop()
 #-----
 #for running TRES.py from other routines
 def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.MSun, outer_mass = 0.5|units.MSun,
@@ -59,9 +118,12 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node)
 
-    stellar_code = setup_stellar_code(metallicity, stars)
+    # stellar_code = setup_stellar_code(metallicity, stars)
+    stellar_code = SeBa()
+    stellar_code.parameters.metallicity = metallicity
+    secular_code = SecularTriple()
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code,
+    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination, tend, tinit,
             number, maximum_radius_change_factor,  
             stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
@@ -164,8 +226,9 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
         if REPORT_DEBUG or MAKE_PLOTS:
             plot_function(triple_class_object, dir_plots)
             triple_class_object.print_stellar_system()
-#    triple_class_object.stellar_code.stop()
-#    triple_class_object.secular_code.stop()
+   
+    # triple_class_object.stellar_code.stop()
+    # triple_class_object.secular_code.stop()
 
 
     return triple_class_object

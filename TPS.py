@@ -126,7 +126,9 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 import TRES as TRES
 from amuse.community.seba.interface import SeBa
+from seculartriple_TPS.interface import SecularTriple
 stellar_code = SeBa()
+secular_code = SecularTriple()
 #stellar_code = SeBa(redirection='none')
 
 
@@ -155,7 +157,7 @@ else:
     absolute_min_mass = 0.2|units.MJupiter     # for planetary objects
 
 
-REPORT = False 
+REPORT = False
 REPORT_USER_WARNINGS = False 
 
 def flat_distr(lower, upper):
@@ -833,7 +835,13 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
 
         tr = None
         
-        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, triple_system.inner_semi, triple_system.outer_semi, triple_system.inner_ecc, triple_system.outer_ecc, triple_system.incl, triple_system.inner_aop, triple_system.outer_aop, triple_system.inner_loan)
+        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
+                                                              triple_system.inner_secondary_mass, 
+                                                              triple_system.outer_mass, triple_system.inner_semi, 
+                                                              triple_system.outer_semi, triple_system.inner_ecc, 
+                                                              triple_system.outer_ecc, triple_system.incl, 
+                                                              triple_system.inner_aop, triple_system.outer_aop, 
+                                                              triple_system.inner_loan)
 
         if correct_params == False:
             if REPORT:
@@ -843,7 +851,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             stellar_code.parameters.metallicity = metallicity
             stellar_code.particles.add_particles(stars)
     
-            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, 
+            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
                         relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
                         stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
                         stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 

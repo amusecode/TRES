@@ -23,9 +23,9 @@ import numpy as np
 #                          kozai_type_factor, \
 #                          maximum_time_step_factor, \
 #                          minimum_time_step
-from tres_options import *
-from tres_setup import setup_secular_code, setup_secular_code2, setup_stellar_code2
-from tres_plotting import plot_data_container
+from TRES_options import *
+from TRES_setup import setup_secular_code, setup_secular_code2, setup_stellar_code2
+from TRES_plotting import plot_data_container
 
 
 class Triple_Class:
@@ -90,20 +90,30 @@ class Triple_Class:
         self.triple.mass_transfer_at_initialisation = False
         self.triple.CHE_at_initialisation = False
 
+        # print("Here 1")
         self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, stop_at_no_CHE,
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
             stop_at_dynamical_instability, stop_at_semisecular_regime,  stop_at_SN, stop_at_CPU_time)
         
+        # print("Here 2")
         self.initialize_stellar(stellar_code, stars)
         self.initialize_secular(secular_code, stop_at_semisecular_regime, 
                                               stop_at_dynamical_instability)
-        
+        # print("Here 3")
         self.triple.kozai_type = self.get_kozai_type()
+        
+        # print("Here 4")
         self.update_stellar_parameters() 
+        
+        # print("Here 5")
         self.update_time_derivative_of_radius()
+        
+        # print("Here 6")
         self.update_previous_stellar_parameters()
+        # print("Here 7")
+
 
     def initialize_secular(self, secular_code, 
                             stop_at_semisecular_regime,
@@ -135,7 +145,7 @@ class Triple_Class:
 
     
     def initialize_stellar(self, stellar_code, stars):
-        self.stellar_code = setup_stellar_code2(stellar_code, 0.0122, stars)
+        self.stellar_code = setup_stellar_code2(stellar_code, stars)
         # stellar_code.parameters.metallicity = metallicity
         # stellar_code.particles.add_particles(stars)
         self.channel_from_stellar = stellar_code.particles.new_channel_to(stars)

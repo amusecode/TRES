@@ -4,11 +4,12 @@
 # this document provides a few examples of how to do this 
 
 import numpy as np
+import matplotlib.pyplot as plt
 from amuse.datamodel import Particles
 from amuse.units import units
 from amuse.community.seba.interface import SeBa
 import TRES as TRES
-
+from seculartriple_TPS.interface import SecularTriple
 
 #simplest way of running TRES
 def example_1():
@@ -16,8 +17,10 @@ def example_1():
     tr = TRES.main()
     print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
 
-    tr.stellar_code.stop()
-    tr.secular_code.stop()
+    # the stellar and secular codes are stopped inside main(), 
+    # so no need to do it here:
+    # tr.stellar_code.stop()
+    # tr.secular_code.stop()
 
 
 #simple way of running TRES with adjusting input parameters
@@ -62,8 +65,8 @@ def example_2():
                         inner_semimajor_axis = ain, outer_semimajor_axis = aout, relative_inclination = incl)
     print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
 
-    tr.stellar_code.stop()
-    tr.secular_code.stop()
+    # tr.stellar_code.stop()
+    # tr.secular_code.stop()
 
 
 
@@ -82,8 +85,8 @@ def example_3():
     tr = TRES.main(inner_primary_mass = M1, tinit = tinit, tend = tend)
     print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
 
-    tr.stellar_code.stop()
-    tr.secular_code.stop()
+    # tr.stellar_code.stop()
+    # tr.secular_code.stop()
            
 
 
@@ -112,7 +115,8 @@ def example_4():
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
+    #stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
     
     inner_eccentricity_array = []
     outer_eccentricity_array = []
@@ -121,7 +125,8 @@ def example_4():
     
     #make triple object and evolve for small timestep
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr)
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code,
+                             incl, tend=1e-4|units.Myr)
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
@@ -169,7 +174,9 @@ def example_5():
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
+    # stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
+
     
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
@@ -183,7 +190,7 @@ def example_5():
     
     #make triple object and evolve for small timestep
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr, stop_at_mass_transfer=False)
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr, stop_at_mass_transfer=False)
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
@@ -259,10 +266,12 @@ def example_6():
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
+    # stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
+
     
     #make triple object and evolve unil 2Myr
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=2|units.Myr)    
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=2|units.Myr)    
     #continue evolution until 3 myr
     tr.evolve_model(3|units.Myr)
     #continue evolution until 5 myr
@@ -310,10 +319,12 @@ def example_7():
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
+    # stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
+
     
     #make triple object and evolve unil 2Myr
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=2|units.Myr)
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=2|units.Myr)
     #continue evolution until 3 myr
     tr.evolve_model(3|units.Myr)
     #continue evolution until 5 myr
@@ -374,11 +385,12 @@ def example_8():
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
-    
+    # stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
+
     #make triple object (evolve for small timestep)
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr)
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
     
     #only evolve the stars until 8Myr 
     stellar_code.evolve_model(8|units.Myr)
@@ -423,11 +435,12 @@ def example_9():
     stellar_code = SeBa()
     #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    stellar_code.particles.add_particles(stars)
-    
+    # stellar_code.particles.add_particles(stars)
+    secular_code = SecularTriple()
+
     #make triple object (evolve for small timestep)
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, incl, tend=1e-4|units.Myr)
+    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
     
     #only evolve the stars until 8Myr 
     stellar_code.evolve_model(8|units.Myr)
@@ -458,13 +471,13 @@ def example_9():
     
     
     
-#example_1()
-#example_2()
-#example_3()
+example_1()
+example_2()
+example_3()
 example_4()
-#example_5()
-#example_6()
-#example_7()
-#example_8()
-#example_9()
+example_5()
+example_6()
+example_7()
+example_8()
+example_9()
 
