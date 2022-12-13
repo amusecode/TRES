@@ -78,8 +78,8 @@ def run_triple(triple_class, tend, dir_plots=""):
         if REPORT_DEBUG or MAKE_PLOTS:
             plot_function(triple_class, dir_plots)
             triple_class.print_stellar_system()
-    triple_class.stellar_code.stop()
-    triple_class.secular_code.stop()
+    # triple_class.stellar_code.stop()
+    # triple_class.secular_code.stop()
 #-----
 #for running TRES.py from other routines
 def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.MSun, outer_mass = 0.5|units.MSun,
@@ -157,6 +157,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
         if REPORT_DEBUG or MAKE_PLOTS:
             plot_function(triple_class_object, dir_plots)
             triple_class_object.print_stellar_system()
+            
     triple_class_object.stellar_code.stop()
     triple_class_object.secular_code.stop()
 
@@ -229,7 +230,6 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
    
     # triple_class_object.stellar_code.stop()
     # triple_class_object.secular_code.stop()
-
 
     return triple_class_object
 

@@ -24,7 +24,7 @@ import numpy as np
 #                          maximum_time_step_factor, \
 #                          minimum_time_step
 from TRES_options import *
-from TRES_setup import setup_secular_code, setup_secular_code2, setup_stellar_code2
+from TRES_setup import setup_secular_code, setup_stellar_code
 from TRES_plotting import plot_data_container
 
 
@@ -119,7 +119,7 @@ class Triple_Class:
                             stop_at_semisecular_regime,
                             stop_at_dynamical_instability):
         triple_set = self.triple.as_set()
-        self.secular_code = setup_secular_code2(self.triple, secular_code, stop_at_semisecular_regime)      
+        self.secular_code = setup_secular_code(self.triple, secular_code, stop_at_semisecular_regime)      
         self.channel_from_secular = self.secular_code.triples.new_channel_to(triple_set)
         self.channel_to_secular = triple_set.new_channel_to(self.secular_code.triples)
            
@@ -145,7 +145,7 @@ class Triple_Class:
 
     
     def initialize_stellar(self, stellar_code, stars):
-        self.stellar_code = setup_stellar_code2(stellar_code, stars)
+        self.stellar_code = setup_stellar_code(stellar_code, stars)
         # stellar_code.parameters.metallicity = metallicity
         # stellar_code.particles.add_particles(stars)
         self.channel_from_stellar = stellar_code.particles.new_channel_to(stars)

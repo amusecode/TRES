@@ -798,7 +798,6 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
     nr_iss = 0 #number of systems that is dynamically unstable at initialisation
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
-
     while i_n < number:
         triple_system = Generate_initial_triple(inner_primary_mass_max, inner_primary_mass_min, 
                     inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max,
@@ -827,7 +826,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             if (min_mass > triple_system.inner_secondary_mass) or (min_mass > triple_system.outer_mass):
                 if REPORT:
                     print('non-star secondary & tertiary included: ', triple_system.inner_secondary_mass, triple_system.outer_mass)
-            continue
+                continue
 
         number_of_system = initial_number + i_n
         if REPORT:
@@ -849,8 +848,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             nr_cp += 1
         else:
             stellar_code.parameters.metallicity = metallicity
-            stellar_code.particles.add_particles(stars)
-    
+            # stellar_code.particles.add_particles(stars)
             tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
                         relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
                         stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
@@ -880,6 +878,8 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                 i_n += 1            
 
             stellar_code.particles.remove_particles(stars)
+            # tr.stellar_code.stop()
+            # tr.secular_code.stop()
             del stars, bins, tr
 
     if REPORT:
