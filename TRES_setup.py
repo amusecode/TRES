@@ -164,7 +164,7 @@ def make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
 
 def setup_stellar_code(stellar_code, stars):
     stellar_code.particles.add_particles(stars)
-    return stellar_code #, channel_from_stellar, channel_to_stellar
+    return stellar_code 
 
                     
 def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
@@ -184,6 +184,8 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
     #0: mardling & aarseth 2001, 1:petrovich et al. 2015 simple, 2:petrovich et al. 2015 
     #3: holman et al. 98 s-type, 4: holman et al. 98 p-type,  
     #for stars 0, for exoplanets 1-4
+
+    secular_code.parameters.ignore_tertiary = False
 
     secular_code.parameters.include_quadrupole_terms = True
     secular_code.parameters.include_octupole_terms = True        

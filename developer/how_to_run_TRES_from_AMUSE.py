@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 from amuse.datamodel import Particles
 from amuse.units import units
 from amuse.community.seba.interface import SeBa
+
+import sys, os
+sys.path.append(os.path.dirname(os.getcwd()))
 import TRES as TRES
 from seculartriple_TPS.interface import SecularTriple
 
@@ -108,14 +111,12 @@ def example_4():
     Gin = 0.1
     Gout = 0.5
     Oin = 0.
-    Oout = Oin - np.pi
     metallicity = 0.02
         
     stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
-    #stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
     
     inner_eccentricity_array = []
@@ -174,10 +175,8 @@ def example_5():
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
-    # stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
 
-    
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
     radius_primary_array = np.array([])
@@ -194,7 +193,7 @@ def example_5():
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
-        print(time_array[i], tr.triple.child2.bin_type, tr.instantaneous_evolution,tr.triple.child2.child1.stellar_type)
+#        print(time_array[i], tr.triple.child2.bin_type, tr.instantaneous_evolution,tr.triple.child2.child1.stellar_type)
         inner_semimajor_axis_array = np.append(inner_semimajor_axis_array, tr.triple.child2.semimajor_axis.value_in(units.RSun))
         outer_semimajor_axis_array = np.append(outer_semimajor_axis_array, tr.triple.semimajor_axis.value_in(units.RSun))
         radius_primary_array = np.append(radius_primary_array, tr.triple.child2.child1.radius.value_in(units.RSun))
@@ -264,11 +263,8 @@ def example_6():
     stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
-    #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    # stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
-
     
     #make triple object and evolve unil 2Myr
     tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=2|units.Myr)    
@@ -317,11 +313,8 @@ def example_7():
     stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
-    #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    # stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
-
     
     #make triple object and evolve unil 2Myr
     tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=2|units.Myr)
@@ -383,9 +376,7 @@ def example_8():
     stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
-    #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    # stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
 
     #make triple object (evolve for small timestep)
@@ -433,9 +424,7 @@ def example_9():
     stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
     stellar_code = SeBa()
-    #stellar_code = SeBa(redirection='none')
     stellar_code.parameters.metallicity = metallicity
-    # stellar_code.particles.add_particles(stars)
     secular_code = SecularTriple()
 
     #make triple object (evolve for small timestep)
@@ -471,13 +460,13 @@ def example_9():
     
     
     
-# example_1()
-# example_2()
-example_3()
-# example_4()
-# example_5()
-# example_6()
-# example_7()
-# example_8()
-# example_9()
+example_1()
+#example_2()
+#example_3()
+#example_4()
+#example_5()
+#example_6()
+#example_7()
+#example_8()
+#example_9()
 

@@ -23,6 +23,7 @@ import numpy as np
 #                          kozai_type_factor, \
 #                          maximum_time_step_factor, \
 #                          minimum_time_step
+
 from TRES_options import *
 from TRES_setup import setup_secular_code, setup_stellar_code
 from TRES_plotting import plot_data_container
@@ -73,7 +74,7 @@ class Triple_Class:
         self.fallback_kick_for_black_holes = fallback_kick_for_black_holes
         self.max_CPU_time = max_CPU_time
 
-        self.triple = bins[1]
+        self.triple = bins[1]        
         self.triple.time = 0.0|units.yr
         self.triple.relative_inclination = relative_inclination 
         self.triple.is_star = False #maybe not necessary?
@@ -90,71 +91,15 @@ class Triple_Class:
         self.triple.mass_transfer_at_initialisation = False
         self.triple.CHE_at_initialisation = False
 
-        # print("Here 1")
         self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
             stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, stop_at_no_CHE,
             stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
             stop_at_dynamical_instability, stop_at_semisecular_regime,  stop_at_SN, stop_at_CPU_time)
-        
-        # print("Here 2")
+
         self.initialize_stellar(stellar_code, stars)
         self.initialize_secular(secular_code, stop_at_semisecular_regime, 
                                               stop_at_dynamical_instability)
-        # print("Here 3")
-        self.triple.kozai_type = self.get_kozai_type()
-        
-        # print("Here 4")
-        self.update_stellar_parameters() 
-        
-        # print("Here 5")
-        self.update_time_derivative_of_radius()
-        
-        # print("Here 6")
-        self.update_previous_stellar_parameters()
-        # print("Here 7")
-
-
-    def initialize_secular(self, secular_code, 
-                            stop_at_semisecular_regime,
-                            stop_at_dynamical_instability):
-        triple_set = self.triple.as_set()
-        self.secular_code = setup_secular_code(self.triple, secular_code, stop_at_semisecular_regime)      
-        self.channel_from_secular = self.secular_code.triples.new_channel_to(triple_set)
-        self.channel_to_secular = triple_set.new_channel_to(self.secular_code.triples)
-           
-        self.secular_code.check_for_dynamical_stability()
-        if stop_at_dynamical_instability == True and self.secular_code.triples[0].dynamical_instability == True:
-            self.triple.dynamical_instability_at_initialisation = True
-            self.triple.dynamical_instability = True
-            self.set_bintype_to_dynamical_instability()
-            return 
-
-        self.secular_code.check_for_semisecular_regime()
-        if stop_at_semisecular_regime == True and self.secular_code.triples[0].semisecular_regime == True:
-            self.triple.semisecular_regime_at_initialisation = True
-            self.triple.semisecular_regime = True        
-            return
-
-        # if stop_at_semisecular_regime == True:                   
-        #     self.secular_code.check_for_semisecular_regime()
-        #     if self.secular_code.triples[0].semisecular_regime == True:
-        #         self.triple.semisecular_regime_at_initialisation = True
-        #         self.triple.semisecular_regime = True
-        #     return             
-
-    
-    def initialize_stellar(self, stellar_code, stars):
-        self.stellar_code = setup_stellar_code(stellar_code, stars)
-        # stellar_code.parameters.metallicity = metallicity
-        # stellar_code.particles.add_particles(stars)
-        self.channel_from_stellar = stellar_code.particles.new_channel_to(stars)
-        self.channel_to_stellar = stars.new_channel_to(stellar_code.particles)
-        self.copy_from_stellar()        
-        self.initial_angular_frequency() 
-
-
-    def misc(self):
 
         self.check_RLOF() 
         if self.has_tertiary_donor() and (self.stop_at_outer_mass_transfer or self.stop_at_mass_transfer or self.stop_at_init_mass_transfer): 
@@ -187,7 +132,41 @@ class Triple_Class:
 
             return
 
+        self.triple.kozai_type = self.get_kozai_type()
+        self.update_stellar_parameters() 
+        self.update_time_derivative_of_radius()
+        self.update_previous_stellar_parameters()
 
+    def initialize_stellar(self, stellar_code, stars):
+        self.stellar_code = setup_stellar_code(stellar_code, stars)
+        self.channel_from_stellar = stellar_code.particles.new_channel_to(stars)
+        self.channel_to_stellar = stars.new_channel_to(stellar_code.particles)
+        self.copy_from_stellar()        
+        self.initial_angular_frequency() 
+
+    def initialize_secular(self, secular_code, 
+                            stop_at_semisecular_regime,
+                            stop_at_dynamical_instability):
+
+        triple_set = self.triple.as_set()
+        self.secular_code = setup_secular_code(self.triple, secular_code, stop_at_semisecular_regime)      
+        self.channel_from_secular = self.secular_code.triples.new_channel_to(triple_set)
+        self.channel_to_secular = triple_set.new_channel_to(self.secular_code.triples)
+        self.channel_to_secular.copy()
+
+        self.secular_code.check_for_dynamical_stability()
+        if stop_at_dynamical_instability == True and self.secular_code.triples[0].dynamical_instability == True:
+            self.triple.dynamical_instability_at_initialisation = True
+            self.triple.dynamical_instability = True
+            self.set_bintype_to_dynamical_instability()
+            return 
+
+        self.secular_code.check_for_semisecular_regime()
+        if stop_at_semisecular_regime == True and self.secular_code.triples[0].semisecular_regime == True:
+            self.triple.semisecular_regime_at_initialisation = True
+            self.triple.semisecular_regime = True        
+            return
+   
         
     def set_stopping_conditions(self, stop_at_mass_transfer,stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
@@ -914,8 +893,10 @@ class Triple_Class:
         elif self.is_triple():
             # for disrupted binary
             if self.triple.child1.is_star:
+                star = self.triple.child1
                 bin = self.triple.child2
             else:
+                star = self.triple.child2
                 bin = self.triple.child1
         
             Rl2_1 = L2_radius(bin, bin.child1, self)
@@ -2137,6 +2118,12 @@ class Triple_Class:
                 if REPORT_TRIPLE_EVOLUTION:
                     print('Mass transfer in inner binary at time = ',self.triple.time)
                     print(self.stop_at_mass_transfer,self.stop_at_stable_mass_transfer, self.stop_at_unstable_mass_transfer, self.stop_at_eccentric_stable_mass_transfer, self.stop_at_eccentric_unstable_mass_transfer, stellar_system.is_mt_stable)                       
+
+                if stellar_system.is_mt_stable:
+                    stellar_system.bin_type = bin_type['stable_mass_transfer']
+                else:
+                    stellar_system.bin_type = bin_type['common_envelope']
+
                 return False    
             else:
                 return True

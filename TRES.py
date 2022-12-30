@@ -24,7 +24,10 @@ from TRES_options import REPORT_DEBUG, \
                          REPORT_TRIPLE_EVOLUTION, \
                          MAKE_PLOTS, \
                          REPORT_USER_WARNINGS
-
+from interactions import corotating_spin_angular_frequency_binary, \
+                        lang_spin_angular_frequency, \
+                        break_up_angular_frequency, \
+                        criticial_angular_frequency_CHE
 
 def initialize_triple_class(stars, bins, correct_params,
                             stellar_code, secular_code, relative_inclination = 80.0*np.pi/180.0,
@@ -118,10 +121,13 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node)
 
-    # stellar_code = setup_stellar_code(metallicity, stars)
     stellar_code = SeBa()
+#    stellar_code = SeBa(redirection='none')
+#    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = metallicity
     secular_code = SecularTriple()
+#    secular_code = SecularTriple(redirection='none')
+#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
     triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination, tend, tinit,
@@ -160,7 +166,6 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             
     triple_class_object.stellar_code.stop()
     triple_class_object.secular_code.stop()
-
 
     return triple_class_object
 
@@ -228,9 +233,6 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
             plot_function(triple_class_object, dir_plots)
             triple_class_object.print_stellar_system()
    
-    # triple_class_object.stellar_code.stop()
-    # triple_class_object.secular_code.stop()
-
     return triple_class_object
 
 
@@ -390,9 +392,15 @@ if __name__ == '__main__':
             opt["inner_argument_of_pericenter"], opt["outer_argument_of_pericenter"],
             opt["inner_longitude_of_ascending_node"])
 
-    stellar_code = setup_stellar_code(opt["metallicity"], stars)
+    stellar_code = SeBa()
+#    stellar_code = SeBa(redirection='none')
+#    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
+    stellar_code.parameters.metallicity = opt["metallicity"]
+    secular_code = SecularTriple()
+#    secular_code = SecularTriple(redirection='none')
+#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, 
+    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             opt["relative_inclination"], opt["tend"], opt["tinit"],
             opt["number"], opt["maximum_radius_change_factor"],  
             opt["stop_at_mass_transfer"], opt["stop_at_init_mass_transfer"], opt["stop_at_outer_mass_transfer"],

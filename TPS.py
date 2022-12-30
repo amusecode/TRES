@@ -128,9 +128,11 @@ import TRES as TRES
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
 stellar_code = SeBa()
-secular_code = SecularTriple()
 #stellar_code = SeBa(redirection='none')
-
+#stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
+secular_code = SecularTriple()
+#secular_code = SecularTriple(redirection='none')
+#secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
 import sys
 from amuse.units.optparse import OptionParser
@@ -146,19 +148,16 @@ from amuse.ic.millerscalo import new_miller_scalo_mass_distribution
 from amuse.ic.salpeter import new_salpeter_mass_distribution
 from amuse.ic.flatimf import new_flat_mass_distribution
 
-precision = 1.e-10 
-min_mass = 0.08 |units.MSun # for primary stars
-absolute_max_mass = 100 |units.MSun
+from TRES_options import REPORT_TPS, \
+                         REPORT_USER_WARNINGS_TPS, \
+                         EXCLUDE_SSO, \
+                         precision,  min_mass, absolute_max_mass                         
 
-EXCLUDE_SSO = True #in order to not simulate systems with exoplanet or brown dwarf secondaries and tertiaries
 if EXCLUDE_SSO:
     absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
 else:
     absolute_min_mass = 0.2|units.MJupiter     # for planetary objects
 
-
-REPORT = False
-REPORT_USER_WARNINGS = False 
 
 def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
@@ -271,7 +270,7 @@ class Generate_initial_triple:
                         inner_mass_ratio_max, inner_mass_ratio_min,
                         outer_mass_ratio_max, outer_mass_ratio_min,  
                         inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_mass')
 
         if inner_primary_mass_max == inner_primary_mass_min:
@@ -338,7 +337,7 @@ class Generate_initial_triple:
                         outer_ecc_max, outer_ecc_min,
                         inner_ecc_distr, outer_ecc_distr, 
                         inner_secondary_mass, outer_mass):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_semi_and_ecc')
                                 
         self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
@@ -364,7 +363,7 @@ class Generate_initial_triple:
             self.inner_semi = inner_semi_min
         else:
             if inner_semi_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_semi: unambiguous choice of constant semi-major axis')
                     print('--A_min option to set the value of the semi-major axis in the inner binary')                
                 self.inner_semi = inner_semi_min
@@ -451,7 +450,7 @@ class Generate_initial_triple:
             self.outer_semi = outer_semi_min
         else:
             if outer_semi_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_semi: unambiguous choise of constant semi-major axis')
                     print('--a_min option to set the value of the semi-major axis in the outer binary')                
                 self.outer_semi = outer_semi_min
@@ -555,14 +554,14 @@ class Generate_initial_triple:
 
 
     def generate_ecc_1d(self, ecc_max, ecc_min, ecc_distr, mass):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_ecc_1d')
                         
         if ecc_max == ecc_min:
             return ecc_min
         else:
             if ecc_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_ecc: unambiguous choise of constant eccentricity')
                     print('--E_min and --e_min option to set the value of the eccentricity')                
                 return ecc_min
@@ -581,13 +580,13 @@ class Generate_initial_triple:
 
 
     def generate_incl(self, incl_max, incl_min, incl_distr):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_incl')
         if incl_max == incl_min:
             self.incl = incl_min           
         else:
             if incl_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_incl: unambiguous choise of constant relative inclination')
                     print('--i_min option to set the value of the relative inclination in the inner triple')                
                 self.incl = incl_min
@@ -598,14 +597,14 @@ class Generate_initial_triple:
                         inner_aop_max, inner_aop_min, 
                         outer_aop_max, outer_aop_min,
                         inner_aop_distr, outer_aop_distr):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_aop')
 
         if inner_aop_max == inner_aop_min:
             self.inner_aop = inner_aop_min
         else:
             if inner_aop_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_aop: unambiguous choise of constant argument of pericenter')
                     print('--G_min option to set the value of the argument of pericenter of the inner binary')                
                 self.inner_aop = inner_aop_min
@@ -617,7 +616,7 @@ class Generate_initial_triple:
             self.outer_aop = outer_aop_min
         else:
             if outer_aop_distr == 1: #Constant 
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_aop: unambiguous choise of constant argument of pericenter')
                     print('--g_min option to set the value of the argument of pericenter of the outer binary')                
                 self.outer_aop = outer_aop_min
@@ -626,7 +625,7 @@ class Generate_initial_triple:
                 
 
     def generate_loan(self, inner_loan_max, inner_loan_min, inner_loan_distr):                                
-        if REPORT:
+        if REPORT_TPS:
             print('generate_loan')
 
         if inner_loan_max == inner_loan_min:
@@ -635,7 +634,7 @@ class Generate_initial_triple:
             if inner_loan_distr == 0: #Circular uniform distribution
                 self.inner_loan = np.arccos(np.random.uniform(np.cos(inner_loan_min), np.cos(inner_loan_max)))
             else: #Constant
-                if REPORT_USER_WARNINGS:
+                if REPORT_USER_WARNINGS_TPS:
                     print('TPS::generate_loan: unambiguous choise of constant longitude of ascending nodes')
                     print('--O_min option to set the value of the argument of pericenter of the inner binary')                
                 self.inner_loan = inner_loan_min
@@ -647,7 +646,7 @@ class Generate_initial_triple:
     def generate_mass_and_semi_eggleton(self, inner_primary_mass_max, inner_primary_mass_min,  
                         inner_secondary_mass_min,outer_mass_min,outer_mass_max,
                         inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min):
-        if REPORT:
+        if REPORT_TPS:
             print('generate_mass_and_semi_eggleton')
         U0_mass = [0., .01, .09, .32, 1., 3.2, 11, 32, np.inf]#solar mass
         U0_l0 = [0.40, 0.40, 0.40, 0.40, 0.50, 0.75, 0.88, 0.94, 0.96]
@@ -795,7 +794,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
 
     i_n = 0
     nr_ids = 0 #number of systems that is dynamically unstable at initialisation
-    nr_iss = 0 #number of systems that is dynamically unstable at initialisation
+    nr_iss = 0 #number of systems that is in the semisecular regime at initialisation
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
     while i_n < number:
@@ -814,22 +813,22 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                     inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
                     inner_aop_distr, outer_aop_distr, inner_loan_distr)
                 
-        if REPORT:
+        if REPORT_TPS:
            triple_system.print_triple()
 
         if (min_mass > triple_system.inner_primary_mass):
-            if REPORT:
+            if REPORT_TPS:
                     print('non-star primary included: ', triple_system.inner_primary_mass)
             continue
         
         if EXCLUDE_SSO: 
             if (min_mass > triple_system.inner_secondary_mass) or (min_mass > triple_system.outer_mass):
-                if REPORT:
+                if REPORT_TPS:
                     print('non-star secondary & tertiary included: ', triple_system.inner_secondary_mass, triple_system.outer_mass)
                 continue
 
         number_of_system = initial_number + i_n
-        if REPORT:
+        if REPORT_TPS:
             print('number of system = ', number_of_system)
 
         tr = None
@@ -843,7 +842,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                                                               triple_system.inner_loan)
 
         if correct_params == False:
-            if REPORT:
+            if REPORT_TPS:
                 print('Incorrect parameters')
             nr_cp += 1
         else:
@@ -878,13 +877,15 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                 i_n += 1            
 
             stellar_code.particles.remove_particles(stars)
-            # tr.stellar_code.stop()
-            # tr.secular_code.stop()
-            del stars, bins, tr
+            triple_set = tr.triple.as_set()    
+            secular_code.triples.remove_particles(triple_set)            
+            del stars, bins, tr, triple_set
 
-    if REPORT:
+    if REPORT_TPS:
       print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
 
+    stellar_code.stop()
+    secular_code.stop()
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
                         inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 

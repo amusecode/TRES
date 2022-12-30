@@ -1087,13 +1087,10 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     if (check_for_dynamical_stability == TRUE)
     {
         /*	check for dynamical stability */
-        /*  at the moment: uses Mardling & Aarseth criterion (2001MNRAS.321..398M) */
-        /*  in future other criteria could be implemented as well */
-
         double itot = acos(Ith(yev,9));
         double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot,stability_limit_specification);
-        
         gout[0] = a_out/a_in - a_out_div_a_in_crit;///1.5;
+        printf("dyn stab %g %g %g %g \n",a_out, a_in, a_out_div_a_in_crit, gout[0]);        
     }
 
     if (check_for_inner_collision == TRUE)

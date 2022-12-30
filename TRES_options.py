@@ -1,24 +1,25 @@
 import numpy as np
 from amuse.units import units
 
+#--------------------------------------------------------------------------------------------------------------------
+# TRES general settings
 REPORT_USER_WARNINGS = True
-MAKE_PLOTS = False
-
 REPORT_DEBUG = False
 REPORT_DT = False 
 REPORT_SN_EVOLUTION = False
 REPORT_TRIPLE_EVOLUTION = False 
-
-GET_GYRATION_RADIUS_FROM_STELLAR_CODE = False
-GET_AMC_FROM_STELLAR_CODE = False
+MAKE_PLOTS = False
 
 REPORT_BINARY_EVOLUTION = False
 REPORT_FUNCTION_NAMES = False
 REPORT_MASS_TRANSFER_STABILITY = False
 
+GET_GYRATION_RADIUS_FROM_STELLAR_CODE = False
+GET_AMC_FROM_STELLAR_CODE = False
 no_stellar_evolution = False
 
-#constants
+#--------------------------------------------------------------------------------------------------------------------
+#TRES constants
 time_step_factor_stable_mt = 0.01 #1% mass loss during mass transfer
 # lowering this to 0.005 makes the code twice as slow
 time_step_factor_ecc = 0.01
@@ -29,8 +30,7 @@ error_dm = 0.05
 #maximum_radius_change_factor = 0.005
 error_dr = 0.05 #0.01
 minimum_time_step = 1.e-9 |units.Myr
-# min_mass = 0.08 |units.MSun # for stars
-# absolute_min_mass = 0.008|units.MSun # AMUSE can't handle planets -> also for secondaries and tertiaries
+
 max_mass = 100 |units.MSun
 maximum_time_step_factor = 100.
 maximum_time_step_factor_after_stable_mt = 5. 
@@ -43,3 +43,17 @@ maximum_time_step = np.inf|units.Myr
 
 kanonical_neutron_star_mass = 1.4|units.MSun
 fall_back_mass = 41 |units.MSun
+
+#--------------------------------------------------------------------------------------------------------------------
+#TPS general settings
+REPORT_TPS = False
+REPORT_USER_WARNINGS_TPS = False
+EXCLUDE_SSO = True #in order to not simulate systems with exoplanet or brown dwarf secondaries and tertiaries
+
+#--------------------------------------------------------------------------------------------------------------------
+#TPS constants
+precision = 1.e-10 
+min_mass = 0.08 |units.MSun # for primary stars
+absolute_max_mass = 100 |units.MSun
+
+#--------------------------------------------------------------------------------------------------------------------
