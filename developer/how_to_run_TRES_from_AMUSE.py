@@ -8,7 +8,7 @@ from amuse.datamodel import Particles
 from amuse.units import units
 from amuse.community.seba.interface import SeBa
 import TRES as TRES
-
+import matplotlib.pyplot as plt
 
 #simplest way of running TRES
 def example_1():
@@ -187,7 +187,7 @@ def example_5():
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
-        print(time_array[i], tr.triple.child2.bin_type, tr.instantaneous_evolution,tr.triple.child2.child1.stellar_type)
+#        print(time_array[i], tr.triple.child2.bin_type, tr.instantaneous_evolution,tr.triple.child2.child1.stellar_type)
         inner_semimajor_axis_array = np.append(inner_semimajor_axis_array, tr.triple.child2.semimajor_axis.value_in(units.RSun))
         outer_semimajor_axis_array = np.append(outer_semimajor_axis_array, tr.triple.semimajor_axis.value_in(units.RSun))
         radius_primary_array = np.append(radius_primary_array, tr.triple.child2.child1.radius.value_in(units.RSun))
