@@ -574,7 +574,7 @@ class Generate_initial_triple:
             elif ecc_distr == 5: # Beta distribution    
                 return beta_distr_SSOs(ecc_min, ecc_max, mass)
             else: #Thermal distribution
-                 return np.sqrt(np.random.uniform(ecc_min, ecc_max))
+                 return np.sqrt(np.random.uniform(ecc_min*ecc_min, ecc_max_*ecc_max))
                  
       
 
