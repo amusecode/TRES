@@ -58,31 +58,6 @@ def initialize_triple_class(stars, bins, correct_params,
     return triple
 
 
-def run_triple(triple_class, tend, dir_plots=""):
-
-    if triple_class.triple.correct_params == False:
-        if REPORT_USER_WARNINGS:
-            print('Choose a different system. The parameters of the given triple are incorrect.')
-        return triple_class # no codes initialized yet
-    elif triple_class.stop_at_semisecular_regime == True and triple_class.triple.semisecular_regime_at_initialisation == True:
-        if REPORT_USER_WARNINGS:
-            print('Choose a different system. The given triple is in the semisecular regime at initialization.')
-    elif triple_class.triple.dynamical_instability_at_initialisation == True:
-        if REPORT_USER_WARNINGS:
-            print('Choose a different system. The given triple is dynamically unstable at initialization.')
-    elif triple_class.triple.mass_transfer_at_initialisation == True:
-        if REPORT_USER_WARNINGS:
-            print('Choose a different system. There is mass transfer in the given triple at initialization.')
-    elif triple_class.stop_at_no_CHE == True and triple_class.triple.CHE_at_initialisation == False:
-        if REPORT_USER_WARNINGS:
-            print('Choose a different system. No chemically homogeneous evolution at initialization')
-    else:    
-        triple_class.evolve_model(tend)
-        if REPORT_DEBUG or MAKE_PLOTS:
-            plot_function(triple_class, dir_plots)
-            triple_class.print_stellar_system()
-    # triple_class.stellar_code.stop()
-    # triple_class.secular_code.stop()
 #-----
 #for running TRES.py from other routines
 def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.MSun, outer_mass = 0.5|units.MSun,
