@@ -1850,7 +1850,7 @@ class Triple_Class:
             if not stopping_condition: #stellar interaction
                 return False                                     
 
-            if stopping_conditions>0:
+            if stopping_condition>0:
                 #in case of outer mass transfer, skip inner evolution, is taken care of in outer mass transfer
                 if not stellar_system.child1.is_star: #child1 is a multiple
                     stopping_condition = self.resolve_stellar_interaction(stellar_system.child1)  
