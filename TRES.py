@@ -75,7 +75,8 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
             stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, 
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True, 
-            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = ""):
+            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = "",
+            stellar_code=None, secular_code=None):
 
     set_printing_strategy("custom", 
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
@@ -96,13 +97,15 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node)
 
-    stellar_code = SeBa()
-#    stellar_code = SeBa(redirection='none')
-#    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
+    if stellar_code is None:
+        stellar_code = SeBa()
+    #    stellar_code = SeBa(redirection='none')
+    #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = metallicity
-    secular_code = SecularTriple()
-#    secular_code = SecularTriple(redirection='none')
-#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
+    if stellar_code is None:
+        secular_code = SecularTriple()
+    #    secular_code = SecularTriple(redirection='none')
+    #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
     triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination, tend, tinit,
@@ -156,7 +159,6 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True, 
             stop_at_dynamical_instability = True, stop_at_semisecular_regime = False, 
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
-        
             stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = ""):
 
 
