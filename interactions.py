@@ -870,6 +870,18 @@ def triple_stable_mass_transfer(bs, donor, accretor, self):
     
     #implementation is missing
 
+def triple_common_envelope_phase(bs, donor, accretor, self):
+    # mass transfer of both inner and outer orbit is not yet considered here
+    
+    # orbital evolution is being taken into account in secular_code        
+    if REPORT_FUNCTION_NAMES:
+        print('Triple common envelope')
+
+    bs.bin_type = bin_type['common_envelope']                
+    self.save_snapshot()       
+    
+    #implementation is missing
+
 #when the tertiary star transfers mass to the inner binary
 def outer_mass_transfer(bs, donor, accretor, self):
 #only for stellar systems consisting of a star and a binary
@@ -884,13 +896,11 @@ def outer_mass_transfer(bs, donor, accretor, self):
         # possible the outer binary needs part_dt_mt as well. 
         #adjusting triple is done in secular evolution code
     else:        
-        if REPORT_FUNCTION_NAMES:
-            print('outer_mass_transfer: unstable mass transfer in outer binary')
-        bs.bin_type = bin_type['common_envelope_energy_balance']                
-        self.save_snapshot()        
-        
-        #implementation is missing
-        #snapshot
+        triple_common_envelope_phase(bs, donor, accretor, self)
+
+
+    #stopping condition 0:False, 1:True, -1: calculate through outer mass transfer - effect on inner & outer orbit is taken care off here. 
+    return -1 
 
 #-------------------------
 
@@ -1044,7 +1054,7 @@ def perform_stellar_interaction(bs, self):
     
             if bs.child1.is_donor:
                 if bs.child2.child1.is_donor or bs.child2.child2.is_donor:
-                    outer_mass_transfer(bs, bs.child1, bs.child2, self)
+                    stopping_condition = outer_mass_transfer(bs, bs.child1, bs.child2, self)
             else:
                 detached(bs, self)
                 

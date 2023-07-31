@@ -863,10 +863,6 @@ class Triple_Class:
             if star.radius >= Rl3 - (1.0 * small_numerical_error|units.RSun):
                 star.is_donor = True
 
-            if star.is_donor and (bin.child1.is_donor or bin.child2.is_donor):
-                print(Rl1, bin.child1.radius, Rl2, bin.child2.radius)
-                print(Rl3, star.radius)
-                sys.exit('RLOF in inner and outer binary')
                 
         else:
             sys.exit('check_RLOF: structure stellar system unknown')
@@ -1842,29 +1838,33 @@ class Triple_Class:
             return
         elif self.is_binary(stellar_system):
             if REPORT_TRIPLE_EVOLUTION:
-                print('\n perform stellar interaction: binary - double star')
+                print('\n perform stellar interaction: binary')
 #            stellar_system = perform_stellar_interaction(stellar_system, self)
             stopping_condition = perform_stellar_interaction(stellar_system, self)
             return stopping_condition #stellar interaction
         else:
-            if not stellar_system.child1.is_star: #child1 is a multiple
-                stopping_condition = self.resolve_stellar_interaction(stellar_system.child1)  
-                if not stopping_condition: #stellar interaction
-                    return False                                     
-            elif not stellar_system.child2.is_star: #child2 is a multiple
-                stopping_condition = self.resolve_stellar_interaction(stellar_system.child2)        
-                if not stopping_condition: #stellar interaction
-                    return False                                     
-            else:
-                sys.exit('resolve_stellar_interaction: structure stellar system unknown, both children are binaries')
-            
             if REPORT_TRIPLE_EVOLUTION:
-                print('\n perform stellar interaction: binary')
-#            stellar_system = perform_stellar_interaction(stellar_system, self)            
+                print('\n perform stellar interaction')
+      
             stopping_condition = perform_stellar_interaction(stellar_system, self)            
             if not stopping_condition: #stellar interaction
                 return False                                     
+
+            if stopping_conditions>0:
+                #in case of outer mass transfer, skip inner evolution, is taken care of in outer mass transfer
+                if not stellar_system.child1.is_star: #child1 is a multiple
+                    stopping_condition = self.resolve_stellar_interaction(stellar_system.child1)  
+                    if not stopping_condition: #stellar interaction
+                        return False                                     
+                elif not stellar_system.child2.is_star: #child2 is a multiple
+                    stopping_condition = self.resolve_stellar_interaction(stellar_system.child2)        
+                    if not stopping_condition: #stellar interaction
+                        return False                                     
+                else:
+                    sys.exit('resolve_stellar_interaction: structure stellar system unknown, both children are binaries')
+
             return True                  
+            
                                                                 
     def determine_mass_transfer_timescale(self, stellar_system = None):
 
