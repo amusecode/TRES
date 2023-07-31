@@ -4,6 +4,7 @@ from amuse.io import read_set_from_file
 from amuse.support.console import set_printing_strategy
 import numpy as np
 import io
+import sys
     
 minimum_time_step = 1.e-9 |units.Myr
 
