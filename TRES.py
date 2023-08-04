@@ -127,7 +127,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
-    elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
+    elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
     elif triple_class_object.triple.mass_transfer_at_initialisation == True:
@@ -195,7 +195,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
     elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
-    elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
+    elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
     elif triple_class_object.triple.mass_transfer_at_initialisation == True:
@@ -397,7 +397,7 @@ if __name__ == '__main__':
     elif opt['stop_at_semisecular_regime'] == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
-    elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
+    elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
     elif triple_class_object.triple.mass_transfer_at_initialisation == True:

@@ -85,7 +85,7 @@ class Triple_Class:
         self.triple.child2.delta_e_in = 0.0
         self.triple.child2.max_delta_e_in = 0.0
                         
-        self.triple.dynamical_instability_at_initialisation = False
+        self.dynamical_instability_at_initialisation = False
         self.semisecular_regime_at_initialisation = False
         self.triple.mass_transfer_at_initialisation = False
         self.triple.CHE_at_initialisation = False
@@ -155,7 +155,7 @@ class Triple_Class:
 
         self.secular_code.check_for_dynamical_stability()
         if stop_at_dynamical_instability == True and self.secular_code.triples[0].dynamical_instability == True:
-            self.triple.dynamical_instability_at_initialisation = True
+            self.dynamical_instability_at_initialisation = True
             self.triple.dynamical_instability = True
             self.set_bintype_to_dynamical_instability()
             return 
