@@ -87,7 +87,7 @@ class Triple_Class:
                         
         self.dynamical_instability_at_initialisation = False
         self.semisecular_regime_at_initialisation = False
-        self.triple.mass_transfer_at_initialisation = False
+        self.mass_transfer_at_initialisation = False
         self.triple.CHE_at_initialisation = False
 
         self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
@@ -102,7 +102,7 @@ class Triple_Class:
 
         self.check_RLOF() 
         if self.has_tertiary_donor() and (self.stop_at_outer_mass_transfer or self.stop_at_mass_transfer or self.stop_at_init_mass_transfer): 
-            self.triple.mass_transfer_at_initialisation = True
+            self.mass_transfer_at_initialisation = True
             self.triple.bin_type = bin_type['rlof']
             return
         
@@ -112,7 +112,7 @@ class Triple_Class:
             return
                     
         if (self.has_donor() or self.has_OLOF_donor()) and (self.stop_at_mass_transfer or self.stop_at_init_mass_transfer):            
-            self.triple.mass_transfer_at_initialisation = True
+            self.mass_transfer_at_initialisation = True
             #assuming object is triple as is triple constructor
             if self.is_binary(self.triple.child1):
                 bin = self.triple.child1

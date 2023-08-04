@@ -871,7 +871,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                 nr_iss +=1
             elif tr.dynamical_instability_at_initialisation == True:
                 nr_ids +=1
-            elif tr.triple.mass_transfer_at_initialisation == True:
+            elif tr.mass_transfer_at_initialisation == True:
                 nr_imt +=1
             else:
                 i_n += 1            

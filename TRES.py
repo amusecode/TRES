@@ -130,7 +130,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
-    elif triple_class_object.triple.mass_transfer_at_initialisation == True:
+    elif triple_class_object.mass_transfer_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. There is mass transfer in the given triple at initialization.')
     elif stop_at_no_CHE == True and triple_class_object.triple.CHE_at_initialisation == False:
@@ -198,7 +198,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
     elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
-    elif triple_class_object.triple.mass_transfer_at_initialisation == True:
+    elif triple_class_object.mass_transfer_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. There is mass transfer in the given triple at initialization.')
     elif stop_at_no_CHE == True and triple_class_object.triple.CHE_at_initialisation == False:
@@ -400,7 +400,7 @@ if __name__ == '__main__':
     elif triple_class_object.dynamical_instability_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is dynamically unstable at initialization.')
-    elif triple_class_object.triple.mass_transfer_at_initialisation == True:
+    elif triple_class_object.mass_transfer_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. There is mass transfer in the given triple at initialization.')
     elif opt["stop_at_no_CHE"] == True and triple_class_object.triple.CHE_at_initialisation == False:
