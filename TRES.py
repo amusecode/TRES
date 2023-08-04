@@ -120,7 +120,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
 
-    if triple_class_object.triple.correct_params == False:
+    if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
         return triple_class_object # no codes initialized yet
@@ -188,7 +188,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
                                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
 
-    if triple_class_object.triple.correct_params == False:
+    if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
         return triple_class_object # no codes initialized yet
@@ -389,7 +389,7 @@ if __name__ == '__main__':
             opt["stop_at_SN"], opt["SN_kick_distr"], opt["impulse_kick_for_black_holes"], opt["fallback_kick_for_black_holes"],
             opt["stop_at_CPU_time"], opt["max_CPU_time"], opt["file_name"], opt["file_type"], opt["dir_plots"])  
 
-    if triple_class_object.triple.correct_params == False:
+    if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.' )   
         # no codes initialized yet

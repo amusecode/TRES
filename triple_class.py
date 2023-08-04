@@ -45,9 +45,9 @@ class Triple_Class:
             stop_at_CPU_time, max_CPU_time,
             file_name, file_type, dir_plots):
         
+        self.correct_params = correct_params
         if correct_params == False:
-            self.triple = Particles(1)
-            self.triple.correct_params = correct_params 
+            self.triple = Particles(1) 
             return
             
         self.tend = tend 
@@ -84,7 +84,6 @@ class Triple_Class:
         self.triple.CPU_time = 0.0
         self.triple.child2.delta_e_in = 0.0
         self.triple.child2.max_delta_e_in = 0.0
-        self.triple.correct_params = correct_params 
                         
         self.triple.dynamical_instability_at_initialisation = False
         self.triple.semisecular_regime_at_initialisation = False
