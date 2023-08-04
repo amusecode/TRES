@@ -88,7 +88,7 @@ class Triple_Class:
         self.dynamical_instability_at_initialisation = False
         self.semisecular_regime_at_initialisation = False
         self.mass_transfer_at_initialisation = False
-        self.triple.CHE_at_initialisation = False
+        self.CHE_at_initialisation = False
 
         self.set_stopping_conditions(stop_at_mass_transfer, stop_at_init_mass_transfer,stop_at_outer_mass_transfer,
             stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
@@ -108,7 +108,7 @@ class Triple_Class:
         
         self.check_OLOF()
         if self.stop_at_no_CHE and (not self.check_CHE()):
-            self.triple.CHE_at_initialization = False
+            self.CHE_at_initialization = False
             return
                     
         if (self.has_donor() or self.has_OLOF_donor()) and (self.stop_at_mass_transfer or self.stop_at_init_mass_transfer):            
