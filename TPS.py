@@ -867,7 +867,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                         stop_at_CPU_time = stop_at_CPU_time,
                         max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
         
-            if tr.triple.semisecular_regime_at_initialisation == True:
+            if tr.semisecular_regime_at_initialisation == True:
                 nr_iss +=1
             elif tr.triple.dynamical_instability_at_initialisation == True:
                 nr_ids +=1

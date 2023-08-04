@@ -86,7 +86,7 @@ class Triple_Class:
         self.triple.child2.max_delta_e_in = 0.0
                         
         self.triple.dynamical_instability_at_initialisation = False
-        self.triple.semisecular_regime_at_initialisation = False
+        self.semisecular_regime_at_initialisation = False
         self.triple.mass_transfer_at_initialisation = False
         self.triple.CHE_at_initialisation = False
 
@@ -162,7 +162,7 @@ class Triple_Class:
 
         self.secular_code.check_for_semisecular_regime()
         if stop_at_semisecular_regime == True and self.secular_code.triples[0].semisecular_regime == True:
-            self.triple.semisecular_regime_at_initialisation = True
+            self.semisecular_regime_at_initialisation = True
             self.triple.semisecular_regime = True        
             return
    

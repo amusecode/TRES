@@ -124,7 +124,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
         return triple_class_object # no codes initialized yet
-    elif stop_at_semisecular_regime == True and triple_class_object.triple.semisecular_regime_at_initialisation == True:
+    elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
     elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
@@ -192,7 +192,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
         return triple_class_object # no codes initialized yet
-    elif stop_at_semisecular_regime == True and triple_class_object.triple.semisecular_regime_at_initialisation == True:
+    elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
     elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
@@ -394,7 +394,7 @@ if __name__ == '__main__':
             print('Choose a different system. The parameters of the given triple are incorrect.' )   
         # no codes initialized yet
         sys.exit('Choose a different system. The parameters of the given triple are incorrect.')
-    elif opt['stop_at_semisecular_regime'] == True and triple_class_object.triple.semisecular_regime_at_initialisation == True:
+    elif opt['stop_at_semisecular_regime'] == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
     elif triple_class_object.triple.dynamical_instability_at_initialisation == True:
