@@ -3,6 +3,8 @@ from amuse.datamodel import Particles
 from amuse.units import units
 from seculartriple_TPS.interface import SecularTriple
 
+from TRES_options import max_mass, absolute_min_mass
+
 from interactions import *
 from tidal_friction_constant import *
 
@@ -84,19 +86,21 @@ def test_initial_parameters(inner_primary_mass, inner_secondary_mass, outer_mass
         relative_inclination,
         inner_argument_of_pericenter, outer_argument_of_pericenter,
         inner_longitude_of_ascending_node):
-        
 
-#         if max(inner_primary_mass, outer_mass) > max_mass:  
-#             print(inner_primary_mass, inner_secondary_mass, outer_mass)
-#             print('should be within:', min_mass, '-', max_mass)
-#             print('error: masses not in allowed range')
-#             return False, 0,0
-                    
-#         if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:  
-#             print(inner_primary_mass, inner_secondary_mass, outer_mass)
-#             print('should be at least above:', absolute_min_mass)
-#             print('error: masses not in allowed range')
-#             return False, 0,0
+    if max(inner_primary_mass, outer_mass) > max_mass:  
+        print('error: masses not in allowed range')
+        print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
+        print('should be below:', max_mass)
+        print('max_mass settable in TRES_options.py')
+        return False, 0,0
+               
+    if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:  
+        print('error: masses not in allowed range')
+        print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
+        print('should be at least above:', absolute_min_mass)
+        print('absolute_min_mass settable in TRES_options.py')
+        print('substellar objects can be included through EXCLUDE_SSO in TRES_options.py')
+        return False, 0,0
 
     if inner_semimajor_axis >= outer_semimajor_axis:
         print('error input parameters, should be:')

@@ -151,13 +151,7 @@ from amuse.ic.flatimf import new_flat_mass_distribution
 from TRES_options import REPORT_TPS, \
                          REPORT_USER_WARNINGS_TPS, \
                          EXCLUDE_SSO, \
-                         precision,  min_mass, absolute_max_mass                         
-
-if EXCLUDE_SSO:
-    absolute_min_mass = 0.0075|units.MSun #  for secondaries and tertiaries
-else:
-    absolute_min_mass = 0.2|units.MJupiter     # for planetary objects
-
+                         precision,  min_mass, absolute_min_mass, absolute_max_mass                         
 
 def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
@@ -977,18 +971,18 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
-        sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'")
-        
+        sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'. min_mass and absolute_max_mass settable in TRES_options.py")
+                
     if (inner_secondary_mass_max > absolute_max_mass) :
-        sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'")
+        sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
     
     if (outer_mass_max > absolute_max_mass) :
-        sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'")
+        sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
     
     if (inner_secondary_mass_min < absolute_min_mass) :
-         sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'")
+         sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
     if (outer_mass_min < absolute_min_mass)  :
-         sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'")
+         sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
     
     if (inner_primary_mass_max < inner_primary_mass_min):
         sys.exit('error: maximum inner primary mass smaller than minimum in primary mass')

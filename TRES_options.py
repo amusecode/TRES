@@ -32,6 +32,8 @@ error_dr = 0.05 #0.01
 minimum_time_step = 1.e-9 |units.Myr
 
 max_mass = 100 |units.MSun
+min_mass = 0.08 |units.MSun # for primary stars
+
 maximum_time_step_factor = 100.
 maximum_time_step_factor_after_stable_mt = 5. 
 time_step_factor_find_RLOF = 0.5
@@ -53,7 +55,11 @@ EXCLUDE_SSO = True #in order to not simulate systems with exoplanet or brown dwa
 #--------------------------------------------------------------------------------------------------------------------
 #TPS constants
 precision = 1.e-10 
-min_mass = 0.08 |units.MSun # for primary stars
 absolute_max_mass = 100 |units.MSun
+#  for secondaries and tertiaries
+if EXCLUDE_SSO:
+    absolute_min_mass = 0.0075|units.MSun 
+else:
+    absolute_min_mass = 0.2|units.MJupiter  
 
 #--------------------------------------------------------------------------------------------------------------------
