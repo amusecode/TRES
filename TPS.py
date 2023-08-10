@@ -403,7 +403,7 @@ class Generate_initial_triple:
 
                    logAU = np.random.normal(0.95, 1.35, 1)
                    self.inner_semi = (10**logAU[0])|units.AU
-                   if self.inner_semi < 5|units.RSun or self.inner_semi > 5e8|units.RSun:#truncation of Gaussian wings
+                   if self.inner_semi < 0.5|units.RSun or self.inner_semi > 5e8|units.RSun:#truncation of Gaussian wings
                         self.inner_semi = 0.|units.RSun
 
             elif inner_semi_distr == 5: #Sana
@@ -499,7 +499,7 @@ class Generate_initial_triple:
 
                    logAU = np.random.normal(0.95, 1.35, 1)
                    self.outer_semi = (10**logAU[0])|units.AU
-                   if self.outer_semi < 5|units.RSun or self.outer_semi > 5e8|units.RSun:#truncation of Gaussian wings
+                   if self.outer_semi < 0.5|units.RSun or self.outer_semi > 5e8|units.RSun:#truncation of Gaussian wings
                         self.outer_semi = 0.|units.RSun
 
             elif outer_semi_distr == 5: #Sana
@@ -1008,10 +1008,10 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
         sys.exit('error: maximum outer mass ratio smaller than minimum mass ratio')
        
 
-    if (inner_semi_min < 5.|units.RSun):
+    if (inner_semi_min < 0.5|units.RSun):
         sys.exit('error: inner separation not in allowed range >5 RSun')
 
-    if (outer_semi_min < 5.|units.RSun):
+    if (outer_semi_min < 0.5|units.RSun):
         sys.exit('error: outer separation not in allowed range >5 RSun')
         
     if (inner_semi_max < inner_semi_min):
@@ -1112,7 +1112,7 @@ def parse_arguments():
 
     parser.add_option("--A_min", "--Ain_min", unit=units.RSun,
                       dest="inner_semi_min", type="float", 
-                      default = 5|units.RSun,
+                      default = 0.5|units.RSun,
                       help="minimum of inner semi major axis [%default]")
     parser.add_option("--A_max",  "--Ain_max",unit=units.RSun,
                       dest="inner_semi_max", type="float", 
@@ -1123,7 +1123,7 @@ def parse_arguments():
 
     parser.add_option("--a_min",  "--Aout_min",unit=units.RSun,
                       dest="outer_semi_min", type="float", 
-                      default = 5|units.RSun,
+                      default = 0.5|units.RSun,
                       help="minimum of outer semi major axis [%default]")
     parser.add_option("--a_max",  "--Aout_max", unit=units.RSun,
                       dest="outer_semi_max", type="float", 
