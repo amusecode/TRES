@@ -185,9 +185,11 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
     secular_code.parameters.roche_radius_specification = 0
     #0: eccentric eggleton, 1: sepinsky, 2: classical circular eggleton
     secular_code.parameters.stability_limit_specification = 0
+    #for stars 0, 5-6, for exoplanets 1-4
     #0: mardling & aarseth 2001, 1:petrovich et al. 2015 simple, 2:petrovich et al. 2015 
     #3: holman et al. 98 s-type, 4: holman et al. 98 p-type,  
-    #for stars 0, for exoplanets 1-4
+    #5: vynatheya+ 22
+    #6: tory+ 22
 
     secular_code.parameters.ignore_tertiary = False
 

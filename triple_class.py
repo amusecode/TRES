@@ -1072,24 +1072,78 @@ class Triple_Class:
     def save_snapshot(self):
         file_name = self.file_name
 
-        if self.file_type == 'txt':
-            print(self.file_name,self.file_type)
-            parents = self.remove_parents()
-            write_set_to_file(self.triple.as_set(), self.file_name, self.file_type) 
-            self.set_parents(parents)
-
+        snapshot_triple = self.triple.copy()
+        #make nice recursive loop
+        #find star & bin particles sets 
+        if snapshot_triple.is_star:
+            star_particle_set = snapshot_triple.particles_set
+            bin_particle_set = None
         else:
-            write_set_to_file(self.triple.as_set(), self.file_name, self.file_type, version='2.0', append_to_file=True)
+            bin_particle_set = snapshot_triple.particles_set
             
-        self.triple.child2.max_delta_e_in = 0
+            if snapshot_triple.child1.is_star:
+                star_particle_set = snapshot_triple.child1.particles_set
+            else:
+                sys.exit('save_snapshot: structure stellar system unknown')        
 
-    #some minor parameters are missing:
+        #deleting redundant parameters of stellar particle set
+        del star_particle_set.apsidal_motion_constant
+        del star_particle_set.convective_envelope_mass
+        del star_particle_set.convective_envelope_radius
+        del star_particle_set.core_radius
+        del star_particle_set.gyration_radius
+        del star_particle_set.initial_mass
+        del star_particle_set.moment_of_inertia_of_star
+        del star_particle_set.previous_moment_of_inertia_of_star
+        del star_particle_set.previous_radius
+        del star_particle_set.previous_spin_angular_frequency
+        del star_particle_set.previous_stellar_type
+        del star_particle_set.previous_time_derivative_of_radius
+        del star_particle_set.time_derivative_of_radius
+        del star_particle_set.wind_mass_loss_rate
+
+        #deleting redundant parameters of binary particle set 
+        del bin_particle_set.accretion_efficiency_mass_transfer
+        del bin_particle_set.accretion_efficiency_wind_child1_to_child2
+        del bin_particle_set.accretion_efficiency_wind_child2_to_child1
+        del bin_particle_set.mass_transfer_rate
+        del bin_particle_set.part_dt_mt
+        del bin_particle_set.previous_bin_type
+        del bin_particle_set.previous_kozai_type
+        del bin_particle_set.previous_mass
+        del bin_particle_set.specific_AM_loss_mass_transfer
+
+
+    #double parameters
+#            del snapshot_triple.child2.particles_set.CPU_time
+#            del snapshot_triple.child2.particles_set.time
+#            del snapshot_triple.child2.particles_set.dynamical_instability
+#            del snapshot_triple.child2.particles_set.error_flag_secular
+#            del snapshot_triple.child2.particles_set.delta_e_in
+#            del snapshot_triple.child2.particles_set.max_delta_e_in
+#            del snapshot_triple.child2.particles_set.number
+
+    #some minor parameters are not saved:
 #        self.instantaneous_evolution = False 
 #        self.tend = tend #...
 #        self.triple.time = 0.0|units.yr
 #        self.previous_time = 0.0|units.yr
 #        self.file_name
 #        self.file_type
+
+
+        if self.file_type == 'txt':
+            print(self.file_name,self.file_type)
+            bin_particle_set.parent = 0
+            star_particle_set.parent = 0
+            write_set_to_file(snapshot_triple.as_set(), self.file_name, self.file_type) 
+        else:
+            write_set_to_file(snapshot_triple.as_set(), self.file_name, self.file_type, version='2.0', append_to_file=True)
+
+        del snapshot_triple
+            
+        self.triple.child2.max_delta_e_in = 0
+
 
     #-------
         

@@ -1176,6 +1176,10 @@ double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, doubl
         return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);}        
     else if (stability_limit_specification == 4){
         return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);}         
+    else if (stability_limit_specification == 5){
+        return a_out_div_a_in_dynamical_stability_vynatheya(m1,m2,m3,e_in,e_out,itot);}         
+    else if (stability_limit_specification == 6){
+        return a_out_div_a_in_dynamical_stability_tory(m1,m2,m3,e_in,e_out,itot);}         
     else {
         return a_out_div_a_in_dynamical_stability_mardling_aarseth_01(m1,m2,m3,e_out,itot);}
 
@@ -1238,6 +1242,38 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
 
     double mu = min(m1,m2)/(m1+m2);
     double a_out_div_a_in_crit = 1.6+5.1*e_in-2.22*e_in*e_in+4.12*mu-4.27*e_in*mu-5.09*mu*mu+4.61*e_in*e_in*mu*mu;
+    return a_out_div_a_in_crit;
+}
+
+double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double m3, double e_in, double e_out, double itot)
+{
+    /* Vynatheya criterion (2022MNRAS.516.4146V) */     
+     printf("Vynatheya \n");
+
+    double q_out = m3/(m1+m2);
+    double cositot = cos(itot);
+    double e_in_max = pow(1-5./3.*cositot*cositot,0.5);
+    double e_in_av = max(e_in, 0.5*e_in_max*e_in_max);
+    double Ycrit = 2.4 * pow((1+q_out)/(1+e_in_av)/pow(1-e_out,0.5), 0.4) * ((1-0.2*e_in_av+e_out)/8.*(cositot -1)+1)
+    double a_out_div_a_in_crit = Ycrit * (1+e_in_av)/(1-e_out);
+//    double a_out_div_a_in_crit = Ycrit * (1+e_in??)/(1-e_out);
+    return a_out_div_a_in_crit;
+}
+
+double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, double e_in, double e_out, double itot)
+{
+    /* Tory criterion (2022PASA...39...62T) */     
+     printf("Tory \n");
+
+    double q_out = (m1+m2)/m3;
+    double f = pow(10, -0.6+0.04*q_out) * pow(q_out, 0.32+0.1*q_out);
+    double g = -0.4*cos(itot)+1.4;
+    if (itot>PI/3.){
+        g = –0.1773*pow(itot,4) + 1.1211*pow(itot,3) –1.9149*itot*itot + 0.5022*itot + 1.6222;
+    }
+    double logh = -1.*itot*pow(q_out,1.3)/1500
+    
+    double a_out_div_a_in_crit = 1./(f*g*pow(10,logh)) / (1-e_out);
     return a_out_div_a_in_crit;
 }
 

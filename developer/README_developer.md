@@ -167,15 +167,17 @@ For the moment this only works for pre-mass transfer systems.
 1  Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
 2  Roche radius based on Eggleton's classical formula. Watch out this is only valid for circularized & synchronised systems
 ```
-7) To change the prescription of the dynamical stability limit, you can set self.secular_code.parameters.stability_limit_specification in setup_secular_code to 0-5: 
+7) To change the prescription of the dynamical stability limit, you can set self.secular_code.parameters.stability_limit_specification in setup_secular_code to: 
 ```
 0  Stability limit based on Mardling & Aarseth 2001  [default]
 1  Stability limit based on Petrovich et al. 2015 (simple version)
 2  Stability limit based on Petrovich et al. 2015 (extended version) 
 3  Stability limit based on Holman et al. 1998 for S-type orbits
 4  Stability limit based on Holman et al. 1998 for P-type orbits
+5  Stability limit based on Vynatheya et al. 2022 analytical estimate
+6  Stability limit based on Tory et al. 2022
 ```
-option 0 is for stellar systems, options 1-4 are for planetary systems.
+option 0, 5-6 are advised for stellar systems, options 1-4 for planetary systems.
 
 8) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 
 Option 1:run the rdc_TRES.py script multiple times. You will, however, get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
@@ -218,3 +220,7 @@ a star is transferring mass to a:
 	- (elif) M_donor/M_binary > q_crit    							->   unstable mass transfer 
 	- (elif) M_donor/M_binary <= q_crit   							->   stable mass transfer  
 ```
+
+12) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters. 
+
+
