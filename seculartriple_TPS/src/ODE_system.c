@@ -1226,7 +1226,9 @@ double a_out_div_a_in_dynamical_stability_petrovich_15(double m1, double m2, dou
 double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, double m3, double e_out)
 {
     /* Holman criterion ( 1999AJ....117..621H) 
-        for planet orbiting a star (s+p)+s */     
+        for planet orbiting a star (s+p)+s 
+        updated by Quarles et al. 2020 2020AJ....159...80Q for i=0, 30,45 & 180
+        */     
      printf("Holman S-type \n");
 
     double mu = m3/(max(m1,m2)+m3);
@@ -1237,7 +1239,9 @@ double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, 
 double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, double m3, double e_in)
 {
     /* Holman criterion ( 1999AJ....117..621H) 
-         for planet orbiting a binary (s+s)+p */     
+         for planet orbiting a binary (s+s)+p 
+         updated by Quarles et al. 2018 2018ApJ...856..150Q 
+         */     
      printf("Holman P-type \n");
 
     double mu = min(m1,m2)/(m1+m2);

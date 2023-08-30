@@ -217,7 +217,10 @@ Depreciated (yet still functioning) parameters are given in {}.
        1: "Kroupa IMF",
        2: "Galicher et al. 2016 powerlaw (M^-1.31)", #draws from mass distribution instead of mass ratio distribution, 
 --Ain_max      {--A_max}    upper limit for the inner semi-major axis [5e6 RSun]
---Ain_min      {--A_min}    lower limit for the inner semi-major axis [5]
+--Ain_min      {--A_min}    lower limit for the inner semi-major axis [0.5 RSun]
+        Note that the true minimum separation is also affected by RLOF. 
+        By default contact or semi-detached systems on the ZAMS are removed from the sample. 
+        We recommend to add the command line option --include_circularisation_during_preMS, such that the eccentricity is redrawn (<10x). 
 --Ain_distr    {--A_distr}  inner semi-major axis option: 
         0: "Log Uniform distribution", #default
         1: "Constant semi-major axis",
@@ -228,7 +231,7 @@ Depreciated (yet still functioning) parameters are given in {}.
         6: "flat distribution",
         7: "Galicher et al. 2016 powerlaw (a^-0.61)", #appropriate for planets
 --Aout_max     {--a_max}    upper limit for the outer semi-major axis [5e6 RSun]
---Aout_min     {--a_min}    lower limit for the outer semi-major axis [5 RSun]
+--Aout_min     {--a_min}    lower limit for the outer semi-major axis [0.5 RSun]
 --Aout_distr   {--a_distr}  outer semi-major axis option: 
         0: "Log Uniform distribution", #default
         1: "Constant semi-major axis",
@@ -277,10 +280,12 @@ Depreciated (yet still functioning) parameters are given in {}.
         0: "Circular niform distribution", 
         1: "Constant longitude of ascending nodes", #default
         (outer longitude of ascending nodes = inner - pi)             
+
 -T or -t                     binary end time. [13500 Myr]
 -Z              {-z}         metallicity of stars  [0.02 (Solar)] 
 -n                           number of triples to be simulated  [1]
 -N                           number of initial triple  [0]
+
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:

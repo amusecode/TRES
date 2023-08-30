@@ -568,7 +568,7 @@ class Generate_initial_triple:
             elif ecc_distr == 5: # Beta distribution    
                 return beta_distr_SSOs(ecc_min, ecc_max, mass)
             else: #Thermal distribution
-                 return np.sqrt(np.random.uniform(ecc_min*ecc_min, ecc_max_*ecc_max))
+                 return np.sqrt(np.random.uniform(ecc_min*ecc_min, ecc_max*ecc_max))
                  
       
 
@@ -749,13 +749,13 @@ class Generate_initial_triple:
         print('g =', self.inner_aop, self.outer_aop)
         print('o =', self.inner_loan, self.inner_loan -np.pi)
 
-#        print( triple_system.inner_primary_mass, triple_system.inner_secondary_mass, triple_system.outer_mass, )
-#        print( triple_system.inner_semi, triple_system.outer_semi,)
-#        print( triple_system.inner_ecc, triple_system.outer_ecc,)
-#        print( triple_system.incl,)
-#        print( triple_system.inner_aop, triple_system.outer_aop,)
-#        print( triple_system.inner_loan, triple_system.inner_loan -np.pi)
-#        print(' ')
+    def print_triple_short(self):
+        print( self.inner_primary_mass.value_in(units.MSun), self.inner_secondary_mass.value_in(units.MSun), self.outer_mass.value_in(units.MSun), end=" ")
+        print( self.inner_semi.value_in(units.RSun), self.outer_semi.value_in(units.RSun), end=" ")
+        print( self.inner_ecc, self.outer_ecc, end=" ")
+        print( self.incl, end=" ")
+        print( self.inner_aop, self.outer_aop, end=" ")
+        print( self.inner_loan, self.inner_loan -np.pi, end=" ")
         
 #-------
 
@@ -779,7 +779,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE,
+                        stop_at_no_CHE, include_CHE, include_circ,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
@@ -866,7 +866,58 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             elif tr.dynamical_instability_at_initialisation == True:
                 nr_ids +=1
             elif tr.mass_transfer_at_initialisation == True:
-                nr_imt +=1
+               if tr.has_tertiary_donor():
+                    nr_imt +=1
+               elif include_CHE:
+                    nr_imt +=1
+                    # todo reset so that no olof
+               else: 
+                    nr_imt += 1  
+                    
+                    if include_circ:
+                        i_ecc = 0
+                        max_nr_tries_ecc = 10
+                        while(i_ecc < max_nr_tries_ecc and tr.mass_transfer_at_initialisation):
+                            i_ecc += 1
+                            new_ecc = triple_system.generate_ecc_1d(triple_system.inner_ecc, inner_ecc_min, inner_ecc_distr, triple_system.inner_secondary_mass)
+                            #resetting semi-major axis creates too many short orbit systems - for now only eccentricity is reset
+#                            tr.triple.child2.semimajor_axis *= (1- tr.triple.child2.eccentricity**2)/(1-new_ecc**2) 
+#                            triple_system.inner_semi = tr.triple.child2.semimajor_axis
+                            triple_system.inner_ecc = new_ecc
+                            tr.triple.child2.eccentricity = new_ecc
+                            tr.check_RLOF()
+                            if not tr.has_donor():
+                                i_ecc = max_nr_tries_ecc+1
+                                i_n += 1  
+                                nr_imt -= 1
+    
+                                del stars, bins, tr
+                                stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
+                                                                  triple_system.inner_secondary_mass, 
+                                                                  triple_system.outer_mass, triple_system.inner_semi, 
+                                                                  triple_system.outer_semi, triple_system.inner_ecc, 
+                                                                  triple_system.outer_ecc, triple_system.incl, 
+                                                                  triple_system.inner_aop, triple_system.outer_aop, 
+                                                                  triple_system.inner_loan)
+                                tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
+                                            relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
+                                            stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
+                                            stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
+                                            stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
+                                            stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
+                                            stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
+                                            stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
+                                            stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
+                                            stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
+                                            stop_at_dynamical_instability = stop_at_dynamical_instability, 
+                                            stop_at_semisecular_regime = stop_at_semisecular_regime,  
+                                            stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
+                                            impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
+                                            fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                                            which_common_envelope = which_common_envelope,
+                                            stop_at_CPU_time = stop_at_CPU_time,
+                                            max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+
             else:
                 i_n += 1            
 
@@ -899,7 +950,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE, 
+                        stop_at_no_CHE, include_CHE, include_circ,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
@@ -925,6 +976,7 @@ def print_distr(inner_primary_mass_max, inner_primary_mass_min,
 
     print('Based on the following assumptions:')
     print('Include CHE: \t\t',                  include_CHE) 
+    print('Include circularisation during pre-MS: \t\t',                  include_circ) 
     print('\n')
         
     print('Based on the following stopping conditions:')
@@ -964,7 +1016,7 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
                         stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
                         stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE,
+                        stop_at_no_CHE, include_CHE, include_circ,
                         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
                         stop_at_dynamical_instability, stop_at_semisecular_regime,  
                         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
@@ -1238,6 +1290,8 @@ def parse_arguments():
                       help="stop if no chemically homogeneous evolution [%default] %unit") 
     parser.add_option("--include_CHE", dest="include_CHE", 
                     action="store_true", default = False, help="include chemically homogeneous evolution in the stellar evolution [%default] %unit")
+    parser.add_option("--include_circularisation_during_preMS", dest="include_circ", 
+                    action="store_true", default = False, help="include circularisation during pre-MS [%default] %unit")
 
     parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
                       help="stop at merger [%default] %unit")
