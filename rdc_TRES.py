@@ -59,9 +59,11 @@ tr_type = {     'all': -1,
                 'error_flag_secular': 3, 
             }
 
-lib_print_style = { 0: "TRES standard; selected parameters", 
-                1: "Full",
-                2: "Readable format",}#default
+lib_print_style = { 0: "Readable format",
+                    1: "Full",
+                    2: "TRES standard; selected parameters", 
+                    3: "TRES standard; selected parameters - csv style", 
+                }#default
 
 def print_particle(particle):
         if particle.is_star:
@@ -74,7 +76,14 @@ def print_particle(particle):
 
 def print_to_string(*args, **kwargs):
     output = io.StringIO()
-    print(*args, file=output, **kwargs)
+    print(*args, file=output, **kwargs, sep=' ')
+    contents = output.getvalue()
+    output.close()
+    return contents
+
+def print_to_string_csv(*args, **kwargs):
+    output = io.StringIO()
+    print(*args, file=output, **kwargs, sep=',')
     contents = output.getvalue()
     output.close()
     return contents
@@ -148,9 +157,18 @@ inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, tr
 #    print(inner_bin_type, outer_bin_type, triple_type)
 #    print(bin_type[inner_bin_type_string], bin_type[outer_bin_type_string], tr_type[triple_type_string])
 
-    print(lib_print_style[print_style])
+    print('#', lib_print_style[print_style])
     triple_string = ''
     snapshot_string = '' 
+    if print_style == 2:
+        snapshot_string = snapshot_string + '# '
+    if print_style == 2 or print_style == 3:
+        snapshot_string = snapshot_string + 'number, time, incl, dyn_inst, kozai_type, error_flag, CPU_time,'
+        snapshot_string = snapshot_string + ' bin_type2, a2, e2, p2, l2, bin_type1, a1, e1, p1, l1,'
+        snapshot_string = snapshot_string + ' m1_donor, m1_stellar_type, m1_mass, m1_spin, m1_radius, m1_core,'
+        snapshot_string = snapshot_string + ' m2_donor, m2_stellar_type, m2_mass, m2_spin, m2_radius, m2_core,'
+        snapshot_string = snapshot_string + ' m3_donor, m3_stellar_type, m3_mass, m3_spin, m3_radius, m3_core,'
+        snapshot_string = snapshot_string + '\n' 
     triple_number = 0
     previous_triple_number = -1 
     
@@ -194,7 +212,7 @@ inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, tr
                 triple_type_snapshot = tr_type['error_flag_secular']
         
         
-        if print_style == 2:
+        if print_style == 0:
 #            print(' ')
 #            print(i, triple[0].number, triple[0].time, triple[0].relative_inclination, triple[0].dynamical_instability, triple[0].kozai_type, triple[0].error_flag_secular, triple[0].CPU_time)
 #                  
@@ -230,13 +248,22 @@ inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, tr
 #            print(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t' )
 #            print(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
   
-            
-            snapshot_string = snapshot_string + print_to_string(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
-            snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
-            snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
-            snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
-            snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t')
-            snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
+  
+            if print_style == 3:
+                snapshot_string = snapshot_string + print_to_string_csv(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = ',')
+                snapshot_string = snapshot_string + print_to_string_csv(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = ',')
+                snapshot_string = snapshot_string + print_to_string_csv(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = ',')
+                snapshot_string = snapshot_string + print_to_string_csv(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = ',')
+                snapshot_string = snapshot_string + print_to_string_csv(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = ',')
+                snapshot_string = snapshot_string + print_to_string_csv(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
+
+            else:
+                snapshot_string = snapshot_string + print_to_string(triple[0].number, triple[0].time.value_in(units.Myr), triple[0].relative_inclination, int(triple[0].dynamical_instability), int(triple[0].kozai_type), int(triple[0].error_flag_secular), triple[0].CPU_time, end = '\t')
+                snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].child2.bin_type], triple[0].child2.semimajor_axis.value_in(units.RSun), triple[0].child2.eccentricity, triple[0].child2.argument_of_pericenter, triple[0].child2.longitude_of_ascending_node, end = '\t')
+                snapshot_string = snapshot_string + print_to_string(bin_type[triple[0].bin_type], triple[0].semimajor_axis.value_in(units.RSun), triple[0].eccentricity, triple[0].argument_of_pericenter, triple[0].longitude_of_ascending_node, end = '\t')
+                snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child1.is_donor), triple[0].child2.child1.stellar_type.value_in(units.stellar_type), triple[0].child2.child1.mass.value_in(units.MSun),  triple[0].child2.child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child1.radius.value_in(units.RSun), triple[0].child2.child1.core_mass.value_in(units.MSun), end = '\t')
+                snapshot_string = snapshot_string + print_to_string(int(triple[0].child2.child2.is_donor),  triple[0].child2.child2.stellar_type.value_in(units.stellar_type), triple[0].child2.child2.mass.value_in(units.MSun), triple[0].child2.child2.spin_angular_frequency.value_in(1./units.Myr), triple[0].child2.child2.radius.value_in(units.RSun),triple[0].child2.child2.core_mass.value_in(units.MSun), end = '\t')
+                snapshot_string = snapshot_string + print_to_string(int(triple[0].child1.is_donor), triple[0].child1.stellar_type.value_in(units.stellar_type), triple[0].child1.mass.value_in(units.MSun), triple[0].child1.spin_angular_frequency.value_in(1./units.Myr), triple[0].child1.radius.value_in(units.RSun), triple[0].child1.core_mass.value_in(units.MSun))
 #            snapshot_string = snapshot_string + '\n'
 
         if (inner_primary_star_type == star_type['all'] or triple[0].child2.child1.stellar_type.value_in(units.stellar_type) in np.array(inner_primary_star_type)) and \

@@ -352,9 +352,10 @@ or if you prefer to specify these in string format:
 Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
 Currently there are 3 options settable on the command line via -S (print_style):
 ```
-0      TRES standard - selected parameters
+0      Selected parameters are printed in a human readible way
 1      Full - all possible parameters are printed (sys.exit after first snapshot)
-2      Selected parameters are printed in a human readible way
+2      TRES standard - selected parameters
+3      TRES standard - selected parameters, csv format 
 ```
 
 
