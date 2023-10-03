@@ -25,7 +25,7 @@ double a_out_div_a_in_dynamical_stability_petrovich_15(double m1, double m2, dou
 double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, double m3, double e_out);
 double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, double m3, double e_in);
 double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double m3, double e_in, double e_out, double itot);
-double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, double e_in, double e_out, double itot)
+double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, double e_in, double e_out, double itot);
 
 
 double roche_radius_pericenter_eggleton(double rp, double q);
