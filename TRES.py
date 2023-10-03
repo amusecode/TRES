@@ -102,7 +102,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     #    stellar_code = SeBa(redirection='none')
     #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = metallicity
-    if stellar_code is None:
+    if secular_code is None:
         secular_code = SecularTriple()
     #    secular_code = SecularTriple(redirection='none')
     #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
