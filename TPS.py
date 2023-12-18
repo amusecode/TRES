@@ -127,10 +127,10 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 import TRES as TRES
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
-stellar_code = SeBa()
+#stellar_code = SeBa()
 #stellar_code = SeBa(redirection='none')
 #stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
-secular_code = SecularTriple()
+#secular_code = SecularTriple()
 #secular_code = SecularTriple(redirection='none')
 #secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
@@ -827,22 +827,30 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
 
         tr = None
         
-        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
-                                                              triple_system.inner_secondary_mass, 
-                                                              triple_system.outer_mass, triple_system.inner_semi, 
-                                                              triple_system.outer_semi, triple_system.inner_ecc, 
-                                                              triple_system.outer_ecc, triple_system.incl, 
-                                                              triple_system.inner_aop, triple_system.outer_aop, 
-                                                              triple_system.inner_loan)
+#        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
+#                                                              triple_system.inner_secondary_mass, 
+#                                                              triple_system.outer_mass, triple_system.inner_semi, 
+#                                                              triple_system.outer_semi, triple_system.inner_ecc, 
+#                                                              triple_system.outer_ecc, triple_system.incl, 
+#                                                              triple_system.inner_aop, triple_system.outer_aop, 
+#                                                              triple_system.inner_loan)
 
-        if correct_params == False:
+        if False:
+#        if correct_params == False:
             if REPORT_TPS:
                 print('Incorrect parameters')
             nr_cp += 1
         else:
-            stellar_code.parameters.metallicity = metallicity
+            #stellar_code.parameters.metallicity = metallicity
             # stellar_code.particles.add_particles(stars)
-            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
+#            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
+            tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                    inner_secondary_mass = triple_system.inner_secondary_mass, 
+                    outer_mass = triple_system.outer_mass, 
+                    inner_semimajor_axis = triple_system.inner_semi, 
+                    outer_semimajor_axis = triple_system.outer_semi, 
+                    inner_eccentricity = triple_system.inner_ecc, 
+                    outer_eccentricity = triple_system.outer_ecc,
                         relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
                         stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
                         stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
@@ -861,7 +869,10 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                         stop_at_CPU_time = stop_at_CPU_time,
                         max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
         
-            if tr.semisecular_regime_at_initialisation == True:
+            if tr.correct_params == False:
+                nr_cp += 1
+            elif tr.semisecular_regime_at_initialisation == True:
+#            if tr.semisecular_regime_at_initialisation == True:
                 nr_iss +=1
             elif tr.dynamical_instability_at_initialisation == True:
                 nr_ids +=1
@@ -892,14 +903,21 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                                 nr_imt -= 1
     
                                 del stars, bins, tr
-                                stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
-                                                                  triple_system.inner_secondary_mass, 
-                                                                  triple_system.outer_mass, triple_system.inner_semi, 
-                                                                  triple_system.outer_semi, triple_system.inner_ecc, 
-                                                                  triple_system.outer_ecc, triple_system.incl, 
-                                                                  triple_system.inner_aop, triple_system.outer_aop, 
-                                                                  triple_system.inner_loan)
-                                tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
+#                                stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
+#                                                                  triple_system.inner_secondary_mass, 
+#                                                                  triple_system.outer_mass, triple_system.inner_semi, 
+#                                                                  triple_system.outer_semi, triple_system.inner_ecc, 
+#                                                                  triple_system.outer_ecc, triple_system.incl, 
+#                                                                  triple_system.inner_aop, triple_system.outer_aop, 
+#                                                                  triple_system.inner_loan)
+#                                tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
+                                tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                                                inner_secondary_mass = triple_system.inner_secondary_mass, 
+                                                outer_mass = triple_system.outer_mass, 
+                                                inner_semimajor_axis = triple_system.inner_semi, 
+                                                outer_semimajor_axis = triple_system.outer_semi, 
+                                                inner_eccentricity = triple_system.inner_ecc, 
+                                                outer_eccentricity = triple_system.outer_ecc,  
                                             relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
                                             stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
                                             stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
@@ -921,16 +939,17 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
             else:
                 i_n += 1            
 
-            stellar_code.particles.remove_particles(stars)
-            triple_set = tr.triple.as_set()    
-            secular_code.triples.remove_particles(triple_set)            
-            del stars, bins, tr, triple_set
+#            stellar_code.particles.remove_particles(stars)
+#            triple_set = tr.triple.as_set()    
+#            secular_code.triples.remove_particles(triple_set)            
+#            del stars, bins, tr, triple_set
+            del tr
 
     if REPORT_TPS:
       print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
 
-    stellar_code.stop()
-    secular_code.stop()
+#    stellar_code.stop()
+#    secular_code.stop()
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
                         inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
@@ -1346,7 +1365,7 @@ if __name__ == '__main__':
     print_distr(**options)
     evolve_model(**options)
     
-    stellar_code.stop()
+#    stellar_code.stop()
 #    secular_code.stop()
     
     print('\nYou have used the TRES triple evolution code. Literature reference:')
