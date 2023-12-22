@@ -127,12 +127,6 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 import TRES as TRES
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
-#stellar_code = SeBa()
-#stellar_code = SeBa(redirection='none')
-#stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
-#secular_code = SecularTriple()
-#secular_code = SecularTriple(redirection='none')
-#secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
 import sys
 from amuse.units.optparse import OptionParser
@@ -825,131 +819,101 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
         if REPORT_TPS:
             print('number of system = ', number_of_system)
 
-        tr = None
-        
-#        stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
-#                                                              triple_system.inner_secondary_mass, 
-#                                                              triple_system.outer_mass, triple_system.inner_semi, 
-#                                                              triple_system.outer_semi, triple_system.inner_ecc, 
-#                                                              triple_system.outer_ecc, triple_system.incl, 
-#                                                              triple_system.inner_aop, triple_system.outer_aop, 
-#                                                              triple_system.inner_loan)
-
-        if False:
-#        if correct_params == False:
+        #do not use main_developer in TPS.py
+        #memory of SeBa needs to be cleaned, in particular SeBa time
+        #otherwise use evolve_for for particles indivicually -> many calls 
+        tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                inner_secondary_mass = triple_system.inner_secondary_mass, 
+                outer_mass = triple_system.outer_mass, 
+                inner_semimajor_axis = triple_system.inner_semi, 
+                outer_semimajor_axis = triple_system.outer_semi, 
+                inner_eccentricity = triple_system.inner_ecc, 
+                outer_eccentricity = triple_system.outer_ecc,
+                relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
+                stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
+                stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
+                stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
+                stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
+                stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
+                stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
+                stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
+                stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
+                stop_at_dynamical_instability = stop_at_dynamical_instability, 
+                stop_at_semisecular_regime = stop_at_semisecular_regime,  
+                stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
+                impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
+                fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                which_common_envelope = which_common_envelope,
+                stop_at_CPU_time = stop_at_CPU_time,
+                max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+    
+        if tr.correct_params == False:
             if REPORT_TPS:
-                print('Incorrect parameters')
+                print('Incorrect parameters')            
             nr_cp += 1
-        else:
-            #stellar_code.parameters.metallicity = metallicity
-            # stellar_code.particles.add_particles(stars)
-#            tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
-            tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
-                    inner_secondary_mass = triple_system.inner_secondary_mass, 
-                    outer_mass = triple_system.outer_mass, 
-                    inner_semimajor_axis = triple_system.inner_semi, 
-                    outer_semimajor_axis = triple_system.outer_semi, 
-                    inner_eccentricity = triple_system.inner_ecc, 
-                    outer_eccentricity = triple_system.outer_ecc,
-                        relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
-                        stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
-                        stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
-                        stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
-                        stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
-                        stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
-                        stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
-                        stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                        stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
-                        stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                        stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                        stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
-                        impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
-                        fallback_kick_for_black_holes = fallback_kick_for_black_holes,
-                        which_common_envelope = which_common_envelope,
-                        stop_at_CPU_time = stop_at_CPU_time,
-                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
-        
-            if tr.correct_params == False:
-                nr_cp += 1
-            elif tr.semisecular_regime_at_initialisation == True:
-#            if tr.semisecular_regime_at_initialisation == True:
-                nr_iss +=1
-            elif tr.dynamical_instability_at_initialisation == True:
-                nr_ids +=1
-            elif tr.mass_transfer_at_initialisation == True:
-               if tr.has_tertiary_donor():
-                    nr_imt +=1
-               elif include_CHE:
-                    nr_imt +=1
-                    # todo reset so that no olof
-               else: 
-                    nr_imt += 1  
-                    
-                    if include_circ:
-                        i_ecc = 0
-                        max_nr_tries_ecc = 10
-                        while(i_ecc < max_nr_tries_ecc and tr.mass_transfer_at_initialisation):
-                            i_ecc += 1
-                            new_ecc = triple_system.generate_ecc_1d(triple_system.inner_ecc, inner_ecc_min, inner_ecc_distr, triple_system.inner_secondary_mass)
-                            #resetting semi-major axis creates too many short orbit systems - for now only eccentricity is reset
+        elif tr.semisecular_regime_at_initialisation == True:
+            nr_iss +=1
+        elif tr.dynamical_instability_at_initialisation == True:
+            nr_ids +=1
+        elif tr.mass_transfer_at_initialisation == True:
+           if tr.has_tertiary_donor():
+                nr_imt +=1
+           elif include_CHE:
+                nr_imt +=1
+                # todo reset so that no olof
+           else: 
+                nr_imt += 1  
+                
+                if include_circ:
+                    i_ecc = 0
+                    max_nr_tries_ecc = 10
+                    while(i_ecc < max_nr_tries_ecc and tr.mass_transfer_at_initialisation):
+                        i_ecc += 1
+                        new_ecc = triple_system.generate_ecc_1d(triple_system.inner_ecc, inner_ecc_min, inner_ecc_distr, triple_system.inner_secondary_mass)
+                        #resetting semi-major axis creates too many short orbit systems - for now only eccentricity is reset
 #                            tr.triple.child2.semimajor_axis *= (1- tr.triple.child2.eccentricity**2)/(1-new_ecc**2) 
 #                            triple_system.inner_semi = tr.triple.child2.semimajor_axis
-                            triple_system.inner_ecc = new_ecc
-                            tr.triple.child2.eccentricity = new_ecc
-                            tr.check_RLOF()
-                            if not tr.has_donor():
-                                i_ecc = max_nr_tries_ecc+1
-                                i_n += 1  
-                                nr_imt -= 1
-    
-                                del stars, bins, tr
-#                                stars, bins, correct_params = TRES.make_particle_sets(triple_system.inner_primary_mass, 
-#                                                                  triple_system.inner_secondary_mass, 
-#                                                                  triple_system.outer_mass, triple_system.inner_semi, 
-#                                                                  triple_system.outer_semi, triple_system.inner_ecc, 
-#                                                                  triple_system.outer_ecc, triple_system.incl, 
-#                                                                  triple_system.inner_aop, triple_system.outer_aop, 
-#                                                                  triple_system.inner_loan)
-#                                tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, 
-                                tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
-                                                inner_secondary_mass = triple_system.inner_secondary_mass, 
-                                                outer_mass = triple_system.outer_mass, 
-                                                inner_semimajor_axis = triple_system.inner_semi, 
-                                                outer_semimajor_axis = triple_system.outer_semi, 
-                                                inner_eccentricity = triple_system.inner_ecc, 
-                                                outer_eccentricity = triple_system.outer_ecc,  
-                                            relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
-                                            stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
-                                            stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
-                                            stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
-                                            stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
-                                            stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
-                                            stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
-                                            stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                                            stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
-                                            stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                                            stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                                            stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
-                                            impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
-                                            fallback_kick_for_black_holes = fallback_kick_for_black_holes,
-                                            which_common_envelope = which_common_envelope,
-                                            stop_at_CPU_time = stop_at_CPU_time,
-                                            max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+                        triple_system.inner_ecc = new_ecc
+                        tr.triple.child2.eccentricity = new_ecc
+                        tr.check_RLOF()
+                        if not tr.has_donor():
+                            i_ecc = max_nr_tries_ecc+1
+                            i_n += 1  
+                            nr_imt -= 1
 
-            else:
-                i_n += 1            
+                            tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                                        inner_secondary_mass = triple_system.inner_secondary_mass, 
+                                        outer_mass = triple_system.outer_mass, 
+                                        inner_semimajor_axis = triple_system.inner_semi, 
+                                        outer_semimajor_axis = triple_system.outer_semi, 
+                                        inner_eccentricity = triple_system.inner_ecc, 
+                                        outer_eccentricity = triple_system.outer_ecc,  
+                                        relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
+                                        stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
+                                        stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
+                                        stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
+                                        stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
+                                        stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
+                                        stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
+                                        stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
+                                        stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
+                                        stop_at_dynamical_instability = stop_at_dynamical_instability, 
+                                        stop_at_semisecular_regime = stop_at_semisecular_regime,  
+                                        stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
+                                        impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
+                                        fallback_kick_for_black_holes = fallback_kick_for_black_holes,
+                                        which_common_envelope = which_common_envelope,
+                                        stop_at_CPU_time = stop_at_CPU_time,
+                                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
 
-#            stellar_code.particles.remove_particles(stars)
-#            triple_set = tr.triple.as_set()    
-#            secular_code.triples.remove_particles(triple_set)            
-#            del stars, bins, tr, triple_set
-            del tr
+        else:
+            i_n += 1            
+
+        del tr
 
     if REPORT_TPS:
       print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
 
-#    stellar_code.stop()
-#    secular_code.stop()
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
                         inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 

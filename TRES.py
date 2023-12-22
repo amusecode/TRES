@@ -142,6 +142,12 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             plot_function(triple_class_object, dir_plots)
             triple_class_object.print_stellar_system()
             
+
+    stellar_code.particles.remove_particles(stars)
+    triple_set = triple_class_object.triple.as_set()    
+    secular_code.triples.remove_particles(triple_set)            
+    del stars, bins, triple_set
+
     triple_class_object.stellar_code.stop()
     triple_class_object.secular_code.stop()
 
