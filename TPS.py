@@ -355,7 +355,7 @@ class Generate_initial_triple:
                     print('TPS::generate_semi: unambiguous choice of constant semi-major axis')
                     print('--A_min option to set the value of the semi-major axis in the inner binary')                
                 self.inner_semi = inner_semi_min
-            elif inner_semi_distr == 2: #Tokovinin Lognormal mu=10^5.5d, sigma=2.3
+            elif inner_semi_distr == 2: #Tokovinin Lognormal mu=10^5d, sigma=2.3
                 self.inner_semi = 0.|units.RSun
                 while (self.inner_semi < inner_semi_min or self.inner_semi > inner_semi_max):
                    self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, inner_secondary_mass)
@@ -379,7 +379,7 @@ class Generate_initial_triple:
                    if inner_semi_latus_rectum_max:
                        inner_semi_max = inner_semi_max_orig /(1-self.inner_ecc**2)                       
 
-                   logP = np.random.normal(5, 2.3, 1)
+                   logP = np.random.normal(3.5, 2.3, 1)
                    P = (10**logP[0])|units.day
                    self.inner_semi = ((P/2./np.pi)**2 * constants.G* (self.inner_primary_mass + self.inner_secondary_mass))**(1./3.)  
                    if logP < -0.3 or logP > 10:#truncation of Gaussian wings

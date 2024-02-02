@@ -14,6 +14,8 @@ This document contains the following parts:
 
 [Simple examples](#Simple-examples-of-runs)
 
+[TRES-Exo for exoplanet research](#TRES-exo)
+
 [Understanding the TRES output](#Understanding-the-TRES-output)
 
 [Reducing the TRES output](#Reducing-the-TRES-output)
@@ -312,6 +314,41 @@ action items                    add these to:
 --stop_at_CPU_time              to stop the simulation when the computational time exceeds a given value
 
 ```
+## TRES-exo for exoplanet research
+
+In Columba et al. 2023, (A&A, 675A, 156C) we presented an extension for TRES to incorporate exoplanets. 
+For exoplanet research, we have included the following processes and recommend the following settings:
+
+1) For the dynamical stability of triples, you can which stability criterium is used through the parameter stability_limit_specification in TRES_setup.py. Options applicable to exoplanets are the simple prescription from Petrovich et al. (1), the full prescription from Petrovich et al. (2), Holman's prescription for S-type orbits (3), Holman's prescription for P-type orbits (4). 
+2) energy-limited atmospheric photoevaporation of planets
+3) initial planetary spin rate as 0.126 the breakup speed (Bryan+2018). This can be adjusted in the function initial_angular_frequency in triple_class.py
+
+Examples 
+1) To evolve a single system (binary star + CBP) that survives for one Hubble time (13.5 Gyr) with the following parameters:
+```
+- primary mass:   M1           1.04  Msun 
+- secondary mass: M2           1.00  Msun
+- CBP mass:       M3           0.011 Msun
+- inner binary semimajor axis:  Ain       54.6  Rsun
+- CBP semimajor axis:           Aout      477.8 Rsun
+- inner binary eccentricity:    Ein       0.67
+- CBP eccentricity:             Eout      0.15
+- relative orbital inclination: i         1.9 (rad)
+- simulation time:      T    1000 Myr
+```
+
+you can run TRES as:
+```
+python TRES.py --M1 1.04 --M2 1. --M3 0.011 --Ain 54.6 --Aout 477.8 --Ein 0.67 --Eout 0.15 -i 1.9 -T 1000  --no_stop_at_mass_transfer 
+```
+and use the rdc_ py to read the output and print it in readable text format. If you wish to run the complete evolution, use -T 13500 to simulate one Hubble time and you'll obtain a DWD-orbiting CBP ('Magrathea' planet).
+
+2) To evolve a single system (binary star + CBP) where the inner binary merges as a DWD around 10 Gyr, you can use the following command:
+
+```
+python TRES.py --M1 1.33 --M2 1.06 --M3 0.0046 --Ain 26.35 --Aout 3012.9 --Ein 0.3 --Eout 0.1 -i 1.7 -T 11000  --no_stop_at_mass_transfer -f 'testRun_2.hdf'
+```
+
 
 
 ## Understanding the TRES output
@@ -454,8 +491,8 @@ For example: ```rdc_TRES.py -f TRES.hdf --print_init -l 0```. This will return s
 ```amuse TRES.py -M 1.3 -m 0.5  -l  0.5 -A 200.0 -a 20000.0 -E 0.1 -e 0.5 -G 0.1 -g 0.5 -I 1.3962634016 ```
 
 
-
-
+## TRES-development-team
+For more advanced tips, see the README in the developer-folder.
 
 ## References
 
