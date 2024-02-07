@@ -14,7 +14,7 @@ This document contains the following parts:
 
 [Simple examples](#Simple-examples-of-runs)
 
-[TRES-Exo for exoplanet research](#TRES-exo)
+[TRES-Exo for exoplanet research](#TRES-Exo-for-exoplanet-research)
 
 [Understanding the TRES output](#Understanding-the-TRES-output)
 
@@ -314,14 +314,15 @@ action items                    add these to:
 --stop_at_CPU_time              to stop the simulation when the computational time exceeds a given value
 
 ```
-## TRES-exo for exoplanet research
+## TRES-Exo for exoplanet research
 
-In Columba et al. 2023, (A&A, 675A, 156C) we presented an extension for TRES to incorporate exoplanets. 
+In Columba et al. 2023, (A&A, 675A, 156C) we presented an extension for TRES to incorporate exoplanets.  
 For exoplanet research, we have included the following processes and recommend the following settings:
 
-1) For the dynamical stability of triples, you can which stability criterium is used through the parameter stability_limit_specification in TRES_setup.py. Options applicable to exoplanets are the simple prescription from Petrovich et al. (1), the full prescription from Petrovich et al. (2), Holman's prescription for S-type orbits (3), Holman's prescription for P-type orbits (4). 
-2) energy-limited atmospheric photoevaporation of planets
-3) initial planetary spin rate as 0.126 the breakup speed (Bryan+2018). This can be adjusted in the function initial_angular_frequency in triple_class.py
+1) First things first: tell TRES to include Sub-Stellar Objects by setting the boolean EXCLUDE_SSO to False in TRES.options.py. Amongst other things, this will automatically set the minimum mass of a body to 0.2 Jupiter masses (~0.0002 Solar masses) in stead of 0.0075 Solar masses. Note that our extension is only valid for giant planets, hence the minimum mass of 0.2 Jupiter masses.
+2) For the dynamical stability of triples, you can which stability criterium is used through the parameter stability_limit_specification in TRES_setup.py. Options applicable to exoplanets are the simple prescription from Petrovich et al. (1), the full prescription from Petrovich et al. (2), Holman's prescription for S-type orbits (3), Holman's prescription for P-type orbits (4). 
+3) energy-limited atmospheric photoevaporation of planets
+4) initial planetary spin rate as 0.126 the breakup speed (Bryan+2018). This can be adjusted in the function initial_angular_frequency in triple_class.py
 
 Examples 
 1) To evolve a single system (binary star + CBP) that survives for one Hubble time (13.5 Gyr) with the following parameters:
@@ -496,7 +497,8 @@ For more advanced tips, see the README in the developer-folder.
 
 ## References
 
-See the following publication: [Toonen et al 2016](https://ui.adsabs.harvard.edu/abs/2016ComAC...3....6T/abstract) for more details.
+See the following publication: [Toonen et al 2016](https://ui.adsabs.harvard.edu/abs/2016ComAC...3....6T/abstract) for more details on TRES in general.
+See [Columba et al 2023](https://ui.adsabs.harvard.edu/abs/2023A%26A...675A.156C/abstract) for more details on TRES-Exo.
 
 
 
