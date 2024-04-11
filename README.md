@@ -342,7 +342,7 @@ you can run TRES as:
 ```
 python TRES.py --M1 1.04 --M2 1. --M3 0.011 --Ain 54.6 --Aout 477.8 --Ein 0.67 --Eout 0.15 -i 1.9 -T 1000  --no_stop_at_mass_transfer 
 ```
-and use the rdc_ py to read the output and print it in readable text format. If you wish to run the complete evolution, use -T 13500 to simulate one Hubble time and you'll obtain a DWD-orbiting CBP ('Magrathea' planet).
+and use the rdc_TRES.py and rdc_TRES_csv.py to read the output and print it in readable text format. If you wish to run the complete evolution, use -T 13500 to simulate one Hubble time and you'll obtain a DWD-orbiting CBP ('Magrathea' planet).
 
 2) To evolve a single system (binary star + CBP) where the inner binary merges as a DWD around 10 Gyr, you can use the following command:
 
@@ -359,13 +359,28 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 
 ## Reducing the TRES output
 
-The python script rdc_TRES.py reduce the TRES hdf output. The full list of available options is [default]:
+The python script rdc_TRES_csv.py reduce the TRES hdf output and creates a csv file. The full list of available options is [default]:
+```
+-f      Root of the name of the input file [TRES]
+-P 	Parameter_style [1]
+-S      Printing style [0] 
+-F      Print all snapshots. By default only the first & last lines are printed.
+```
 
+For the parameter style you can choose between:
 ```
--f      root of the name of the input file [TRES]
--S      printing style [0] 
--F      print all snapshots. By default only the first & last lines are printed.
+0      All parameters
+1	Selected parameters [default]
+2	Parameters can be selected by the user in the function create_snapshot_for_dict
 ```
+
+You can also print the parameters to the terminal through the printing style option:
+```
+0      No printing to screen
+1	Printing to screen
+```
+
+
 
 You can also select specific types of triples. For these a single extra line is added on the first occasion the requirements are met. Options are:
 ```
@@ -386,6 +401,8 @@ or if you prefer to specify these in string format:
 --trtstr       triple type [all]
 ```
 
+
+The depreciated script rdc_TRES.py only prints to screen. Here the printing style options are:
 
 Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
 Currently there are 3 options settable on the command line via -S (print_style):
