@@ -1,5 +1,5 @@
 # TRES
-TRiple Evolution Simulation 
+TRiple Evolution Simulator 
 
 ### Description
 TRES is a numerical framework for simulating hierarchical triple systems with stellar and planetary components. 
