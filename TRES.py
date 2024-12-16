@@ -23,11 +23,15 @@ from TRES_setup import make_particle_sets, setup_stellar_code
 from TRES_options import REPORT_DEBUG, \
                          REPORT_TRIPLE_EVOLUTION, \
                          MAKE_PLOTS, \
-                         REPORT_USER_WARNINGS
+                         REPORT_USER_WARNINGS, \
+                         USE_MESA_AS_STELLAR_CODE
 from interactions import corotating_spin_angular_frequency_binary, \
                         lang_spin_angular_frequency, \
                         break_up_angular_frequency, \
                         criticial_angular_frequency_CHE
+
+if USE_MESA_AS_STELLAR_CODE:
+    from amuse.community.mesa.interface import Mesa
 
 def initialize_triple_class(stars, bins, correct_params,
                             stellar_code, secular_code, relative_inclination = 80.0*np.pi/180.0,
@@ -97,15 +101,23 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node)
 
+    clean_up_stellar_code = False
+    clean_up_secular_code = False
     if stellar_code is None:
-        stellar_code = SeBa()
+        if USE_MESA_AS_STELLAR_CODE:
+            stellar_code = Mesa(redirection='none')
+        else:
+            stellar_code = SeBa()
     #    stellar_code = SeBa(redirection='none')
     #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
+        clean_up_stellar_code = True
+
     stellar_code.parameters.metallicity = metallicity
     if secular_code is None:
         secular_code = SecularTriple()
     #    secular_code = SecularTriple(redirection='none')
     #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
+        clean_up_secular_code = True
 
     triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination, tend, tinit,
@@ -148,9 +160,13 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     secular_code.triples.remove_particles(triple_set)            
     del stars, bins, triple_set
 
-    triple_class_object.stellar_code.stop()
-    triple_class_object.secular_code.stop()
-
+    if clean_up_stellar_code:
+        triple_class_object.stellar_code.stop()
+        print('cleaning se')
+    if clean_up_secular_code:
+        triple_class_object.secular_code.stop()
+        print('cleaning sec')
+    
     return triple_class_object
 
 
@@ -375,7 +391,10 @@ if __name__ == '__main__':
             opt["inner_argument_of_pericenter"], opt["outer_argument_of_pericenter"],
             opt["inner_longitude_of_ascending_node"])
 
-    stellar_code = SeBa()
+    if USE_MESA_AS_STELLAR_CODE:
+        stellar_code = Mesa(redirection='none')
+    else:
+        stellar_code = SeBa()
 #    stellar_code = SeBa(redirection='none')
 #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = opt["metallicity"]

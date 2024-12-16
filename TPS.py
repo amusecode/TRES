@@ -128,6 +128,7 @@ import TRES as TRES
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
 
+secular_code = SecularTriple()
 import sys
 from amuse.units.optparse import OptionParser
 from amuse.units import units, constants
@@ -845,7 +846,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                 fallback_kick_for_black_holes = fallback_kick_for_black_holes,
                 which_common_envelope = which_common_envelope,
                 stop_at_CPU_time = stop_at_CPU_time,
-                max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+                max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots, secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -904,7 +905,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                                         fallback_kick_for_black_holes = fallback_kick_for_black_holes,
                                         which_common_envelope = which_common_envelope,
                                         stop_at_CPU_time = stop_at_CPU_time,
-                                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots)
+                                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots, secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -913,6 +914,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
 
     if REPORT_TPS:
       print(number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
+    secular_code.stop()
 
 
 def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
