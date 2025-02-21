@@ -1,11 +1,16 @@
 # TRES as developer
 This is a short additional document that will help guide you through the installation and compilation process of TRES as a developer. For a more complete guide on how to use TRES, please have a look at the [README.md](https://github.com/amusecode/TRES/blob/main/README.md) file.
 
-For the installation, it is important to know that TRES combines two different codes: SeBa, which is a stellar evolution code, and a dynamical code. The dynamical code is already integrated into TRES and thus doesn't need to be installed separately. SeBa however, needs to be installed through the AMUSE framework. We will explain how to do this shortly, but just make sure to satisfy the [AMUSE pre-requisites](https://amuse.readthedocs.io/en/latest/install/howto-install-AMUSE.html) and have installed the necessary python modules beforehand.
+This document contains the following parts:
 
-In case the you have access to a computer cluster, [Run TRES on cluster](#Run-TRES-on-cluster) gives some additional information on running TRES with slurm.
+[Installation TRES](#Installation-TRES)
+[TRES development team](#TRES-development-team)
+[Development tips and tricks](#Development-tips-and-tricks)
  
-### Installation TRES
+## Installation TRES
+For the installation, it is important to know that TRES combines two different codes: a stellar evolution code (default:SeBa) and a dynamical code. The dynamical code is already integrated into TRES and thus doesn't need to be installed separately. The stellar evolution code needs to be installed through the AMUSE framework. We will explain how to do this shortly, but just make sure to satisfy the [AMUSE pre-requisites](https://amuse.readthedocs.io/en/latest/install/howto-install-AMUSE.html) and have installed the necessary python modules beforehand.
+
+
 If you are interested in applying changes to the stellar evolution code SeBa, the code should be locally installed. To do this, you will have to install AMUSE directly from the source code:
 
 ```
@@ -99,7 +104,7 @@ git push --set-upstream upstream (branch)
 
 Manage who has access to your fork via github:  "settings -> manage access -> invite a collaborator"
 
-### Development tips & tricks
+### Development tips and tricks
 1) TRES makes use of object oriented programming. The structure of the object is as follows:
 ```
 - self contains simulations parameters such as the initial and final time

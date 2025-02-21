@@ -6,14 +6,12 @@
 ##              given any initial conditions (M, m, l, A, a, E, e, i, G, g, O, o, T, z).
  
 import sys
-
 import numpy as np
 # from interactions import *
 # from tidal_friction_constant import *
 from amuse.units import units
 from amuse.support.console import set_printing_strategy
 
-from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
 
 
@@ -23,15 +21,12 @@ from TRES_setup import make_particle_sets, setup_stellar_code
 from TRES_options import REPORT_DEBUG, \
                          REPORT_TRIPLE_EVOLUTION, \
                          MAKE_PLOTS, \
-                         REPORT_USER_WARNINGS, \
-                         USE_MESA_AS_STELLAR_CODE
+                         REPORT_USER_WARNINGS
 from interactions import corotating_spin_angular_frequency_binary, \
                         lang_spin_angular_frequency, \
                         break_up_angular_frequency, \
                         criticial_angular_frequency_CHE
 
-if USE_MESA_AS_STELLAR_CODE:
-    from amuse.community.mesa.interface import Mesa
 
 def initialize_triple_class(stars, bins, correct_params,
                             stellar_code, secular_code, relative_inclination = 80.0*np.pi/180.0,
@@ -103,14 +98,22 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
 
     clean_up_stellar_code = False
     clean_up_secular_code = False
-    if stellar_code is None:
-        if USE_MESA_AS_STELLAR_CODE:
-            stellar_code = Mesa(redirection='none')
-        else:
-            stellar_code = SeBa()
+
+    if stellar_code is None or stellar_code.__module__.split(".")[-2]=="seba":
+        from amuse.community.seba.interface import SeBa #Steven
+        stellar_code = SeBa()
     #    stellar_code = SeBa(redirection='none')
     #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
-        clean_up_stellar_code = True
+    elif stellar_code.__module__.split(".")[-2]=="sse":                               
+        from amuse.community.sse.interface import SSE #Steven
+        stellar_code = SSE()
+    elif stellar_code.__module__.split(".")[-2]=="mese":                
+        from amuse.community.mesa.interface import Mesa #Steven
+        stellar_code = Mesa()
+    else:
+        print('No valid stellar evolution code selected. Options are SeBa (default), SSE or MESA')
+        return triple_class_object # no codes initialized yet
+    clean_up_stellar_code = True
 
     stellar_code.parameters.metallicity = metallicity
     if secular_code is None:
@@ -162,10 +165,12 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
 
     if clean_up_stellar_code:
         triple_class_object.stellar_code.stop()
-        print('cleaning se')
+        if REPORT_USER_WARNINGS:
+            print('Cleaning stellar evolution code')
     if clean_up_secular_code:
         triple_class_object.secular_code.stop()
-        print('cleaning sec')
+        if REPORT_USER_WARNINGS:
+            print('Cleaning secular code')
     
     return triple_class_object
 
@@ -358,12 +363,13 @@ def parse_arguments():
                       help="do not rescale the BH SN kick with fallback  [%default]")                      
                       
                       
-                      
     parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
                       help="stop at CPU time [%default] %unit")
     parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 3600.0,
                       help="max CPU time [%default] %unit")
-                      
+
+    parser.add_option("--stellar_evolution_code", dest="SE_code",  type="int", default = 0,
+                      help="which stellar evolution [%default]")                                            
                       
     parser.add_option("-f", dest="file_name", type ="string", default = "TRES.hdf",#"TRES.txt"
                       help="file name[%default]")
@@ -391,13 +397,20 @@ if __name__ == '__main__':
             opt["inner_argument_of_pericenter"], opt["outer_argument_of_pericenter"],
             opt["inner_longitude_of_ascending_node"])
 
-    if USE_MESA_AS_STELLAR_CODE:
-        stellar_code = Mesa(redirection='none')
+
+    if opt["SE_code"] == 1:
+        from amuse.community.sse.interface import SSE #steven
+        stellar_code = SSE()
+    elif opt["SE_code"] == 2:
+        from amuse.community.mesa.interface import Mesa #Steven
+        stellar_code = Mesa()
     else:
-        stellar_code = SeBa()
-#    stellar_code = SeBa(redirection='none')
-#    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
+        from amuse.community.seba.interface import SeBa #steven
+        stellar_code = SeBa()    
+#        stellar_code = SeBa(redirection='none')
+#        stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = opt["metallicity"]
+
     secular_code = SecularTriple()
 #    secular_code = SecularTriple(redirection='none')
 #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')

@@ -6,7 +6,7 @@ TRES is a numerical framework for simulating hierarchical triple systems with st
 Mass transfer from one star to another and the consequential effect to the orbital dynamics is realized via heuristic recipes.
 These recipes are combined with  three-body  dynamics and stellar evolution inluding their mutual influences. 
 
-TRES includes the effects of common-envelope evolution, circularized stable mass transfer, tides, gravitational wave emission and up-to-date stellar evolution through SeBa. Other stellar evolution codes such as SSE or MESA can also be used. Coming soon: transition to N-body calculations (including stellar evolution and dissipative processes) when the system's evolution is not secular anymore. 
+TRES includes the effects of common-envelope evolution, circularized stable mass transfer, tides, gravitational wave emission and up-to-date stellar evolution including chemically homogeneous evolution. By default the stellar evolution code SeBa is used. Other stellar evolution codes such as SSE or MESA can also be used.  
 
 This document contains the following parts:
 
@@ -16,7 +16,7 @@ This document contains the following parts:
 
 [TRES-Exo for exoplanet research](#TRES-Exo-for-exoplanet-research)
 
-[TRES with MESA](#TRES-with-MESA)
+[TRES with other stellar evolution codes](#TRES-with-other-stellar-evolution-codes)
 
 [Understanding the TRES output](#Understanding-the-TRES-output)
 
@@ -354,11 +354,12 @@ python TRES.py --M1 1.33 --M2 1.06 --M3 0.0046 --Ain 26.35 --Aout 3012.9 --Ein 0
 
 ## TRES with MESA
 
-TRES can now be run with MESA as stellar code. To do so, you simply need to switch option 'USE_MESA_AS_STELLAR_CODE' in TRES_options.py to True. In this case, we also advise to switch to True 'GET_GYRATION_RADIUS_FROM_STELLAR_CODE' and 'GET_AMC_FROM_STELLAR_CODE'. These physical quantities are in this case obtained directly from the structure of the star.
+By default TRES uses the stellar evolution code SeBa (Portegies Zwart et al. 1996, Toonen et al. 2012), but other stellar evolution codes, such as SSE or MESA can be used as well.
+To do so, you simply choose your favorite stellar evolution code when running TRES on the command line (0: SeBa, 1: SSE, 2: MESA). 
 
-If you want to change settings within MESA, this can be done in AMUSE through "particles.set_control('name_of_control', value)". For TRES, we provide the script MESA_setup.py which already sets a few MESA controls. The choice of input physics was made in order to be the closest to the SeBa defaults. More details can be found in Sciarini et al. 2025 (in prep.).
+If you want to change settings within MESA, this can be done in AMUSE through "particles.set_control('name_of_control', value)". For TRES, we provide the function options_mesa_code in the file TRES_options.py which already sets a few MESA controls. The specific choice of input physics was made in order to be the closest to the SeBa defaults. More details can be found in Sciarini et al. 2025 (in prep.). The full list of MESA controls can be found in https://github.com/MESAHub/mesa/blob/r15140/star/defaults/controls.defaults. In addition we recommend to set the minimum_time_step to 1e-7|units.Myr and to switch GET_GYRATION_RADIUS_FROM_STELLAR_CODE and GET_AMC_FROM_STELLAR_CODE to true. The latter two quantities re then obtained directly from the structure of the star. 
 
-The list of MESA controls can be found in https://github.com/MESAHub/mesa/blob/r15140/star/defaults/controls.defaults.    
+[future]: Note, that when running TRES with MESA, GET_GYRATION_RADIUS_FROM_STELLAR_CODE and GET_AMC_FROM_STELLAR_CODE are set to true by default. These physical quantities are in this case obtained directly from the structure of the star.
 
 
 ## Understanding the TRES output

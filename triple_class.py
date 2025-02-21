@@ -1432,7 +1432,7 @@ class Triple_Class:
             if REPORT_DT or REPORT_DEBUG:
                 print('min increase', time_step, maximum_time_step_factor*self.previous_dt)   
                 
-            #maybe not relevant with MESA                                 
+            #maybe not relevant for MESA                                 
             time_step = min(time_step, maximum_time_step_factor*self.previous_dt) 
 
 
@@ -2355,7 +2355,10 @@ class Triple_Class:
             dt = self.determine_time_step()  
             if not no_stellar_evolution: 
                 self.update_previous_stellar_parameters()
-                if not USE_MESA_AS_STELLAR_CODE: # for now, refresh_memory and recall_memory_one_step not available in MESA interface
+                
+                if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                    print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
+                else:
                     self.stellar_code.particles.refresh_memory()
             self.triple.time += dt   
             self.previous_dt = dt         
@@ -2381,10 +2384,12 @@ class Triple_Class:
                                 
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
                 while successfull_step == False:
-                    if not USE_MESA_AS_STELLAR_CODE: # for now, refresh_memory and recall_memory_one_step not available in MESA interface
-                        successfull_step, nr_unsuccessfull, star_unsuccessfull = self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
-                    else:
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                        print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
                         successfull_step = True
+                    else:
+                        successfull_step, nr_unsuccessfull, star_unsuccessfull = self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
+                
                 # if SN has taken place
                 if self.has_stellar_type_changed_into_SN_remnant():
                     if REPORT_TRIPLE_EVOLUTION:
@@ -2399,9 +2404,11 @@ class Triple_Class:
                 if (self.has_donor() or self.has_OLOF_donor()) and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and dt > minimum_time_step:
 #                    self.rewind_to_begin_of_rlof_stellar(dt) 
 #                    print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
-
-                    if not USE_MESA_AS_STELLAR_CODE: # for now, refresh_memory and recall_memory_one_step not available in MESA interface
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                        print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
+                    else:
                         self.stellar_code.particles.recall_memory_one_step()
+
                     self.copy_from_stellar()
                     self.update_stellar_parameters()   
                     if self.include_CHE:#only needed when including CHE
@@ -2479,8 +2486,11 @@ class Triple_Class:
                         print('stopping conditions stellar 2')                    
                         break                   
 
-                    if not USE_MESA_AS_STELLAR_CODE: # for now, refresh_memory and recall_memory_one_step not available in MESA interface
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                        print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
+                    else:
                         self.rewind_to_begin_of_rlof_secular()
+                        
                     self.triple.child2.semimajor_axis = previous_semimajor_axis_in
                     self.triple.child2.eccentricity = previous_eccentricity_in
                     self.triple.child2.previous_argument_of_pericenter_in = previous_argument_of_pericenter_in

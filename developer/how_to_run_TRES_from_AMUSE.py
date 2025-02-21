@@ -458,6 +458,20 @@ def example_9():
     tr.stellar_code.stop()
     tr.secular_code.stop()
     
+
+def example_10():
+    print('TRES example 10')
+    from amuse.community.sse.interface import SSE
+    tr = TRES.main(stellar_code=SSE())
+    print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+
+
+def example_11():
+    print('TRES example 11')
+#    from amuse.community.mesa.interface import MESA
+    tr = TRES.main(stellar_code=MESA())
+    print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+
     
     
 example_1()
@@ -469,4 +483,5 @@ example_1()
 #example_7()
 #example_8()
 #example_9()
-
+#example_10()
+#example_11()
