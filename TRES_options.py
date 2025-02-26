@@ -16,7 +16,7 @@ REPORT_MASS_TRANSFER_STABILITY = False
 
 no_stellar_evolution = False
 
-#reset in case of MESA by function setup_mesa_code below
+#reset in case of MESA by function options_mesa below
 GET_GYRATION_RADIUS_FROM_STELLAR_CODE = False
 GET_AMC_FROM_STELLAR_CODE = False
 
@@ -32,7 +32,7 @@ maximum_wind_mass_loss_factor = 0.01
 error_dm = 0.05
 #maximum_radius_change_factor = 0.005
 error_dr = 0.05 #0.01
-#reset in case of MESA by function setup_mesa_code below
+#reset in case of MESA by function options_mesa below
 minimum_time_step = 1.e-9 |units.Myr
 
 
@@ -70,6 +70,11 @@ else:
 #--------------------------------------------------------------------------------------------------------------------
 
 def options_mesa(stellar_code):   
+
+    #suggested
+#    GET_GYRATION_RADIUS_FROM_STELLAR_CODE = True
+#    GET_AMC_FROM_STELLAR_CODE = True
+#    minimum_time_step = 1.e-3 |units.Myr
         
     for i in range(len(stellar_code.particles)):
           

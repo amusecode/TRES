@@ -107,7 +107,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     elif stellar_code.__module__.split(".")[-2]=="sse":                               
         from amuse.community.sse.interface import SSE #Steven
         stellar_code = SSE()
-    elif stellar_code.__module__.split(".")[-2]=="mese":                
+    elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
         from amuse.community.mesa.interface import Mesa #Steven
         stellar_code = Mesa()
     else:

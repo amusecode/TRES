@@ -2356,7 +2356,7 @@ class Triple_Class:
             if not no_stellar_evolution: 
                 self.update_previous_stellar_parameters()
                 
-                if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                if self.stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
                     print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
                 else:
                     self.stellar_code.particles.refresh_memory()
@@ -2384,7 +2384,7 @@ class Triple_Class:
                                 
                 successfull_step, nr_unsuccessfull, star_unsuccessfull = self.safety_check_time_step() 
                 while successfull_step == False:
-                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
                         print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
                         successfull_step = True
                     else:
@@ -2404,7 +2404,7 @@ class Triple_Class:
                 if (self.has_donor() or self.has_OLOF_donor()) and self.triple.bin_type == 'detached' and self.triple.child2.bin_type == 'detached' and dt > minimum_time_step:
 #                    self.rewind_to_begin_of_rlof_stellar(dt) 
 #                    print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
-                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
                         print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
                     else:
                         self.stellar_code.particles.recall_memory_one_step()
@@ -2486,7 +2486,7 @@ class Triple_Class:
                         print('stopping conditions stellar 2')                    
                         break                   
 
-                    if self.stellar_code.__module__.split(".")[-2]=="mesa":                
+                    if self.stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
                         print('for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt')
                     else:
                         self.rewind_to_begin_of_rlof_secular()
