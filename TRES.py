@@ -12,6 +12,18 @@ import numpy as np
 from amuse.units import units
 from amuse.support.console import set_printing_strategy
 
+try:
+    from amuse.community.seba.interface import SeBa 
+except ImportError:
+    Fi = None
+try:
+    from amuse.community.sse.interface import SSE 
+except ImportError:
+    Fi = None
+try:
+    from amuse.community.mesa.interface import Mesa 
+except ImportError:
+    Fi = None
 from seculartriple_TPS.interface import SecularTriple
 
 
@@ -100,15 +112,12 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     clean_up_secular_code = False
 
     if stellar_code is None or stellar_code.__module__.split(".")[-2]=="seba":
-        from amuse.community.seba.interface import SeBa #Steven
         stellar_code = SeBa()
     #    stellar_code = SeBa(redirection='none')
     #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     elif stellar_code.__module__.split(".")[-2]=="sse":                               
-        from amuse.community.sse.interface import SSE #Steven
         stellar_code = SSE()
     elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
-        from amuse.community.mesa.interface import Mesa #Steven
         stellar_code = Mesa()
     else:
         print('No valid stellar evolution code selected. Options are SeBa (default), SSE or MESA')
@@ -399,13 +408,10 @@ if __name__ == '__main__':
 
 
     if opt["SE_code"] == 1:
-        from amuse.community.sse.interface import SSE #steven
         stellar_code = SSE()
     elif opt["SE_code"] == 2:
-        from amuse.community.mesa.interface import Mesa #Steven
         stellar_code = Mesa()
     else:
-        from amuse.community.seba.interface import SeBa #steven
         stellar_code = SeBa()    
 #        stellar_code = SeBa(redirection='none')
 #        stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
