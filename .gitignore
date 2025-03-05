@@ -1,3 +1,9 @@
-*.pyc
 TRES.hdf
-worker_code
+binev.data
+worker_code.cc
+*_worker
+*.pyc
+*.swp
+*.egg-info
+*.o
+*.dSYM
