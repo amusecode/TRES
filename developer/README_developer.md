@@ -156,7 +156,7 @@ To receive more output from the secular code, there are two options. 1) in setup
 
 3) To reduce the global (TRES) timestep (aka get more timestamps in the TRES terminal output, see above) set the maximum_time_step on the top of TRES.py
 
-4) To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True on the top of TRES.py
+4) To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True in TRES_options.py
 
 5) To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr: 
 
@@ -184,7 +184,12 @@ For the moment this only works for pre-mass transfer systems.
 ```
 option 0, 5-6 are advised for stellar systems, options 1-4 for planetary systems.
 
-8) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 
+8) To include tertiary tides, you can set
+    secular_code.parameters.include_tertiary_tidal_terms_circ and  
+    secular_code.parameters.include_tertiary_tidal_terms in setup_secular_code. 
+    The prior is for circular systems and is based on Gao et al. 2020, MNRAS, 491, 264G, the general latter option is based on Gao et al. in prep. 
+
+9) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 
 Option 1:run the rdc_TRES.py script multiple times. You will, however, get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
 
 ```
@@ -199,15 +204,15 @@ done
 ```
 Option 2: run the rdc_TPS.py script. See top of that file for how to run it. 
 
-9) Running computationally expensive simulations on a computer cluster can save a lot of time. However, clusters work somewhat different than your personal computer. There are two points we'd like to draw your attention to.
+10) Running computationally expensive simulations on a computer cluster can save a lot of time. However, clusters work somewhat different than your personal computer. There are two points we'd like to draw your attention to.
 
 For starters, make sure if the pre-required packages for AMUSE are already installed. The easiest way to do this is try installing AMUSE and check where eventual errors occur. Unfortunately, on a cluster you will most likely not have sudo rights, so you'll have to figure out a way to install the missing packages. 
 
 Second, often clusters work with schedulers like slurm. To run a simulation you must create a bash file that can be sumbitted as a slurm job. The file run_TPS.sh is an example bash script for the helios cluster with additional comments for clarification. If you are using a different cluster or scheduler, change the script accordingly.
 
-10) It is now possible to simulate chemically homogenously evolving stars in TRES(!) when using SeBa for the stellar evolution. To do this set the parameter include_CHE to True in TRES and in SeBa - both need to be set to True for it to work. The former can be done through the input parameter include_CHE (e.g. python TRES.py --include_CHE). The latter can be done in SeBa's constants.C in the directory sstar/starclass. To access this file you need to have AMUSE installed in developer mode. When including CHE in TRES, the initial ZAMS stellar spins are set to corotation by default. You can exclude triples where none of the stars experience CHE with the stop_at_no_CHE option (e.g. python TRES.py --stop_at_no_CHE). 
+11) It is possible to simulate chemically homogenously evolving stars in TRES(!) when using SeBa for the stellar evolution. To do this set the parameter include_CHE to True in TRES and in SeBa - both need to be set to True for it to work. The former can be done through the input parameter include_CHE (e.g. python TRES.py --include_CHE). The latter can be done in SeBa's constants.C in the directory sstar/starclass. To access this file you need to have AMUSE installed in developer mode. When including CHE in TRES, the initial ZAMS stellar spins are set to corotation by default. You can exclude triples where none of the stars experience CHE with the stop_at_no_CHE option (e.g. python TRES.py --stop_at_no_CHE). 
 
-11) How is the stability of mass transfer determined in TRES? Follow the decision tree:
+12) How is the stability of mass transfer determined in TRES? Follow the decision tree:
 ```
 a star is transferring mass to a:
 - another star (e.g. an inner binary of a triple). In case of:
@@ -226,6 +231,6 @@ a star is transferring mass to a:
 	- (elif) M_donor/M_binary <= q_crit   							->   stable mass transfer  
 ```
 
-12) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters. 
+13) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters. 
 
 

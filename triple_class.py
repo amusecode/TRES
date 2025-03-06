@@ -1175,7 +1175,7 @@ class Triple_Class:
         #note: returned value can be inf when the change in radius <= 0
         #radius is only necessary for tides
 
-        if not self.secular_code.parameters.include_inner_tidal_terms and not self.secular_code.parameters.include_outer_tidal_terms:
+        if not self.secular_code.parameters.include_inner_tidal_terms and not self.secular_code.parameters.include_outer_tidal_terms and not self.secular_code.parameters.include_tertiary_tidal_terms_circ and not self.secular_code.parameters.include_tertiary_tidal_terms:
             return np.inf |units.Myr
 
         if stellar_system == None:
@@ -1980,7 +1980,7 @@ class Triple_Class:
                 successfull_dr = False 
                 print('should this statement be here? does this give problems during mt?')
 
-            if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms:
+            if self.secular_code.parameters.include_inner_tidal_terms or self.secular_code.parameters.include_outer_tidal_terms or self.secular_code.parameters.include_tertiary_tidal_terms_circ or self.secular_code.parameters.include_tertiary_tidal_terms:
                 dr = (stellar_system.radius - stellar_system.previous_radius)/stellar_system.radius
     
 #                if REPORT_DEBUG:    

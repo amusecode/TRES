@@ -74,8 +74,10 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     bool include_25PN_outer_terms = data->include_25PN_outer_terms;
     bool include_inner_tidal_terms = data->include_inner_tidal_terms;
     bool include_outer_tidal_terms = data->include_outer_tidal_terms;
+    bool include_tertiary_tidal_terms_circ = data->include_tertiary_tidal_terms_circ;
+    bool include_tertiary_tidal_terms = data->include_tertiary_tidal_terms;
     bool ignore_tertiary = data->ignore_tertiary;
-    
+        
     bool include_linear_mass_change = data->include_linear_mass_change;
     bool include_linear_radius_change = data->include_linear_radius_change;
 
@@ -372,6 +374,11 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double k_div_T_tides_star2 = compute_k_div_T_tides(stellar_type2,m2,m2_convective_envelope,m1,a_in,R2,R2_convective_envelope,luminosity_star2,spin_angular_frequency2,gyration_radius_star2, AMC_star2); // AMC divided by tidal dissipation time-scale
     double k_div_T_tides_star3 = compute_k_div_T_tides(stellar_type3,m3,m3_convective_envelope,m1+m2,a_out,R3,R3_convective_envelope,luminosity_star3,spin_angular_frequency3,gyration_radius_star3, AMC_star3); // AMC divided by tidal dissipation time-scale
 
+    /* tertiary tides quantities */
+    double tau_tertiary_tides = 0.0001;
+    double r_av_tertiary_tides_per_a_in_pow4_8 = 5.53*pow(e_in,4) - 1.225*pow(e_in,3) + 7.565*(e_in*e_in)-0.136*e_in + 1; 
+
+
 //    printf("k_div_T %g %g %g \n",k_div_T_tides_star1,k_div_T_tides_star2,k_div_T_tides_star3);
 
 	double R1_div_a_in = R1/a_in;
@@ -420,8 +427,20 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
     /************************************************
      * the calculations of the ODE right-hand-sides *
-     * **********************************************/
-     	
+     * **********************************************/     	
+
+    /* tertiary tides */
+    double e_in_dot_tertiary_tides = 0.0;
+    double a_in_dot_tertiary_tides = 0.0;
+    double a_out_dot_tertiary_tides = 0.0;
+        
+    if (include_tertiary_tidal_terms == TRUE)
+    { 
+        a_in_dot_tertiary_tides = -7.035E-16/5. * r_av_tertiary_tides_per_a_in_pow4_8 * (1-e_in*e_in)* 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,5.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0);
+         a_out_dot_tertiary_tides = -7.035E-16 * r_av_tertiary_tides_per_a_in_pow4_8 * a_out*a_out/a_in * m1_times_m2/(m1_plus_m2*m3) * (e_in*e_in/2.)* 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,4.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0);
+         e_in_dot_tertiary_tides = ((1-e_in*e_in)*a_in_dot_tertiary_tides + sqrt((m1_plus_m2*m1_plus_m2*m1_plus_m2*m3*m3*a_in*(1-e_in*e_in))/(m1_times_m2*m1_times_m2*(m1_plus_m2+m3)*a_out))*a_out_dot_tertiary_tides) / (2*a_in*e_in);
+     }     	
+
 
     /*******************************
      * e_in_dot                    *
@@ -473,6 +492,8 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 //        printf("e_in_dot_tides %g %g %g \n",e_in_dot_tides, e_in_dot_tides_star1, e_in_dot_tides_star2);
     }
     
+    /* tertiary tides - calculated above */
+
     /* mass transfer */
     /* wind mass loss */
 
@@ -487,11 +508,11 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 	}
     else
 	{
-	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides;
+	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides + e_in_dot_tertiary_tides;
     }
 	Ith(ydot,1) = -1.0*pow(10.0,-x)*e_in_dot/log(10.0);
 
-printf("e_in_dot %g %g %g %g %g %g\n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in_out,e_in_dot_GR_25PN_in,e_in_dot_tides, threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero);
+printf("e_in_dot %g %g %g %g %g %g %g \n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in_out,e_in_dot_GR_25PN_in,e_in_dot_tides, e_in_dot_tertiary_tides, threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero);
 
 
     /*******************************
@@ -675,6 +696,7 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
     double a_in_dot_tides = 0.0;    
     double a_in_dot_wind=0.0;
     double a_in_dot_mass_transfer = 0.0;    
+    double a_in_dot_tertiary_tides_circ = 0.0;    
     
     /* post-Newtonian point particle */  
     if (include_25PN_inner_terms == TRUE)
@@ -727,12 +749,23 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
             a_in_dot_mass_transfer = f_a_dot_mass_variations(m_donor,inner_mass_transfer_rate,m_accretor,a_in,inner_accretion_efficiency_mass_transfer,inner_specific_AM_loss_mass_transfer);
         }
     }
+
+       /* tertiary tides circular */
+    if (include_tertiary_tidal_terms_circ == TRUE)
+    {
+        // the radii and separations are both in AU
+        a_in_dot_tertiary_tides_circ = -7.035E-16/5. * 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,5.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0); 
+        printf("a_in_dot_tertiary_tides_circ %g  \n",a_in_dot_tertiary_tides_circ);
+    }
+
     
     /* combined */
-    double a_in_dot = a_in_dot_GR_25PN_in + a_in_dot_tides + a_in_dot_wind + a_in_dot_mass_transfer;
+    double a_in_dot = a_in_dot_GR_25PN_in + a_in_dot_tides + a_in_dot_wind + a_in_dot_mass_transfer + a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides;
 	Ith(ydot,7) = a_in_dot;
 
-printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_dot_tides, a_in_dot_wind, a_in_dot_mass_transfer);
+printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_dot_tides, a_in_dot_wind, a_in_dot_mass_transfer+ a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides);
+
+
 
     /*******************************
      * a_out_dot                   *
@@ -797,10 +830,11 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
                 a_out_dot_mass_transfer = f_a_dot_mass_variations(m_donor,outer_mass_transfer_rate,m_accretor,a_out,outer_accretion_efficiency_mass_transfer,outer_specific_AM_loss_mass_transfer);
             }
         }
-    }
     
+    }
+       
     /* combined */
-    double a_out_dot = a_out_dot_GR_25PN_out + a_out_dot_tides + a_out_dot_wind + a_out_dot_mass_transfer;
+    double a_out_dot = a_out_dot_GR_25PN_out + a_out_dot_tides + a_out_dot_wind + a_out_dot_mass_transfer + a_out_dot_tertiary_tides;
 	Ith(ydot,8) = a_out_dot;
 
 

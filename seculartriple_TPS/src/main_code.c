@@ -33,6 +33,7 @@ bool check_for_inner_RLOF,check_for_outer_RLOF;
 bool include_quadrupole_terms,include_octupole_terms;
 bool include_1PN_inner_terms,include_1PN_outer_terms,include_1PN_inner_outer_terms,include_25PN_inner_terms,include_25PN_outer_terms;
 bool include_inner_tidal_terms,include_outer_tidal_terms;
+bool include_tertiary_tidal_terms_circ, include_tertiary_tidal_terms;
 bool include_inner_wind_terms,include_outer_wind_terms;
 
 bool ignore_tertiary;
@@ -167,6 +168,8 @@ int evolve(
     data->threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero = threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero;
     data->include_inner_tidal_terms = include_inner_tidal_terms;
     data->include_outer_tidal_terms = include_outer_tidal_terms;
+    data->include_tertiary_tidal_terms_circ = include_tertiary_tidal_terms_circ;
+    data->include_tertiary_tidal_terms = include_tertiary_tidal_terms;
     data->AMC_star1 = AMC_star1; // Apsidal Motion Constant
     data->AMC_star2 = AMC_star2; // Apsidal Motion Constant
     data->AMC_star3 = AMC_star3; // Apsidal Motion Constant
@@ -761,6 +764,22 @@ int get_include_outer_tidal_terms(bool *value){
 }
 int set_include_outer_tidal_terms(int value){
     include_outer_tidal_terms = value == 1;
+    return 0;
+}
+int get_include_tertiary_tidal_terms_circ(bool *value){
+    *value = include_tertiary_tidal_terms_circ ? 1 : 0;
+    return 0;
+}
+int set_include_tertiary_tidal_terms_circ(int value){
+    include_tertiary_tidal_terms_circ = value == 1;
+    return 0;
+}
+int get_include_tertiary_tidal_terms(bool *value){
+    *value = include_tertiary_tidal_terms ? 1 : 0;
+    return 0;
+}
+int set_include_tertiary_tidal_terms(int value){
+    include_tertiary_tidal_terms = value == 1;
     return 0;
 }
 int get_ignore_tertiary(bool *value){

@@ -633,6 +633,35 @@ class SecularTripleInterface(CodeInterface):
         return function
 
     @legacy_function
+    def set_include_tertiary_tidal_terms_circ():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='bool',direction=function.IN,description = "Whether or not to include the effects of tertiary tides assuming circular orbits")
+        function.result_type = 'int32'
+        return function    
+        
+    @legacy_function
+    def get_include_tertiary_tidal_terms_circ():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='bool',direction=function.OUT,description = "Whether or not to include the effects of tertiary tides assuming circular orbits")
+        function.result_type = 'int32'
+        return function
+
+
+    @legacy_function
+    def set_include_tertiary_tidal_terms():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='bool',direction=function.IN,description = "Whether or not to include the effects of tertiary tides")
+        function.result_type = 'int32'
+        return function    
+        
+    @legacy_function
+    def get_include_tertiary_tidal_terms():
+        function = LegacyFunctionSpecification()
+        function.addParameter('value', dtype='bool',direction=function.OUT,description = "Whether or not to include the effects of tertiary tides")
+        function.result_type = 'int32'
+        return function
+
+    @legacy_function
     def set_ignore_tertiary():
         function = LegacyFunctionSpecification()
         function.addParameter('value', dtype='bool',direction=function.IN,description = "Whether or not to include the effects of tides in the outer binary system")
@@ -1046,6 +1075,20 @@ class SecularTriple(InCodeComponentImplementation):
             "set_include_outer_tidal_terms",
             "include_outer_tidal_terms",
             "Whether or not to include the effects of tides in the outer binary system", 
+            default_value = False
+        )
+        object.add_method_parameter(
+            "get_include_tertiary_tidal_terms_circ",
+            "set_include_tertiary_tidal_terms_circ",
+            "include_tertiary_tidal_terms_circ",
+            "Whether or not to include the effects of tertiary tides", 
+            default_value = False
+        )
+        object.add_method_parameter(
+            "get_include_tertiary_tidal_terms",
+            "set_include_tertiary_tidal_terms",
+            "include_tertiary_tidal_terms",
+            "Whether or not to include the effects of tertiary tides", 
             default_value = False
         )
         object.add_method_parameter(
