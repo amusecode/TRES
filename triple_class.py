@@ -2780,8 +2780,8 @@ class Triple_Class:
                         )
                         successfull_step = True
                     else:
-                        successfull_step, nr_unsuccessfull, star_unsuccessfull = self.recall_memory_one_step_stellar(
-                            nr_unsuccessfull, star_unsuccessfull
+                        successfull_step, nr_unsuccessfull, star_unsuccessfull = (
+                            self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
                         )
 
                 # if SN has taken place
@@ -2801,8 +2801,8 @@ class Triple_Class:
                     and self.triple.child2.bin_type == "detached"
                     and dt > minimum_time_step
                 ):
-                    #                    self.rewind_to_begin_of_rlof_stellar(dt)
-                    #                    print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
+                    # self.rewind_to_begin_of_rlof_stellar(dt)
+                    # print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
                     if self.stellar_code.__module__.split(".")[-2] == "mesa_r15140":
                         print(
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
