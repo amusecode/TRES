@@ -7,3 +7,4 @@ worker_code.cc
 *.egg-info
 *.o
 *.dSYM
+.ipynb_checkpoints
