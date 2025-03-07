@@ -2560,6 +2560,7 @@ class Triple_Class:
                     # therefore the radius change is not important
 
                     successfull_dr = False
+
             return successfull_dr, 1, stellar_system
 
         else:

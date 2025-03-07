@@ -3,7 +3,7 @@ from amuse.datamodel import Particles
 from amuse.units import units
 from seculartriple_TPS.interface import SecularTriple
 
-from TRES_options import max_mass, absolute_min_mass, options_mesa
+from TRES_options import max_mass, absolute_min_mass, options_mesa, REPORT_USER_WARNINGS
 
 from interactions import *
 from tidal_friction_constant import *
@@ -206,6 +206,14 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
 
     secular_code.parameters.include_inner_tidal_terms = True
     secular_code.parameters.include_outer_tidal_terms = True
+
+    secular_code.parameters.include_tertiary_tidal_terms_circ = False
+    secular_code.parameters.include_tertiary_tidal_terms = False
+    if (secular_code.parameters.include_tertiary_tidal_terms_circ and secular_code.parameters.include_tertiary_tidal_terms):
+        if REPORT_USER_WARNINGS:
+            print('Both circular and eccentric tertiary tides are switched on. Please pick one or the other.' )   
+        sys.exit('Both circular and eccentric tertiary tides are switched on. Please pick one or the other.')
+
     
     secular_code.parameters.include_1PN_inner_terms = True
     secular_code.parameters.include_1PN_outer_terms = True
