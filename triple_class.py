@@ -1465,6 +1465,8 @@ class Triple_Class:
         if (
             not self.secular_code.parameters.include_inner_tidal_terms
             and not self.secular_code.parameters.include_outer_tidal_terms
+            and not self.secular_code.parameters.include_tertiary_tidal_terms_circ
+            and not self.secular_code.parameters.include_tertiary_tidal_terms
         ):
             return np.inf | units.Myr
 
@@ -2533,6 +2535,8 @@ class Triple_Class:
             if (
                 self.secular_code.parameters.include_inner_tidal_terms
                 or self.secular_code.parameters.include_outer_tidal_terms
+                or self.secular_code.parameters.include_tertiary_tidal_terms_circ
+                or self.secular_code.parameters.include_tertiary_tidal_terms
             ):
                 dr = (
                     stellar_system.radius - stellar_system.previous_radius
