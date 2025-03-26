@@ -1,13 +1,14 @@
+import sys, os
+
 import numpy as np
 import matplotlib.pyplot as plt
 from amuse.datamodel import Particles
 from amuse.units import units
-from amuse.community.seba.interface import SeBa
+from amuse.community.seba import Seba
 
-import sys, os
-sys.path.append(os.path.dirname(os.getcwd()))
-import TRES as TRES
-from seculartriple_TPS.interface import SecularTriple
+import tres
+from tres import run_tres, run_tres_developer
+from tres.seculartriple import Seculartriple
 
 
 bin_type = {    'all': -1,
@@ -32,7 +33,7 @@ bin_type = {    'all': -1,
 #simplest way of running TRES
 def example_1():
     print('TRES example 1')
-    tr = TRES.main()
+    tr = run_tres()
     print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
 
     tr.stellar_code.stop()
@@ -77,8 +78,8 @@ def example_2():
     aout = 15000|units.RSun
     incl = 81.0*np.pi/180.0
     
-    tr = TRES.main(inner_primary_mass = M1, inner_secondary_mass = M2, outer_mass = M3,
-                        inner_semimajor_axis = ain, outer_semimajor_axis = aout, relative_inclination = incl)
+    tr = run_tres(inner_primary_mass = M1, inner_secondary_mass = M2, outer_mass = M3,
+                  inner_semimajor_axis = ain, outer_semimajor_axis = aout, relative_inclination = incl)
     print('final outer eccentricity: ', tr.triple.eccentricity)
     print('final inner eccentricity: ', tr.triple.child2.eccentricity)
 
@@ -105,12 +106,12 @@ def example_3():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = tres.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
-    stellar_code = SeBa()
+    stellar_code = Seba()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_eccentricity_array = []
     outer_eccentricity_array = []
@@ -119,7 +120,7 @@ def example_3():
     
     #make triple object and evolve for small timestep
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
+    tr = run_tres_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
@@ -166,12 +167,12 @@ def example_4():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = tres.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
-    stellar_code = SeBa()
+    stellar_code = Seba()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
@@ -184,7 +185,7 @@ def example_4():
     
     #make triple object and evolve for small timestep
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
+    tr = run_tres_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
@@ -247,12 +248,12 @@ def example_5():
     Oin = 0.
     metallicity = 0.02
 
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = tres.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
-    stellar_code = SeBa()
+    stellar_code = Seba()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
@@ -266,7 +267,7 @@ def example_5():
     
     #make triple object and evolve for small timestep
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr, stop_at_mass_transfer=False)
+    tr = run_tres_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr, stop_at_mass_transfer=False)
     
     for i in range(len(time_array)):
         tr.evolve_model(time_array[i])
@@ -336,16 +337,16 @@ def example_6():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = tres.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
     
-    stellar_code = SeBa()
+    stellar_code = Seba()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     #make triple object (evolve for small timestep)
     #needs to be bigger then 1e-4|units.Myr for secular code 
-    tr = TRES.main_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
+    tr = run_tres_developer(stars, bins, correct_params, stellar_code, secular_code, incl, tend=1e-4|units.Myr)
 
     #only evolve the stars until 4500Myr
     goal_time = 4500|units.Myr 
@@ -362,7 +363,7 @@ def example_6():
     channel_from_stellar.copy()
     
     #possible adjust spins of stars, e.g.
-    corotating_frequency = TRES.corotating_spin_angular_frequency_binary(Ain, stars[0].mass, stars[1].mass)
+    corotating_frequency = tres.corotating_spin_angular_frequency_binary(Ain, stars[0].mass, stars[1].mass)
     stars[0].spin_angular_frequency = corotating_frequency
     stars[1].spin_angular_frequency = corotating_frequency
         
