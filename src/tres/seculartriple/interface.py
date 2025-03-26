@@ -2311,3 +2311,6 @@ def extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2
         self.model_time,self.time_step] ### NOTE: only time_step is used at the moment
         
     return args,skip_integration
+
+
+Seculartriple = SecularTriple
