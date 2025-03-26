@@ -1,5 +1,5 @@
 # to do 
-# min teken in mean anomaly
+# minus sign in mean anomaly
 
 ## Triple:      Triple evolution
 ##              computes the evolution of a given triple
