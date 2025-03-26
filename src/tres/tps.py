@@ -124,7 +124,7 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 ##            -s         random seed
 
 
-import TRES as TRES
+from tres import run_tres
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
 
@@ -143,7 +143,7 @@ from amuse.ic.millerscalo import new_miller_scalo_mass_distribution
 from amuse.ic.salpeter import new_salpeter_mass_distribution
 from amuse.ic.flatimf import new_flat_mass_distribution
 
-from TRES_options import REPORT_TPS, \
+from tres.options import REPORT_TPS, \
                          REPORT_USER_WARNINGS_TPS, \
                          EXCLUDE_SSO, \
                          precision,  min_mass, absolute_min_mass, absolute_max_mass                         
@@ -823,7 +823,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
         #do not use main_developer in TPS.py
         #memory of SeBa needs to be cleaned, in particular SeBa time
         #otherwise use evolve_for for particles indivicually -> many calls 
-        tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+        tr = run_tres(inner_primary_mass = triple_system.inner_primary_mass, 
                 inner_secondary_mass = triple_system.inner_secondary_mass, 
                 outer_mass = triple_system.outer_mass, 
                 inner_semimajor_axis = triple_system.inner_semi, 
@@ -882,7 +882,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                             i_n += 1  
                             nr_imt -= 1
 
-                            tr = TRES.main(inner_primary_mass = triple_system.inner_primary_mass, 
+                            tr = run_tres(inner_primary_mass = triple_system.inner_primary_mass, 
                                         inner_secondary_mass = triple_system.inner_secondary_mass, 
                                         outer_mass = triple_system.outer_mass, 
                                         inner_semimajor_axis = triple_system.inner_semi, 
@@ -1008,18 +1008,18 @@ def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min,
                         stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
 
     if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
-        sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'. min_mass and absolute_max_mass settable in TRES_options.py")
+        sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'. min_mass and absolute_max_mass settable in tres.options")
                 
     if (inner_secondary_mass_max > absolute_max_mass) :
-        sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
+        sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in tres.options")
     
     if (outer_mass_max > absolute_max_mass) :
-        sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
+        sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in tres.options")
     
     if (inner_secondary_mass_min < absolute_min_mass) :
-         sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
+         sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'. absolute_min_mass settable in tres.options")
     if (outer_mass_min < absolute_min_mass)  :
-         sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
+         sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'. absolute_min_mass settable in tres.options")
     
     if (inner_primary_mass_max < inner_primary_mass_min):
         sys.exit('error: maximum inner primary mass smaller than minimum in primary mass')

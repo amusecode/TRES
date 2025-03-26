@@ -3,10 +3,10 @@ from amuse.datamodel import Particles
 from amuse.units import units
 from seculartriple_TPS.interface import SecularTriple
 
-from TRES_options import max_mass, absolute_min_mass, options_mesa, REPORT_USER_WARNINGS
+from tres.options import max_mass, absolute_min_mass, options_mesa, REPORT_USER_WARNINGS
 
-from interactions import *
-from tidal_friction_constant import *
+from tres.interactions import *
+from tres.tidal_friction_constant import *
 
 import numpy as np
 
