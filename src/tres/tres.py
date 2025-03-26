@@ -24,7 +24,7 @@ try:
     from amuse.community.mesa.interface import Mesa 
 except ImportError:
     Mesa = None
-from seculartriple_TPS.interface import SecularTriple
+from tres.seculartriple import Seculartriple
 
 
 from tres.triple_class import Triple_Class
@@ -126,9 +126,9 @@ def run_tres(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|uni
 
     stellar_code.parameters.metallicity = metallicity
     if secular_code is None:
-        secular_code = SecularTriple()
-    #    secular_code = SecularTriple(redirection='none')
-    #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
+        secular_code = Seculartriple()
+    #    secular_code = Seculartriple(redirection='none')
+    #    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
         clean_up_secular_code = True
 
     triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
@@ -417,9 +417,9 @@ if __name__ == '__main__':
 #        stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = opt["metallicity"]
 
-    secular_code = SecularTriple()
-#    secular_code = SecularTriple(redirection='none')
-#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
+    secular_code = Seculartriple()
+#    secular_code = Seculartriple(redirection='none')
+#    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
     triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
             opt["relative_inclination"], opt["tend"], opt["tinit"],

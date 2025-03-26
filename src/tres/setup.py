@@ -1,7 +1,8 @@
 from amuse.community.seba.interface import SeBa
 from amuse.datamodel import Particles
 from amuse.units import units
-from seculartriple_TPS.interface import SecularTriple
+
+from tres.seculartriple import Seculartriple
 
 from tres.options import max_mass, absolute_min_mass, options_mesa, REPORT_USER_WARNINGS
 
