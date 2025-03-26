@@ -27,14 +27,14 @@ except ImportError:
 from seculartriple_TPS.interface import SecularTriple
 
 
-from triple_class import Triple_Class
-from TRES_plotting import plot_data_container, plot_function
-from TRES_setup import make_particle_sets, setup_stellar_code
-from TRES_options import REPORT_DEBUG, \
+from tres.triple_class import Triple_Class
+from tres.plotting import plot_data_container, plot_function
+from tres.setup import make_particle_sets, setup_stellar_code
+from tres.options import REPORT_DEBUG, \
                          REPORT_TRIPLE_EVOLUTION, \
                          MAKE_PLOTS, \
                          REPORT_USER_WARNINGS
-from interactions import corotating_spin_angular_frequency_binary, \
+from tres.interactions import corotating_spin_angular_frequency_binary, \
                         lang_spin_angular_frequency, \
                         break_up_angular_frequency, \
                         criticial_angular_frequency_CHE
@@ -71,7 +71,7 @@ def initialize_triple_class(stars, bins, correct_params,
 
 #-----
 #for running TRES.py from other routines
-def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.MSun, outer_mass = 0.5|units.MSun,
+def run_tres(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.MSun, outer_mass = 0.5|units.MSun,
             inner_semimajor_axis = 1.0 |units.AU, outer_semimajor_axis = 100.0 |units.AU,
             inner_eccentricity = 0.1, outer_eccentricity= 0.5,
             relative_inclination = 80.0*np.pi/180.0,
@@ -184,7 +184,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     return triple_class_object
 
 
-def main_developer(stars, bins, correct_params, stellar_code, secular_code,
+def run_tres_developer(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination = 80.0*np.pi/180.0, 
             metallicity = 0.02, tend = 5.0 |units.Myr, tinit = 0.0 |units.Myr, 
             number = 0, maximum_radius_change_factor = 0.005,
