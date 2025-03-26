@@ -15,15 +15,15 @@ from amuse.support.console import set_printing_strategy
 try:
     from amuse.community.seba.interface import SeBa 
 except ImportError:
-    Fi = None
+    SeBa = None
 try:
     from amuse.community.sse.interface import SSE 
 except ImportError:
-    Fi = None
+    SSE = None
 try:
     from amuse.community.mesa.interface import Mesa 
 except ImportError:
-    Fi = None
+    Mesa = None
 from seculartriple_TPS.interface import SecularTriple
 
 
