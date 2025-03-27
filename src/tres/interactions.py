@@ -3,7 +3,7 @@ import numpy as np
 import sys 
 import scipy.integrate as integrate
 
-from TRES_options import REPORT_BINARY_EVOLUTION, REPORT_FUNCTION_NAMES, REPORT_MASS_TRANSFER_STABILITY
+from tres.options import REPORT_BINARY_EVOLUTION, REPORT_FUNCTION_NAMES, REPORT_MASS_TRANSFER_STABILITY
 
 #constants
 numerical_error  = 1.e-6

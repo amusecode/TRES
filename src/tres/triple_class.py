@@ -1,5 +1,5 @@
-from interactions import *
-from tidal_friction_constant import *
+from tres.interactions import *
+from tres.tidal_friction_constant import *
 
 import sys
 import time
@@ -24,9 +24,9 @@ import numpy as np
 #                          maximum_time_step_factor, \
 #                          minimum_time_step
 
-from TRES_options import *
-from TRES_setup import setup_secular_code, setup_stellar_code
-from TRES_plotting import plot_data_container
+from tres.options import *
+from tres.setup import setup_secular_code, setup_stellar_code
+from tres.plotting import plot_data_container
 
 
 class Triple_Class:
