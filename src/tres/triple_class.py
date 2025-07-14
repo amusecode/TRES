@@ -621,6 +621,22 @@ class Triple_Class:
             if stellar_system.child2.is_star and stellar_system.child2.is_donor and not stellar_system.child1.is_star:
                 return True
         return False
+        
+    def donor_timescale(self, stellar_system=None):
+        if stellar_system == None:
+            stellar_system = self.triple
+
+        if stellar_system.is_star:
+            if stellar_system.is_donor:
+                return abs(stellar_system.mass/stellar_system.parent.mass_transfer_rate)
+            else:
+                return minimum_time_step 
+        else:
+            t_donor1 = self.donor_timescale(stellar_system.child1)
+            t_donor2 = self.donor_timescale(stellar_system.child2)
+            return max(t_donor1, t_donor2)
+            
+        return minimum_time_step        
 
     def contains_SN_remnant(self, stellar_system=None):
         if stellar_system == None:
@@ -2799,7 +2815,7 @@ class Triple_Class:
                     (self.has_donor() or self.has_OLOF_donor())
                     and self.triple.bin_type == "detached"
                     and self.triple.child2.bin_type == "detached"
-                    and dt > minimum_time_step
+                    and dt > 0.5*self.donor_timescale()
                 ):
                     # self.rewind_to_begin_of_rlof_stellar(dt)
                     # print('RLOF:', self.triple.child2.child1.is_donor, self.triple.bin_type , self.triple.child2.bin_type )
