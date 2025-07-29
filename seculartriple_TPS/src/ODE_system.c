@@ -4,23 +4,46 @@
 
 #include "main_code.h"
 
+
+
+double roche_radius(double rp, double q, double e, double f, int roche_radius_specification);
+double roche_radius_pericenter_eggleton(double rp, double q);
+double roche_radius_pericenter_sepinsky(double rp, double q, double e, double f);
+/* auxiliary function to solve Kepler equation to get E_tau as a function of tau */
+double compute_eccentric_anomaly_from_mean_anomaly(double mean_anomaly, double eccentricity)
+{
+    double eccentric_anomaly;
+    double eccentric_anomaly_next = mean_anomaly;
+    double epsilon = 1e-10;
+    double error = 2.0*epsilon;
+    int j = 0;
+    while (error > epsilon || j < 15)
+    {
+        j += 1;
+        eccentric_anomaly = eccentric_anomaly_next;
+        eccentric_anomaly_next = eccentric_anomaly - (eccentric_anomaly - eccentricity*sin(eccentric_anomaly) - mean_anomaly)/(1.0 - eccentricity*cos(eccentric_anomaly));
+        error = fabs(eccentric_anomaly_next - eccentric_anomaly);
+    }
+    return eccentric_anomaly;
+}
+
 int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 {
-    
+
 	UserData data;
 	data = (UserData) data_f;
-	
+
     /**********************
      * extract parameters *
      **********************/
     double global_time_step = data->global_time_step; // the global time-step
-    
+
     int stellar_type1 = data->stellar_type1;
     int stellar_type2 = data->stellar_type2;
     int stellar_type3 = data->stellar_type3;
 	double m1 = data->m1; // masses -- at the END of the global time-step
-	double m2 = data->m2;				
-	double m3 = data->m3;		
+	double m2 = data->m2;
+	double m3 = data->m3;
 	double m1_convective_envelope = data->m1_convective_envelope;
 	double m2_convective_envelope = data->m2_convective_envelope;
 	double m3_convective_envelope = data->m3_convective_envelope;
@@ -33,16 +56,16 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
     double AMC_star1 = data->AMC_star1; // Apsidal Motion Constant
     double AMC_star2 = data->AMC_star2; // Apsidal Motion Constant
-    double AMC_star3 = data->AMC_star3; // Apsidal Motion Constant  
-    
+    double AMC_star3 = data->AMC_star3; // Apsidal Motion Constant
+
 //    printf("apsidal motion constant %g %g %g \n",AMC_star1, AMC_star2, AMC_star3);
-    
+
     double luminosity_star1 = data->luminosity_star1;
     double luminosity_star2 = data->luminosity_star2;
     double luminosity_star3 = data->luminosity_star3;
-    double gyration_radius_star1 = data->gyration_radius_star1; // gyration radius (NOT squared)     
-    double gyration_radius_star2 = data->gyration_radius_star2; // gyration radius (NOT squared)     
-    double gyration_radius_star3 = data->gyration_radius_star3; // gyration radius (NOT squared)             
+    double gyration_radius_star1 = data->gyration_radius_star1; // gyration radius (NOT squared)
+    double gyration_radius_star2 = data->gyration_radius_star2; // gyration radius (NOT squared)
+    double gyration_radius_star3 = data->gyration_radius_star3; // gyration radius (NOT squared)
 
 
     /* !!!!!!!!!!!!!!!!!!!!!!!! */
@@ -52,7 +75,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 //   gyration_radius_star2 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type2,m2);
 //   gyration_radius_star3 = set_crude_gyration_radii_based_on_stellar_structure(stellar_type3,m3);
 
-    
+
     double moment_of_inertia_star1 = data->moment_of_inertia_star1;
     double moment_of_inertia_star2 = data->moment_of_inertia_star2;
     double moment_of_inertia_star3 = data->moment_of_inertia_star3;
@@ -62,7 +85,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
     /* NOTE: k_div_T_tides_stari is not assumed to be constant during the integration */
 //    double k_div_T_tides_star1 = data->k_div_T_tides_star1; // AMC divided by tidal dissipation time-scale
-//    double k_div_T_tides_star2 = data->k_div_T_tides_star2;    
+//    double k_div_T_tides_star2 = data->k_div_T_tides_star2;
 //    double k_div_T_tides_star3 = data->k_div_T_tides_star3;
 
     bool include_quadrupole_terms = data->include_quadrupole_terms;
@@ -77,7 +100,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     bool include_tertiary_tidal_terms_circ = data->include_tertiary_tidal_terms_circ;
     bool include_tertiary_tidal_terms = data->include_tertiary_tidal_terms;
     bool ignore_tertiary = data->ignore_tertiary;
-        
+
     bool include_linear_mass_change = data->include_linear_mass_change;
     bool include_linear_radius_change = data->include_linear_radius_change;
 
@@ -105,13 +128,13 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double outer_accretion_efficiency_wind_star1_to_star3 = data->outer_accretion_efficiency_wind_child2_to_child1; /* temporary */
     double outer_accretion_efficiency_wind_star2_to_star3 = data->outer_accretion_efficiency_wind_child2_to_child1; /* temporary */
     double outer_accretion_efficiency_wind_star3_to_inner_binary = data->outer_accretion_efficiency_wind_child1_to_child2;
-    
+
     double inner_accretion_efficiency_mass_transfer = data->inner_accretion_efficiency_mass_transfer;
     double outer_accretion_efficiency_mass_transfer = data->outer_accretion_efficiency_mass_transfer;
     double inner_specific_AM_loss_mass_transfer = data->inner_specific_AM_loss_mass_transfer;
     double outer_specific_AM_loss_mass_transfer = data->outer_specific_AM_loss_mass_transfer;
     double inner_spin_angular_momentum_wind_accretion_efficiency_child1_to_child2 = data->inner_spin_angular_momentum_wind_accretion_efficiency_child1_to_child2;
-    double inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1 = data->inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1;    
+    double inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1 = data->inner_spin_angular_momentum_wind_accretion_efficiency_child2_to_child1;
 
     double threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero = data->threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero;
     double threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero = data->threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero;
@@ -120,7 +143,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     /******************
      * compute mdots *
      *****************/
-    
+
      /* assumptions:
      * -- in inner binary, child1 is star1 & child2 is star2
      * -- wind mass loss rates are always 0 or negative
@@ -133,8 +156,8 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double m3_dot = wind_mass_loss_rate_star3;
 
     m1_dot += -inner_accretion_efficiency_wind_star2_to_star1*wind_mass_loss_rate_star2; // wind from star2 to star1; minus sign because wind mass loss rates are always negative
-    m2_dot += -inner_accretion_efficiency_wind_star1_to_star2*wind_mass_loss_rate_star1; // wind from star1 to star2; minus sign because wind mass loss rates are always negative    
-    
+    m2_dot += -inner_accretion_efficiency_wind_star1_to_star2*wind_mass_loss_rate_star1; // wind from star1 to star2; minus sign because wind mass loss rates are always negative
+
     /* mass transfer */
     double effective_inner_mass_transfer_rate = inner_accretion_efficiency_mass_transfer*inner_mass_transfer_rate; // always 0 or negative
     if (star1_is_donor == TRUE)  // m1 transfers mass; m2 gains a fraction of this
@@ -151,7 +174,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     /***************************************************************
      * compute time-dependent masses, radii and moments of inertia *
      ***************************************************************/
-     
+
     /* masses and radii extracted above are the FINAL values
      * let q denote mi, Ri or Ii, then
      * q(t) = q_begin + q_dot*t, where t the time relative to the time for which q = q_begin
@@ -177,11 +200,11 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     moment_of_inertia_star2 += moment_of_inertia_dot_star2*t_dif;
     moment_of_inertia_star3 += moment_of_inertia_dot_star3*t_dif;
 
-	/*	the ODE variables	
+	/*	the ODE variables
      *  g: argument of pericentre
      *  h: longitude of the ascending nodes
      */
-     
+
 	double x = Ith(yev,1); // log_10(1-e_in)
 	double y = Ith(yev,2); // log_10(1-e_out)
 	double g_in = Ith(yev,3);
@@ -197,18 +220,18 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
 	double e_in = 1.0 - pow(10.0,x);
 	double e_out = 1.0 - pow(10.0,y);
-    
+
     /*  track the positive changes in eccentricity to obtain
      *  the largest Kozai-Lidov amplitude
      */
-    
+
     extern double e_in_prev;
     extern double tracker;
     extern double delta_e_in;
     extern double t_prev;
 
     double diff = e_in - e_in_prev;
-    
+
     if (t >= t_prev) {
         if (diff >= -1.0e-5) {
             tracker += diff;
@@ -228,7 +251,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     }
     t_prev = t;
     e_in_prev = e_in;
- 
+
     /* in the case that the tertiary is not to be taken into account (ignore_tertiary == TRUE),
      * several quantities should still be set to some arbitrary, nonzero value in order to avoid nans at various instances
      * this does not affect the values of the quantities outside of this function,
@@ -239,7 +262,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
         a_out = 1.0e10;
         e_out = 0.1;
     }
-    
+
     /* premature return values
      * currently not used */
     if (e_in < 0.0)
@@ -261,10 +284,10 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     /********************************
      * preamble: derived quantities *
      * *****************************/
-     
+
 	/*	mass quantities	*/
 	double m1_div_m2 = m1/m2;
-	double m2_div_m1 = 1.0/m1_div_m2;    
+	double m2_div_m1 = 1.0/m1_div_m2;
     double m1_plus_m2 = m1+m2;
     double m1_plus_m2_plus_m3 = m1_plus_m2+m3;
     double m1_times_m2 = m1*m2;
@@ -272,7 +295,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double m1_plus_m2_div_m3 = m1_plus_m2/m3;
     double m1_times_m1 = m1*m1;
     double m2_times_m2 = m2*m2;
-        
+
 	/*	eccentricity quantities	*/
 	double e_in_p2 = e_in*e_in;
 	double l_in_p2 = 1.0 - e_in_p2;
@@ -282,13 +305,13 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double l_in_p5 = l_in_p4*l_in;
     double l_in_p6 = l_in_p5*l_in;
     double l_in_p7 = l_in_p6*l_in;
-    
+
 	double e_out_p2 = e_out*e_out;
 	double l_out_p2 = 1.0 - e_out_p2;
     double l_out = sqrt(l_out_p2);
     double l_out_p3 = l_out_p2*l_out;
     double l_out_p4 = l_out_p3*l_out;
-    double l_out_p5 = l_out_p4*l_out;    
+    double l_out_p5 = l_out_p4*l_out;
     double l_out_p6 = l_out_p5*l_out;
     double l_out_p7 = l_out_p6*l_out;
 
@@ -339,7 +362,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 	double cos_g_in = cos(g_in);
 	double cos_2g_in = cos(2.0*g_in);
 	double cos_g_out = cos(g_out);
-	
+
 	/*	required for octupole-order terms	*/
 	double B = 2.0 + 5.0*e_in_p2 - 7.0*e_in_p2*cos_2g_in;
 	double A = 4.0 + 3.0*e_in_p2 - c_5div2*B*sinitot_p2;
@@ -368,7 +391,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
         f_1PN_in_out_e_in = (2.0 - 5.0*e_in_p2)*m1_times_m1 + 3.0*(-2.0 + e_in_p2)*m1_times_m1 + (2.0 - 5.0*e_in_p2)*m2_times_m2;
         f_1PN_in_out_i = 3.0*a_in*m1_plus_m2_plus_m3*cositot*(f_1PN_in_out_e_in + 3.0*e_in_p2*f_1PN_in_out_m1_m2*cos_2g_in);
     }
-    	
+
     /* tides quantities */
     double k_div_T_tides_star1 = compute_k_div_T_tides(stellar_type1,m1,m1_convective_envelope,m2,a_in,R1,R1_convective_envelope,luminosity_star1,spin_angular_frequency1,gyration_radius_star1, AMC_star1); // AMC divided by tidal dissipation time-scale
     double k_div_T_tides_star2 = compute_k_div_T_tides(stellar_type2,m2,m2_convective_envelope,m1,a_in,R2,R2_convective_envelope,luminosity_star2,spin_angular_frequency2,gyration_radius_star2, AMC_star2); // AMC divided by tidal dissipation time-scale
@@ -376,7 +399,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 
     /* tertiary tides quantities */
     double tau_tertiary_tides = 0.0001;
-    double r_av_tertiary_tides_per_a_in_pow4_8 = 5.53*pow(e_in,4) - 1.225*pow(e_in,3) + 7.565*(e_in*e_in)-0.136*e_in + 1; 
+    double r_av_tertiary_tides_per_a_in_pow4_8 = 5.53*pow(e_in,4) - 1.225*pow(e_in,3) + 7.565*(e_in*e_in)-0.136*e_in + 1;
 
 
 //    printf("k_div_T %g %g %g \n",k_div_T_tides_star1,k_div_T_tides_star2,k_div_T_tides_star3);
@@ -393,11 +416,11 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 	double R3_div_a_out_p2 = R3_div_a_out*R3_div_a_out;
 	double R3_div_a_out_p5 = R3_div_a_out_p2*R3_div_a_out_p2*R3_div_a_out;
 	double R3_div_a_out_p6 = R3_div_a_out*R3_div_a_out_p5;
-	
+
 	double m2_div_m1_times_R1_div_a_in_p6_times_k_div_T_tides_star1 = m2_div_m1*R1_div_a_in_p6*k_div_T_tides_star1;
 	double m1_div_m2_times_R2_div_a_in_p6_times_k_div_T_tides_star2 = m1_div_m2*R2_div_a_in_p6*k_div_T_tides_star2;
 	double m1_plus_m2_div_m3_times_R3_div_a_out_p6_times_k_div_T_tides_star3 = m1_plus_m2_div_m3*R3_div_a_out_p6*k_div_T_tides_star3;
-    
+
     double a_in_p2 = a_in*a_in;
     double a_in_p3 = a_in_p2*a_in;
     double a_in_p4 = a_in_p3*a_in;
@@ -423,47 +446,287 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     double f_tides4_out = f_tides4(e_out_p2);
     double f_tides5_out = f_tides5(e_out_p2);
 
-    
+    /* mass transfer quantities */
+
+    /* eccentric mass transfer model follows the EMT/MSE code by A. Hamers & F. Dosopoulou - 2019; A. Hamers et al. 2021; */
+
+    //XXX: Turn the following parameters into input options
+
+    int mass_transfer_prescription = 2  ; //can be 0 (circular, e_in=const), 1 (Sepinski), 2 (EMT), 3 (MSE as is), 4 (MSE with an extended MT model)
+    bool include_ejection_radius = TRUE;
+    bool include_accretion_radius = TRUE;
+
+    int ejection_radius_model = 1;  // ejection radius model (1 - limit of small donor spin, 2 - limit of large mass ratio q)
+    double mean_anomaly_lag = 0.1;  // mean anomaly shift, in radians, between the MT peak and the periastron passage
+    //alpha, beta, gamma, delta formalism
+    double alpha_mass_transfer = 0.;
+    double beta_mass_transfer  = inner_accretion_efficiency_mass_transfer;  //beta = 1 corresponds to fully conservative mass transfer
+    double delta_mass_transfer = 0.;
+    double gamma_mass_transfer = 0.;
+    double x_mass_transfer     = 1;
+    double eps_mass_transfer   = 1.;
+    double epsilon_mass_transfer = 1.0e-12;
+
+    bool mass_transfer_happening = FALSE;
+    double m_donor,m_accretor;
+    double r_donor,r_accretor;
+    double m_donor_dot, m_accretor_dot;
+    double norm_spin_donor, accretion_radius;
+    double fm, fm0, fa, fe, fg, ga, ge, ha, he;
+    double E0, x_roche, E_tau;
+
+    double finite_size_term_a = 0;
+    double finite_size_term_e = 0;
+    double a_in_dot_mass_transfer_eccentric = 0.;
+    double e_in_dot_mass_transfer_eccentric = 0.;
+    double g_in_dot_mass_transfer_eccentric = 0.;
+
+    double omega_peri = sqrt(CONST_G*(m1+m2)*(1.0+e_in)/(pow((a_in*(1.-e_in)),3)));
+
+    if (include_inner_RLOF_terms == TRUE)
+    {
+        if (star1_is_donor == TRUE)
+        {
+            m_donor = m1;
+            m_accretor = m2;
+            m_donor_dot = m1_dot;
+            m_accretor_dot = m2_dot;
+            r_donor = R1;
+            r_accretor = R2;
+            norm_spin_donor = spin_angular_frequency1/omega_peri;
+
+            mass_transfer_happening = TRUE;
+        }
+        else if (star2_is_donor == TRUE)
+        {
+            m_donor = m2;
+            m_accretor = m1;
+            m_donor_dot = m2_dot;
+            m_accretor_dot = m1_dot;
+            r_donor = R2;
+            r_accretor = R1;
+            norm_spin_donor = spin_angular_frequency2/omega_peri;
+
+            mass_transfer_happening = TRUE;
+        }
+
+        /* printf("DonorAssign %d %d %g %g %g \n",star1_is_donor, star2_is_donor, m1, m2, m_donor); */
+    }
+
+    /*Test if all is working*/
+    printf("DEBUG: include_inner_RLOF_terms=%d  star1_is_donor=%d  star2_is_donor=%d  => mass_transfer_happening=%d\n",
+           include_inner_RLOF_terms, star1_is_donor, star2_is_donor, mass_transfer_happening);
+    if (mass_transfer_happening == TRUE)
+    {
+        /* Print out the main triple properties corresponding to the current derivatives */
+        /*printf("triple_prop %g %g %g %g %g %g %g %g %g\n", m_donor, m_accretor, a_in, e_in, G_in, cositot, a_out, e_out, G_out);*/
+
+
+        double m_donor_div_m_accretor = m_donor/m_accretor;
+        double R_roche_circ_equiv = roche_radius_pericenter_eggleton(a_in, m_donor_div_m_accretor); //Eggleton-based Roche lobe radius for a circular orbit corresponding to a_in <-> RL_c
+        //double R_roche_circ_equiv_div_a_in = R_roche_circ_equiv/a_in;
+        //double R_roche_circ_equiv_div_a_in_prime_X = m_donor_div_m_accretor_pow_one_third;
+        //double R_roche_circ_equiv_div_a_in_prime_Y = log(1. + m_donor_div_m_accretor_pow_one_third);
+        //double R_roche_circ_equiv_div_a_in_prime   = 0.49*(25*(-R_roche_circ_equiv_div_a_in_prime_X + 2*(1 + R_roche_circ_equiv_div_a_in_prime_X)*R_roche_circ_equiv_div_a_in_prime_Y))/(3*(1 + R_roche_circ_equiv_div_a_in_prime_X)*R_roche_circ_equiv_div_a_in_prime_X*pow((3.*pow(R_roche_circ_equiv_div_a_in_prime_X,2) + 5*R_roche_circ_equiv_div_a_in_prime_Y),2));
+
+        double Aplus  = pow(m_donor_div_m_accretor*(54. + pow(m_donor_div_m_accretor,2) + 6.*sqrt(3.)*sqrt(27. + pow(m_donor_div_m_accretor,2))),c_1div3);
+        double Aminus = pow(m_donor_div_m_accretor*(54. + pow(m_donor_div_m_accretor,2) - 6.*sqrt(3.)*sqrt(27. + pow(m_donor_div_m_accretor,2))),c_1div3);
+        double XL0_q  = (3. + sqrt(3.)*sqrt(3. + Aminus + Aplus - 2.*m_donor_div_m_accretor) - sqrt(3.)*sqrt(6. - Aplus - 4.*m_donor_div_m_accretor - pow(m_donor_div_m_accretor,2)/Aplus + (6.*sqrt(3.)*(1. + m_donor_div_m_accretor))/sqrt(3. + Aminus + Aplus - 2.*m_donor_div_m_accretor)))/6.;
+        double XL0_s  = pow(norm_spin_donor,-2.0/3.0)*(1.0-e_in)/pow(1.0+e_in,c_1div3);
+
+        x_roche = R_roche_circ_equiv/r_donor;
+
+        /* fraction of the orbit the donor is overfilling the Roche lobe */
+        if (x_roche > 1.0/(1.0 - e_in))
+        {
+            E0   = 0.;
+        }
+        else if (x_roche <= 1.0/(1.0 + e_in))
+        {
+            E0 = M_PI; /*RLOF at all phases*/
+        }
+        else
+        {
+            E0 = acos((1.0/e_in)*(1.0 - 1.0/x_roche));
+        }
+        /* eccentric anomaly */
+        E_tau = compute_eccentric_anomaly_from_mean_anomaly(mean_anomaly_lag, e_in);
+        if (E_tau > M_PI)
+        {
+            E_tau = M_PI;
+        }
+
+        /* intermediate variables for eccentric mass transfer */
+        if ((mass_transfer_prescription == 2)  || (mass_transfer_prescription == 3)  || (mass_transfer_prescription == 4))
+        {
+            fm = -(-192*E0 + 576*E0*x_roche - 576*E0*pow(x_roche,2) - 288*pow(e_in,2)*E0*pow(x_roche,2) + 192*E0*pow(x_roche,3) + 288*pow(e_in,2)*E0*pow(x_roche,3) + 72*pow(e_in,2)*E0*x_roche*(4 - 8*x_roche + (4 + pow(e_in,2))*pow(x_roche,2))*cos(E_tau) -
+                      96*e_in*(-1 + x_roche)*(2 - 4*x_roche + (2 + 3*pow(e_in,2))*pow(x_roche,2))*sin(E0) + 6*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 - 3*E_tau) - 8*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 - 3*E_tau) +
+                      3*pow(e_in,4)*pow(x_roche,3)*sin(4*E0 - 3*E_tau) + 72*pow(e_in,3)*pow(x_roche,2)*sin(E0 - 2*E_tau) - 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 - 2*E_tau) - 72*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 - 2*E_tau) +
+                      72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 - 2*E_tau) + 24*pow(e_in,3)*pow(x_roche,2)*sin(3*E0 - 2*E_tau) - 24*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 - 2*E_tau) - 288*e_in*x_roche*sin(E0 - E_tau) +
+                      576*e_in*pow(x_roche,2)*sin(E0 - E_tau) - 288*e_in*pow(x_roche,3)*sin(E0 - E_tau) - 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 - E_tau) + 72*pow(e_in,2)*x_roche*sin(2*E0 - E_tau) - 144*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 - E_tau) +
+                      72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 - E_tau) + 18*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 - E_tau) - 288*e_in*x_roche*sin(E0 + E_tau) + 576*e_in*pow(x_roche,2)*sin(E0 + E_tau) - 288*e_in*pow(x_roche,3)*sin(E0 + E_tau) -
+                      72*pow(e_in,3)*pow(x_roche,3)*sin(E0 + E_tau) - 72*pow(e_in,2)*pow(x_roche,2)*sin(2*(E0 + E_tau)) + 72*pow(e_in,2)*pow(x_roche,3)*sin(2*(E0 + E_tau)) - 8*pow(e_in,3)*pow(x_roche,3)*sin(3*(E0 + E_tau)) +
+                      72*pow(e_in,2)*x_roche*sin(2*E0 + E_tau) - 144*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 + E_tau) + 72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 + E_tau) + 18*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 + E_tau) +
+                      72*pow(e_in,3)*pow(x_roche,2)*sin(E0 + 2*E_tau) - 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 + 2*E_tau) + 24*pow(e_in,3)*pow(x_roche,2)*sin(3*E0 + 2*E_tau) - 24*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 + 2*E_tau) +
+                      6*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 + 3*E_tau) + 3*pow(e_in,4)*pow(x_roche,3)*sin(4*E0 + 3*E_tau))/(192.*M_PI);
+
+
+            fa = (192*E0 - 576*E0*x_roche + 576*E0*pow(x_roche,2) + 288*pow(e_in,2)*E0*pow(x_roche,2) - 192*E0*pow(x_roche,3) - 288*pow(e_in,2)*E0*pow(x_roche,3) + 72*pow(e_in,2)*E0*x_roche*(4 - 8*x_roche + (4 + pow(e_in,2))*pow(x_roche,2))*cos(E_tau) -
+                      96*e_in*(-1 + x_roche)*(2 - 4*x_roche + (2 + 3*pow(e_in,2))*pow(x_roche,2))*sin(E0) + 6*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 - 3*E_tau) + 8*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 - 3*E_tau) +
+                      3*pow(e_in,4)*pow(x_roche,3)*sin(4*E0 - 3*E_tau) + 72*pow(e_in,3)*pow(x_roche,2)*sin(E0 - 2*E_tau) - 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 - 2*E_tau) + 72*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 - 2*E_tau) -
+                      72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 - 2*E_tau) + 24*pow(e_in,3)*pow(x_roche,2)*sin(3*E0 - 2*E_tau) - 24*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 - 2*E_tau) + 288*e_in*x_roche*sin(E0 - E_tau) - 576*e_in*pow(x_roche,2)*sin(E0 - E_tau) +
+                      288*e_in*pow(x_roche,3)*sin(E0 - E_tau) + 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 - E_tau) + 72*pow(e_in,2)*x_roche*sin(2*E0 - E_tau) - 144*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 - E_tau) +
+                      72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 - E_tau) + 18*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 - E_tau) + 288*e_in*x_roche*sin(E0 + E_tau) - 576*e_in*pow(x_roche,2)*sin(E0 + E_tau) + 288*e_in*pow(x_roche,3)*sin(E0 + E_tau) +
+                      72*pow(e_in,3)*pow(x_roche,3)*sin(E0 + E_tau) + 72*pow(e_in,2)*pow(x_roche,2)*sin(2*(E0 + E_tau)) - 72*pow(e_in,2)*pow(x_roche,3)*sin(2*(E0 + E_tau)) + 8*pow(e_in,3)*pow(x_roche,3)*sin(3*(E0 + E_tau)) +
+                      72*pow(e_in,2)*x_roche*sin(2*E0 + E_tau) - 144*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 + E_tau) + 72*pow(e_in,2)*pow(x_roche,3)*sin(2*E0 + E_tau) + 18*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 + E_tau) +
+                      72*pow(e_in,3)*pow(x_roche,2)*sin(E0 + 2*E_tau) - 72*pow(e_in,3)*pow(x_roche,3)*sin(E0 + 2*E_tau) + 24*pow(e_in,3)*pow(x_roche,2)*sin(3*E0 + 2*E_tau) - 24*pow(e_in,3)*pow(x_roche,3)*sin(3*E0 + 2*E_tau) +
+                      6*pow(e_in,4)*pow(x_roche,3)*sin(2*E0 + 3*E_tau) + 3*pow(e_in,4)*pow(x_roche,3)*sin(4*E0 + 3*E_tau))/(192.*M_PI);
+
+            fe = -((-1 + pow(e_in,2))*(12*e_in*E0*x_roche*(4 - 8*x_roche + (4 + pow(e_in,2))*pow(x_roche,2))*cos(E_tau) +
+                      (32 - 96*x_roche + 96*pow(x_roche,2) + 48*pow(e_in,2)*pow(x_roche,2) - 32*pow(x_roche,3) - 48*pow(e_in,2)*pow(x_roche,3) + 3*pow(e_in,3)*pow(x_roche,3)*cos(E0 - 3*E_tau) + pow(e_in,3)*pow(x_roche,3)*cos(3*E0 - 3*E_tau) +
+                      8*pow(e_in,2)*pow(x_roche,2)*cos(2*E0 - 2*E_tau) - 8*pow(e_in,2)*pow(x_roche,3)*cos(2*E0 - 2*E_tau) + 24*e_in*x_roche*cos(E0 - E_tau) - 48*e_in*pow(x_roche,2)*cos(E0 - E_tau) + 24*e_in*pow(x_roche,3)*cos(E0 - E_tau) +
+                      6*pow(e_in,3)*pow(x_roche,3)*cos(E0 - E_tau) + 32*pow(e_in,2)*pow(x_roche,2)*cos(2*E_tau) - 32*pow(e_in,2)*pow(x_roche,3)*cos(2*E_tau) + 24*e_in*x_roche*cos(E0 + E_tau) - 48*e_in*pow(x_roche,2)*cos(E0 + E_tau) +
+                      24*e_in*pow(x_roche,3)*cos(E0 + E_tau) + 6*pow(e_in,3)*pow(x_roche,3)*cos(E0 + E_tau) + 8*pow(e_in,2)*pow(x_roche,2)*cos(2*(E0 + E_tau)) - 8*pow(e_in,2)*pow(x_roche,3)*cos(2*(E0 + E_tau)) +
+                      pow(e_in,3)*pow(x_roche,3)*cos(3*(E0 + E_tau)) + 3*pow(e_in,3)*pow(x_roche,3)*cos(E0 + 3*E_tau))*sin(E0)))/(32.*M_PI);
+
+            fg = -(sqrt(1 - pow(e_in,2))*x_roche*sin(E_tau)*(-48*E0 + 96*E0*x_roche - 48*E0*pow(x_roche,2) - 12*pow(e_in,2)*E0*pow(x_roche,2) + 4*(6 - 12*x_roche + (6 + pow(e_in,2))*pow(x_roche,2))*sin(2*E0) + pow(e_in,2)*pow(x_roche,2)*sin(4*E0) -
+                      2*pow(e_in,2)*pow(x_roche,2)*sin(2*E0 - 2*E_tau) + pow(e_in,2)*pow(x_roche,2)*sin(4*E0 - 2*E_tau) - 24*e_in*x_roche*sin(E0 - E_tau) + 24*e_in*pow(x_roche,2)*sin(E0 - E_tau) + 8*e_in*x_roche*sin(3*E0 - E_tau) -
+                      8*e_in*pow(x_roche,2)*sin(3*E0 - E_tau) - 24*e_in*x_roche*sin(E0 + E_tau) + 24*e_in*pow(x_roche,2)*sin(E0 + E_tau) - 2*pow(e_in,2)*pow(x_roche,2)*sin(2*(E0 + E_tau)) + 8*e_in*x_roche*sin(3*E0 + E_tau) -
+                      8*e_in*pow(x_roche,2)*sin(3*E0 + E_tau) + pow(e_in,2)*pow(x_roche,2)*sin(4*E0 + 2*E_tau)))/(32.*M_PI);
+        }
+        else if (mass_transfer_prescription == 1)
+        {
+            fm  = 1.;
+            fm0 = 1.;
+            fa  = sqrt(1.0-pow(e_in,2));
+            fe  = fa*(1.0-e_in);
+            fg  = 0.;
+        }
+
+        /* some of the emt functions give nans for exactly zero eccentricity -- replace with tiny number in this case */
+        if (e_in < epsilon_mass_transfer)
+        {
+            e_in = epsilon_mass_transfer;
+        }
+
+        if (fabs(fm) <= epsilon_mass_transfer)
+        {
+            fm = epsilon_mass_transfer;
+        }
+
+        // printf("eccentric_mt %g %g %g %g \n", fm, fa, fe, fg);
+
+        if (include_ejection_radius == TRUE || include_accretion_radius == TRUE)
+        {
+            ga = (4*E0*x_roche*(-8*(3 + (-3 + x_roche)*x_roche) + pow(e_in,2)*(12 + (-8 + pow(e_in,2))*pow(x_roche,2))) + 64*sqrt(1 - pow(e_in,2))*atan(((1 + e_in)*tan(E0/2.))/sqrt(1 - pow(e_in,2))) +
+                      e_in*x_roche*(-16*(6 + pow(e_in,2)*(-3 + x_roche) - 4*x_roche)*x_roche*sin(E0) + e_in*(8*(3 + x_roche*(-6 + (2 + pow(e_in,2))*x_roche))*sin(2*E0) + e_in*x_roche*(-16*(-1 + x_roche)*sin(3*E0) + 3*e_in*x_roche*sin(4*E0)))))/(32.*M_PI);
+
+            ge = -((-1 + pow(e_in,2))*(12*E0*(-2 + pow(e_in,2)*x_roche*(6 + x_roche*(-9 + (4 + pow(e_in,2))*x_roche))) + 48*sqrt(1 - pow(e_in,2))*atan(((1 + e_in)*tan(E0/2.))/sqrt(1 - pow(e_in,2))) -
+                      6*e_in*(-4 + x_roche*(24 + 8*(-3 + x_roche)*x_roche + pow(e_in,2)*x_roche*(-15 + 14*x_roche)))*sin(E0) + pow(e_in,2)*x_roche*(6*(6 + x_roche*(-15 + 2*(4 + pow(e_in,2))*x_roche))*sin(2*E0) + e_in*x_roche*(2*(9 - 10*x_roche)*sin(3*E0) + 3*e_in*x_roche*sin(4*E0))))
+                      )/(48.*e_in*M_PI);
+
+            ha = ((8*atan(sqrt(-((1 + e_in)/(-1 + e_in)))*tan(E0/2.)))/sqrt(1 - pow(e_in,2)) + e_in*(-12*x_roche - (-4 + pow(e_in,2))*pow(x_roche,3) - 4/(-1 + e_in*cos(E0)))*sin(E0) +
+                      x_roche*(-2*E0*(6 + x_roche*(-6 + (2 + pow(e_in,2))*x_roche)) - pow(e_in,2)*x_roche*(-3*(-2 + x_roche)*sin(2*E0) + e_in*x_roche*sin(3*E0))))/(4.*M_PI);
+
+            he = (144*pow(1 - pow(e_in,2),1.5)*x_roche*atan(sqrt(-((1 + e_in)/(-1 + e_in)))*tan(E0/2.)) + 48*sqrt(1 - pow(e_in,2))*(1 + 3*(-1 + pow(e_in,2))*x_roche)*atan(((1 + e_in)*tan(E0/2.))/sqrt(1 - pow(e_in,2))) +
+                      ((-1 + pow(e_in,2))*(-24*E0 - 36*pow(e_in,2)*E0*pow(x_roche,2) + 24*pow(e_in,2)*E0*pow(x_roche,3) - 12*e_in*E0*(-2 + pow(e_in,2)*pow(x_roche,2)*(-3 + 2*x_roche))*cos(E0) -
+                      3*e_in*(-8 + 48*x_roche - 3*(16 + 3*pow(e_in,2))*pow(x_roche,2) + 2*(8 + 7*pow(e_in,2))*pow(x_roche,3))*sin(E0) + 72*pow(e_in,2)*x_roche*sin(2*E0) - 126*pow(e_in,2)*pow(x_roche,2)*sin(2*E0) +
+                      60*pow(e_in,2)*pow(x_roche,3)*sin(2*E0) + 16*pow(e_in,4)*pow(x_roche,3)*sin(2*E0) + 27*pow(e_in,3)*pow(x_roche,2)*sin(3*E0) - 26*pow(e_in,3)*pow(x_roche,3)*sin(3*E0) + 4*pow(e_in,4)*pow(x_roche,3)*sin(4*E0))
+                      )/(-1 + e_in*cos(E0)))/(48.*e_in*M_PI);
+
+            if (ejection_radius_model == 1) // limit of small donor spin
+            {
+                finite_size_term_a += XL0_q*ga;
+                finite_size_term_e += XL0_q*ge;
+            }
+            else if (ejection_radius_model == 2) // limit of large mass ratio q
+            {
+                finite_size_term_a += XL0_s*ha;
+                finite_size_term_e += XL0_s*he;
+            }
+            if (include_accretion_radius == TRUE)
+            {
+                accretion_radius = r_accretor;
+                finite_size_term_a -= m_donor_div_m_accretor*(accretion_radius/a_in)*ha*beta_mass_transfer;
+                finite_size_term_e -= m_donor_div_m_accretor*(accretion_radius/a_in)*he*beta_mass_transfer;
+            }
+            //printf("eccentric_mt_size_terms %d %d %g %g %g \n",include_ejection_radius, include_accretion_radius, finite_size_term_a, finite_size_term_e, ga, ge, ha, he);
+        }
+
+        if (mass_transfer_prescription == 0)
+        {
+            a_in_dot_mass_transfer_eccentric = f_a_dot_mass_variations(m_donor,inner_mass_transfer_rate,m_accretor,a_in,inner_accretion_efficiency_mass_transfer,inner_specific_AM_loss_mass_transfer);
+            e_in_dot_mass_transfer_eccentric = 0;
+            g_in_dot_mass_transfer_eccentric = 0;
+        }
+        else if ((mass_transfer_prescription == 1)  || (mass_transfer_prescription == 2))
+        {
+            double common_factor = -2.*(m_donor_dot/m_donor)*(1.0/fm);
+            a_in_dot_mass_transfer_eccentric = common_factor*a_in*(fa*(1.0-m_donor_div_m_accretor) + finite_size_term_a);
+            e_in_dot_mass_transfer_eccentric = common_factor*(fe*(1.0-m_donor_div_m_accretor) + finite_size_term_e);
+            g_in_dot_mass_transfer_eccentric = common_factor*fg*(1.0-m_donor_div_m_accretor);
+        }
+        else if (mass_transfer_prescription == 3)
+        {
+            double common_factor = -2.*(m_donor_dot/m_donor)*(1.0/fm);
+            a_in_dot_mass_transfer_eccentric = common_factor*a_in*(fa*(1.0 - m_donor_div_m_accretor*beta_mass_transfer) + finite_size_term_a);
+            e_in_dot_mass_transfer_eccentric = common_factor*(fe*(1.0 - m_donor_div_m_accretor*beta_mass_transfer) + finite_size_term_e);
+            g_in_dot_mass_transfer_eccentric = common_factor*fg*( 1.0 - m_donor_div_m_accretor*beta_mass_transfer);
+        }
+        else if (mass_transfer_prescription == 4)
+        {
+            a_in_dot_mass_transfer_eccentric = (m_donor_dot/m_donor)*(1.0/fm)*(fa*(2.*(alpha_mass_transfer+beta_mass_transfer*x_mass_transfer*pow(m_donor_div_m_accretor,2) + delta_mass_transfer*gamma_mass_transfer*pow(1+m_donor_div_m_accretor,2))/(1+m_donor_div_m_accretor) +
+                                                        2.*m_donor_div_m_accretor*eps_mass_transfer - 2. + (1.-eps_mass_transfer)*m_donor_div_m_accretor/(1+m_donor_div_m_accretor))-2.*finite_size_term_a);
+            e_in_dot_mass_transfer_eccentric = (m_donor_dot/m_donor)*(1.0/fm)*(2.*fe*(m_donor_div_m_accretor*eps_mass_transfer-1.) - 2.*finite_size_term_e);
+            g_in_dot_mass_transfer_eccentric = -2.0*(m_donor_dot/m_donor)*(1.0/fm)*fg*(1.0-m_donor_div_m_accretor);
+        }
+
+
+        /*printf("\ndot_terms_ecc_mass_transfer %g %g %g \n",a_in_dot_mass_transfer_eccentric, e_in_dot_mass_transfer_eccentric, g_in_dot_mass_transfer_eccentric);*/
+        /*printf("\ndot_terms_ecc_mass_transfer2 %g %g %g %g \n", fm, fe, fa, fg);*/
+
+
+    }
 
     /************************************************
      * the calculations of the ODE right-hand-sides *
-     * **********************************************/     	
+     * **********************************************/
 
     /* tertiary tides */
     double e_in_dot_tertiary_tides = 0.0;
     double a_in_dot_tertiary_tides = 0.0;
     double a_out_dot_tertiary_tides = 0.0;
-        
+
     if (include_tertiary_tidal_terms == TRUE)
-    { 
+    {
         a_in_dot_tertiary_tides = -7.035E-16/5. * r_av_tertiary_tides_per_a_in_pow4_8 * (1-e_in*e_in)* 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,5.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0);
          a_out_dot_tertiary_tides = -7.035E-16 * r_av_tertiary_tides_per_a_in_pow4_8 * a_out*a_out/a_in * m1_times_m2/(m1_plus_m2*m3) * (e_in*e_in/2.)* 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,4.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0);
          e_in_dot_tertiary_tides = ((1-e_in*e_in)*a_in_dot_tertiary_tides + sqrt((m1_plus_m2*m1_plus_m2*m1_plus_m2*m3*m3*a_in*(1-e_in*e_in))/(m1_times_m2*m1_times_m2*(m1_plus_m2+m3)*a_out))*a_out_dot_tertiary_tides) / (2*a_in*e_in);
-     }     	
+     }
 
 
     /*******************************
      * e_in_dot                    *
      * *****************************/
-    
+
 	double e_in_dot_newtonian = 0.0;
     double e_in_dot_GR_1PN_in_out = 0.0;
     double e_in_dot_GR_25PN_in = 0.0;
-    double e_in_dot_tides = 0.0;    
+    double e_in_dot_tides = 0.0;
 
-    /* Newtonian point particle -- up and including octupole order */    
+    /* Newtonian point particle -- up and including octupole order */
     if (ignore_tertiary == FALSE)
     {
         e_in_dot_newtonian = C2*(l_in_p2/G_in)*(30.0*e_in*sinitot_p2*sin_2g_in) \
             + C3*e_out*(l_in_p2/G_in)*(35.0*cosphi*sinitot_p2*e_in_p2*sin_2g_in \
                 - 10.0*cositot*sinitot_p2*cos_g_in*sin_g_out*l_in_p2 \
                 - A*(sin_g_in*cos_g_out - cositot*cos_g_in*sin_g_out));
-                
+
         printf("e_in_dot_new %g %g %g %g \n",C2*(l_in_p2/G_in)*(30.0*e_in*sinitot_p2*sin_2g_in), C3*e_out*(l_in_p2/G_in)*(35.0*cosphi*sinitot_p2*e_in_p2*sin_2g_in), - 10.0*cositot*sinitot_p2*cos_g_in*sin_g_out*l_in_p2*C3*e_out*(l_in_p2/G_in), - A*(sin_g_in*cos_g_out - cositot*cos_g_in*sin_g_out)*C3*e_out*(l_in_p2/G_in));
-                
-                
+
+
     }
-    
+
     /* post-Newtonian point particle */
     if ((ignore_tertiary == FALSE) && (include_1PN_inner_outer_terms == TRUE))
     {
@@ -473,28 +736,29 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
     {
         e_in_dot_GR_25PN_in = -c_304div15*CONST_G_P3*m1_times_m2*m1_plus_m2*(e_in/(CONST_C_LIGHT_P5*a_in_p4*l_in_p5))*f_25PN_e_in;
     }
-    
+
     /* tides */
     if (include_inner_tidal_terms == TRUE)
     {
         double e_in_dot_tides_star1 = -27.0*(1.0+m2_div_m1)*m2_div_m1_times_R1_div_a_in_p6_times_k_div_T_tides_star1*R1_div_a_in_p2*e_in*pow(l_in,-13.0)*(f_tides3_in \
             - c_11div18*l_in_p3*f_tides4_in*spin_angular_frequency1_div_n_in);
         double e_in_dot_tides_star2 = -27.0*(1.0+m1_div_m2)*m1_div_m2_times_R2_div_a_in_p6_times_k_div_T_tides_star2*R2_div_a_in_p2*e_in*pow(l_in,-13.0)*(f_tides3_in \
-            - c_11div18*l_in_p3*f_tides4_in*spin_angular_frequency2_div_n_in);            
+            - c_11div18*l_in_p3*f_tides4_in*spin_angular_frequency2_div_n_in);
 
         if (e_in <= threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero)
         {
             e_in_dot_tides_star1 = e_in_dot_tides_star2 = 0.0;
 //            printf("e_in_dot_tides %g\n",e_in_dot_tides_star1);
-            
+
         }
         e_in_dot_tides = e_in_dot_tides_star1 + e_in_dot_tides_star2;
 //        printf("e_in_dot_tides %g %g %g \n",e_in_dot_tides, e_in_dot_tides_star1, e_in_dot_tides_star2);
     }
-    
+
     /* tertiary tides - calculated above */
 
     /* mass transfer */
+
     /* wind mass loss */
 
     /* combined */
@@ -508,11 +772,16 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 	}
     else
 	{
-	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides + e_in_dot_tertiary_tides;
+	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides + e_in_dot_mass_transfer_eccentric;
     }
 	Ith(ydot,1) = -1.0*pow(10.0,-x)*e_in_dot/log(10.0);
 
-printf("e_in_dot %g %g %g %g %g %g %g \n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in_out,e_in_dot_GR_25PN_in,e_in_dot_tides, e_in_dot_tertiary_tides, threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero);
+
+    /*printf("\ntriple_prop %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g\n", t, m_donor, m_accretor, fm, fa, fe, fg, ga, ge, ha, he, finite_size_term_a, a_in, e_in, G_in, cositot, a_out, e_out, G_out, r_donor, r_accretor, E0, x_roche, E_tau, m_donor_dot);*/
+    /*printf("\ndot_terms_mass_transfer %g %g %g \n",a_in_dot_mass_transfer_eccentric, e_in_dot_mass_transfer_eccentric, g_in_dot_mass_transfer_eccentric);*/
+
+    printf("e_in_dot %g %g %g %g %g %g %g\n",e_in,e_in_dot_newtonian,e_in_dot_GR_1PN_in_out,e_in_dot_GR_25PN_in,e_in_dot_tides, e_in_dot_mass_transfer_eccentric, threshold_value_of_e_in_for_setting_tidal_e_in_dot_zero);
+
 
 
     /*******************************
@@ -522,19 +791,19 @@ printf("e_in_dot %g %g %g %g %g %g %g \n",e_in,e_in_dot_newtonian,e_in_dot_GR_1P
     double e_out_dot_newtonian = 0.0;
     double e_out_dot_GR_25PN_out = 0.0;
     double e_out_dot_tides = 0.0;
-    
+
     if (ignore_tertiary == FALSE)
     {
         /* Newtonian point particle -- up and including octupole order */
         e_out_dot_newtonian = -C3*e_in*(l_out_p2/G_out)*(10.0*cositot*sinitot_p2*l_in_p2*sin_g_in*cos_g_out \
             + A*(cos_g_in*sin_g_out - cositot*sin_g_in*cos_g_out));
-            
-        /* post-Newtonian point particle */        
+
+        /* post-Newtonian point particle */
         if (include_25PN_outer_terms == TRUE)
         {
             e_out_dot_GR_25PN_out = -c_304div15*CONST_G_P3*m1_plus_m2*m3*m1_plus_m2_plus_m3*(e_out/(CONST_C_LIGHT_P5*a_out_p4*l_out_p5))*f_25PN_e_out;
         }
-    
+
         /* tides */
         if (include_outer_tidal_terms == TRUE) // ad hoc/approximate: treats inner binary as point particle
         {
@@ -546,11 +815,11 @@ printf("e_in_dot %g %g %g %g %g %g %g \n",e_in,e_in_dot_newtonian,e_in_dot_GR_1P
         /* mass transfer */
         /* wind mass loss */
     }
-    
+
     /* combined */
 	double e_out_dot = e_out_dot_newtonian + e_out_dot_GR_25PN_out + e_out_dot_tides;
 	Ith(ydot,2) = -1.0*pow(10.0,-y)*e_out_dot/log(10.0);
-printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_out,e_out_dot_tides);
+    printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_out,e_out_dot_tides);
 
 
 
@@ -561,8 +830,8 @@ printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_ou
 	double g_in_dot_newtonian = 0.0;
     double g_in_dot_GR_1PN_in = 0.0;
     double g_in_dot_GR_1PN_in_out = 0.0;
-    double g_in_dot_tides = 0.0;    
-     
+    double g_in_dot_tides = 0.0;
+
     /* Newtonian point particle -- up and including octupole order */
     if (ignore_tertiary == FALSE)
     {
@@ -574,13 +843,13 @@ printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_ou
                 + cosphi*(3.0*A - 10.0*cositot_p2 + 2.0)));
 
 
-//        printf("g_in_dot newtonian %g %g  %g \n", g_in_dot_newtonian,6.0*C2*((1.0/G_in)*(4.0*cositot_p2 + (5.0*cos_2g_in - 1.0)*(l_in_p2 - cositot_p2)) 
+//        printf("g_in_dot newtonian %g %g  %g \n", g_in_dot_newtonian,6.0*C2*((1.0/G_in)*(4.0*cositot_p2 + (5.0*cos_2g_in - 1.0)*(l_in_p2 - cositot_p2))
 //                + (cositot/G_out)*(2.0 + e_in_p2*(3.0 - 5.0*cos_2g_in))) , C3*e_out*(e_in*((1.0/G_out) + (cositot/G_in))*(sin_g_in*sin_g_out*(10.0*(3.0*cositot_p2  - 1.0)*(1.0 - e_in_p2) + A) - 5.0*B*cositot*cosphi) - (l_in_p2/(e_in*G_in))*(sin_g_in*sin_g_out*10.0*cositot*sinitot_p2*(1.0 - 3.0*e_in_p2) + cosphi*(3.0*A - 10.0*cositot_p2 + 2.0))));
 
 
     }
-    
-    /* post-Newtonian point particle */  
+
+    /* post-Newtonian point particle */
     if (include_1PN_inner_terms == TRUE)
     {
         g_in_dot_GR_1PN_in = (3.0/(CONST_C_LIGHT_P2*a_in*l_in_p2))*pow(CONST_G*m1_plus_m2/a_in,3.0/2.0);
@@ -591,10 +860,10 @@ printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_ou
             l_in_p2*(5.0*m1_times_m2 - 3.0*m1_times_m2 + 5.0*m2_times_m2) - 9.0*f_1PN_in_out_m1_m2*( l_in_p2*cos_2g_in + 2.0*cositot_p2*sin_g_in*sin_g_in ) ) \
             + (1.0/G_out)*(-8.0*f_1PN_in_out_LL + f_1PN_in_out_i) );
     }
-	
+
     /* tides/rotation */
     if (include_inner_tidal_terms == TRUE)
-    {    
+    {
         double g_in_dot_tides_star1 = R1_div_a_in_p5*AMC_star1*(n_in/(l_in_p4))*(15.0*m2_div_m1*f_tides4_in/l_in_p6 \
 		+ (1.0+m2_div_m1)*spin_angular_frequency1_div_n_in*spin_angular_frequency1_div_n_in);
         double g_in_dot_tides_star2 = R2_div_a_in_p5*AMC_star2*(n_in/(l_in_p4))*(15.0*m1_div_m2*f_tides4_in/l_in_p6 \
@@ -607,28 +876,29 @@ printf("e_out_dot %g %g %g %g \n",e_out,e_out_dot_newtonian,e_out_dot_GR_25PN_ou
 
 
     }
-    
+
     /* wind mass loss */
-    /* mass transfer */    
-    
-    /* combined */  
-    double g_in_dot = g_in_dot_newtonian + g_in_dot_GR_1PN_in + g_in_dot_GR_1PN_in_out + g_in_dot_tides;
+    /* mass transfer */
+
+
+    /* combined */
+    double g_in_dot = g_in_dot_newtonian + g_in_dot_GR_1PN_in + g_in_dot_GR_1PN_in_out + g_in_dot_tides + g_in_dot_mass_transfer_eccentric;
 	Ith(ydot,3) = g_in_dot;
 
 
-printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_dot_GR_1PN_in, g_in_dot_GR_1PN_in_out, g_in_dot_tides);
+    printf("g_in_dot %g %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_dot_GR_1PN_in, g_in_dot_GR_1PN_in_out, g_in_dot_tides, g_in_dot_mass_transfer_eccentric);
 
 
 
     /*******************************
      * g_out_dot                   *
      * *****************************/
-     
+
     double g_out_dot_newtonian = 0.0;
     double g_out_dot_GR_1PN_out = 0.0;
     double g_out_dot_GR_1PN_in_out = 0.0;
     double g_out_dot_tides = 0.0;
-    
+
     if (ignore_tertiary == FALSE)
     {
         /* Newtonian point particle -- up and including octupole order */
@@ -637,10 +907,10 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
             + C3*e_in*(sin_g_in*sin_g_out*(((4.0*e_out_p2 + 1.0)/(e_out*G_out))*10.0*cositot*sinitot_p2*l_in_p2 \
                 - e_out*((1.0/G_in) + (cositot/G_out))*(A + 10.0*(3.0*cositot_p2 - 1.0)*l_in_p2)) \
                 + cosphi*(5.0*B*cositot*e_out*((1.0/G_in) + (cositot/G_out)) + ((4.0*e_out_p2 + 1.0)/(e_out*G_out))*A));
-    
-        /* post-Newtonian point particle */  
+
+        /* post-Newtonian point particle */
         if (include_1PN_outer_terms == TRUE)
-        {    
+        {
             g_out_dot_GR_1PN_out = (3.0/(CONST_C_LIGHT_P2*a_out*l_out_p2))*pow(CONST_G*m1_plus_m2_plus_m3/a_out,3.0/2.0);
         }
         if (include_1PN_inner_outer_terms == TRUE)
@@ -650,32 +920,32 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
                     16.0*m1_plus_m2*f_1PN_in_out_L_in_tilde*f_1PN_in_out_L_out_tilde*(7.0*m1_plus_m2 + 6.0*m3)*cositot \
                         + c_3div2*a_in*m1_plus_m2_plus_m3*(-f_1PN_in_out_e_in*(1.0 + 3.0*(2.0*cositot_p2 - 1.0)) + 18.0*e_in_p2*f_1PN_in_out_m1_m2*cos_2g_in*sinitot_p2) ) ) );
         }
-    
+
         /* tides */
         if (include_outer_tidal_terms == TRUE)
-        {    
+        {
             double g_out_dot_tides_star3 = R3_div_a_out_p5*AMC_star3*(n_out/(l_out_p4))*(15.0*m1_plus_m2_div_m3*f_tides4_out/l_out_p6 \
             + (1.0+m1_plus_m2_div_m3)*spin_angular_frequency3_div_n_out*spin_angular_frequency3_div_n_out);
             g_out_dot_tides = g_out_dot_tides_star3;
         }
-        
+
         /* wind mass loss */
-        /* mass transfer */    
+        /* mass transfer */
     }
-    
+
     /* combined */
     double g_out_dot = g_out_dot_newtonian + g_out_dot_GR_1PN_out + g_out_dot_GR_1PN_in_out + g_out_dot_tides;
 	Ith(ydot,4) = g_out_dot;
-	
+
 //    printf("g_out_dot %g %g %g %g %g %g \n",g_out, g_out_dot, g_out_dot_newtonian, g_out_dot_GR_1PN_out, g_out_dot_GR_1PN_in_out, g_out_dot_tides);
-    
-    
+
+
     /*******************************
      * h_in_dot                    *
      * *****************************/
-     
+
     double h_in_dot_newtonian = 0.0;
-    
+
     /* Newtonian point particle -- up and including octupole order */
     /* 2013MNRAS.431.2155N Eq. B8 */
     if (ignore_tertiary == FALSE)
@@ -685,20 +955,19 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
     }
     Ith(ydot,5) = h_in_dot_newtonian;
     Ith(ydot,6) = h_in_dot_newtonian;
-   
-   
-   
+
+
+
     /*******************************
      * a_in_dot                    *
      * *****************************/
 
 	double a_in_dot_GR_25PN_in = 0.0;
-    double a_in_dot_tides = 0.0;    
+    double a_in_dot_tides = 0.0;
     double a_in_dot_wind=0.0;
-    double a_in_dot_mass_transfer = 0.0;    
-    double a_in_dot_tertiary_tides_circ = 0.0;    
-    
-    /* post-Newtonian point particle */  
+    double a_in_dot_tertiary_tides_circ = 0.0;
+
+    /* post-Newtonian point particle */
     if (include_25PN_inner_terms == TRUE)
     {
         a_in_dot_GR_25PN_in = -c_64div5*CONST_G_P3*m1_times_m2*m1_plus_m2*(1.0/(CONST_C_LIGHT_P5*a_in_p3*l_in_p7))*f_25PN_a_in;
@@ -710,7 +979,7 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
         double a_in_dot_tides_star1 = -6.0*(1.0+m2_div_m1)*m2_div_m1_times_R1_div_a_in_p6_times_k_div_T_tides_star1*R1_div_a_in_p2*a_in*pow(l_in,-15.0)*(f_tides1_in \
             - l_in_p3*f_tides2_in*spin_angular_frequency1_div_n_in);
         double a_in_dot_tides_star2 = -6.0*(1.0+m1_div_m2)*m1_div_m2_times_R2_div_a_in_p6_times_k_div_T_tides_star2*R2_div_a_in_p2*a_in*pow(l_in,-15.0)*(f_tides1_in \
-            - l_in_p3*f_tides2_in*spin_angular_frequency2_div_n_in);            
+            - l_in_p3*f_tides2_in*spin_angular_frequency2_div_n_in);
         a_in_dot_tides = a_in_dot_tides_star1 + a_in_dot_tides_star2;
 //        printf("a_in_dot_tides %g %g %g \n",a_in_dot_tides, a_in_dot_tides_star1, a_in_dot_tides_star2);
     }
@@ -723,47 +992,14 @@ printf("g_in_dot %g %g %g %g %g %g\n",g_in,g_in_dot, g_in_dot_newtonian, g_in_do
         double a_in_dot_wind_star2 = f_a_dot_mass_variations_fast_and_isotropic_wind(m2,wind_mass_loss_rate_star2,m1,a_in,inner_accretion_efficiency_wind_star2_to_star1);
         a_in_dot_wind = a_in_dot_wind_star1 + a_in_dot_wind_star2;
     }
-    
+
     /* mass transfer */
-    if (include_inner_RLOF_terms == TRUE)
-    {
-        bool calculate = TRUE;
-        double m_donor,m_accretor;
-        if (star1_is_donor == TRUE)
-        {
-            m_donor = m1;
-            m_accretor = m2;
-        }
-        else if (star2_is_donor == TRUE)
-        {
-            m_donor = m2;
-            m_accretor = m1;
-        }
-        else
-        {
-            calculate = FALSE;
-        }
-        
-        if (calculate == TRUE)
-        {
-            a_in_dot_mass_transfer = f_a_dot_mass_variations(m_donor,inner_mass_transfer_rate,m_accretor,a_in,inner_accretion_efficiency_mass_transfer,inner_specific_AM_loss_mass_transfer);
-        }
-    }
 
-       /* tertiary tides circular */
-    if (include_tertiary_tidal_terms_circ == TRUE)
-    {
-        // the radii and separations are both in AU
-        a_in_dot_tertiary_tides_circ = -7.035E-16/5. * 4*m1_div_m2/pow(1+m1_div_m2,2) * pow(R3/0.4652,5.2)*pow(a_in/0.2,5.8)*pow(a_out/2., -10.2)*pow(tau_tertiary_tides/0.5343,-1.0); 
-        printf("a_in_dot_tertiary_tides_circ %g  \n",a_in_dot_tertiary_tides_circ);
-    }
-
-    
     /* combined */
-    double a_in_dot = a_in_dot_GR_25PN_in + a_in_dot_tides + a_in_dot_wind + a_in_dot_mass_transfer + a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides;
+    double a_in_dot = a_in_dot_GR_25PN_in + a_in_dot_tides + a_in_dot_wind + a_in_dot_mass_transfer_eccentric + a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides;
 	Ith(ydot,7) = a_in_dot;
 
-printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_dot_tides, a_in_dot_wind, a_in_dot_mass_transfer+ a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides);
+printf("a_in_dot %g %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_dot_tides, a_in_dot_wind, a_in_dot_mass_transfer_eccentric, a_in_dot_tertiary_tides_circ + a_in_dot_tertiary_tides);
 
 
 
@@ -775,15 +1011,15 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
     double a_out_dot_tides = 0.0;
     double a_out_dot_wind = 0.0;
     double a_out_dot_mass_transfer = 0.0;
-    
+
     if (ignore_tertiary == FALSE)
     {
-        /* post-Newtonian point particle */  
+        /* post-Newtonian point particle */
         if (include_25PN_outer_terms == TRUE)
         {
             a_out_dot_GR_25PN_out = -c_64div5*CONST_G_P3*m1_plus_m2*m3*m1_plus_m2_plus_m3*(1.0/(CONST_C_LIGHT_P5*a_out_p3*l_out_p7))*f_25PN_a_out;
         }
-    
+
         /* tides */
         if (include_outer_tidal_terms == TRUE)
         {
@@ -791,13 +1027,13 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
                 - l_out_p3*f_tides2_out*spin_angular_frequency3_div_n_out);
             a_out_dot_tides = a_out_dot_tides_star3;
         }
-        
+
         /* wind mass loss */
         if (include_outer_wind_terms == TRUE)
         {
             /* a_out_dot due to wind mass loss of star3, where part is accreted by the inner binary (treated as point mass) */
             double a_out_dot_wind_star3 = f_a_dot_mass_variations_fast_and_isotropic_wind(m3,wind_mass_loss_rate_star3,m1+m2,a_out,outer_accretion_efficiency_wind_star3_to_inner_binary);
-    
+
             /* a_out_dot due to wind mass loss from the inner binary (treated as a point mass) to star3 */
             /* here, it is assumed that wind material from the inner binary can be accreted by star3, but not material due to nonconservative mass transfer in the inner binary */
             double m_dot_lost_from_inner_binary = \
@@ -807,17 +1043,17 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
             double m_dot_accreted_by_star3_from_inner_binary_winds = \
                 + wind_mass_loss_rate_star1*(1.0-inner_accretion_efficiency_wind_star1_to_star2)*outer_accretion_efficiency_wind_star1_to_star3 \
                 + wind_mass_loss_rate_star2*(1.0-inner_accretion_efficiency_wind_star2_to_star1)*outer_accretion_efficiency_wind_star2_to_star3;
-    
+
             double a_out_dot_wind_inner_binary = 0.0;
             if (m_dot_lost_from_inner_binary < 0.0)
             {
                 double effective_accretion_efficiency_wind_inner_binary_to_star3 = m_dot_accreted_by_star3_from_inner_binary_winds/m_dot_lost_from_inner_binary;
-    
+
                 a_out_dot_wind_inner_binary = f_a_dot_mass_variations_fast_and_isotropic_wind(m1+m2,m_dot_lost_from_inner_binary,m3,a_out,effective_accretion_efficiency_wind_inner_binary_to_star3);
             }
             a_out_dot_wind = a_out_dot_wind_star3 + a_out_dot_wind_inner_binary;
         }
-        
+
         /* mass transfer */
         if (include_outer_RLOF_terms == TRUE)
         {
@@ -830,9 +1066,9 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
                 a_out_dot_mass_transfer = f_a_dot_mass_variations(m_donor,outer_mass_transfer_rate,m_accretor,a_out,outer_accretion_efficiency_mass_transfer,outer_specific_AM_loss_mass_transfer);
             }
         }
-    
+
     }
-       
+
     /* combined */
     double a_out_dot = a_out_dot_GR_25PN_out + a_out_dot_tides + a_out_dot_wind + a_out_dot_mass_transfer + a_out_dot_tertiary_tides;
 	Ith(ydot,8) = a_out_dot;
@@ -851,7 +1087,7 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
         double G_out_dot = -G_out*e_out*e_out_dot_newtonian/l_out_p2;
         cositot_dot = (-1.0/(G_in*G_out))*(G_in_dot*(G_in + G_out*cositot) + G_out_dot*(G_out + G_in*cositot));
     }
-    
+
 	Ith(ydot,9) = cositot_dot;
 
 
@@ -864,7 +1100,7 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
     double spin_angular_frequency1_dot_magnetic_braking = 0.0;
     double spin_angular_frequency1_dot_moment_of_inertia_plus_wind_changes = 0.0;
     double spin_angular_frequency1_dot_accretion_from_companions = 0.0;
-    
+
     /* tides */
     if (include_inner_tidal_terms == TRUE)
     {
@@ -877,13 +1113,13 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
     {
         spin_angular_frequency1_dot_magnetic_braking = spin_angular_frequency_dot_magnetic_braking(spin_angular_frequency1,m1,wind_mass_loss_rate_star1,gyration_radius_star1,R1,R1_dot);
     }
-    
+
     /* changes of moment inertia, wind & AM accretion */
     if (include_spin_radius_mass_coupling_terms_star1 == TRUE)
     {
         /* changes in the spin frequency due to 1) changes in the moment of inertia and 2) loss of spin AM in the wind */
         spin_angular_frequency1_dot_moment_of_inertia_plus_wind_changes = spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes(spin_angular_frequency1,m1,R1,moment_of_inertia_star1,moment_of_inertia_dot_star1, wind_mass_loss_rate_star1,threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero);
-        
+
         /* changes in the spin frequency due to spin AM transferred from the companion -- here, a `spin AM accretion efficiency' of 1 is assumed */
         /* also, it is assumed that star1 can only receive spin AM from star 2, not star3 */
         double m_dot_accreted_by_star1_from_wind_of_star2 = -inner_accretion_efficiency_wind_star2_to_star1*wind_mass_loss_rate_star2;
@@ -893,7 +1129,7 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
 
     double spin_angular_frequency1_dot = spin_angular_frequency1_dot_tides + spin_angular_frequency1_dot_magnetic_braking + spin_angular_frequency1_dot_moment_of_inertia_plus_wind_changes + spin_angular_frequency1_dot_accretion_from_companions;
 	Ith(ydot,10) = spin_angular_frequency1_dot;
-    
+
 
 
     /************************************
@@ -904,14 +1140,14 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
     double spin_angular_frequency2_dot_magnetic_braking = 0.0;
     double spin_angular_frequency2_dot_moment_of_inertia_plus_wind_changes = 0.0;
     double spin_angular_frequency2_dot_accretion_from_companions = 0.0;
-    
+
     /* tides */
     if (include_inner_tidal_terms == TRUE)
     {
         spin_angular_frequency2_dot_tides = 3.0*m1_div_m2_times_R2_div_a_in_p6_times_k_div_T_tides_star2*(m1_div_m2/(gyration_radius_star2*gyration_radius_star2)) \
             *(n_in/(l_in_p6*l_in_p6))*(f_tides2_in - l_in_p3*f_tides5_in*spin_angular_frequency2_div_n_in);
     }
-    
+
     /* magnetic braking */
     if (include_magnetic_braking_terms == TRUE)
     {
@@ -929,7 +1165,7 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
         double m_dot_accreted_by_star2_from_wind_of_star1 = -inner_accretion_efficiency_wind_star1_to_star2*wind_mass_loss_rate_star1;
         spin_angular_frequency2_dot_accretion_from_companions = spin_angular_frequency_dot_accretion_from_companion(moment_of_inertia_star2, m_dot_accreted_by_star2_from_wind_of_star1, spin_angular_frequency1, R1);
     }
-    
+
     double spin_angular_frequency2_dot = spin_angular_frequency2_dot_tides + spin_angular_frequency2_dot_magnetic_braking + spin_angular_frequency2_dot_moment_of_inertia_plus_wind_changes + spin_angular_frequency2_dot_accretion_from_companions;
 	Ith(ydot,11) = spin_angular_frequency2_dot;
 
@@ -951,32 +1187,32 @@ printf("a_in_dot %g %g %g %g %g %g\n",a_in,a_in_dot, a_in_dot_GR_25PN_in, a_in_d
             spin_angular_frequency3_dot_tides = 3.0*m1_plus_m2_div_m3_times_R3_div_a_out_p6_times_k_div_T_tides_star3*(m1_plus_m2_div_m3/(gyration_radius_star3*gyration_radius_star3)) \
                 *(n_out/(l_out_p6*l_out_p6))*(f_tides2_out - l_out_p3*f_tides5_out*spin_angular_frequency3_div_n_out);
         }
-        
+
         /* magnetic braking */
         if (include_magnetic_braking_terms == TRUE)
         {
             spin_angular_frequency3_dot_magnetic_braking = spin_angular_frequency_dot_magnetic_braking(spin_angular_frequency3,m3,wind_mass_loss_rate_star3,gyration_radius_star3,R3,R3_dot);
         }
-        
+
         /* changes of moment inertia, wind & AM accretion */
         if (include_spin_radius_mass_coupling_terms_star3 == TRUE)
         {
-            /* changes in the spin frequency due to 1) changes in the moment of inertia and 2) loss of spin AM in the wind */        
+            /* changes in the spin frequency due to 1) changes in the moment of inertia and 2) loss of spin AM in the wind */
             spin_angular_frequency3_dot_moment_of_inertia_plus_wind_changes = spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes(spin_angular_frequency3,m3,R3,moment_of_inertia_star3,moment_of_inertia_dot_star3, wind_mass_loss_rate_star3,threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero);
-    
+
             /* changes in the spin frequency due to spin AM transferred from the companions in the inner orbit -- here, a `spin AM accretion efficiency' of 1 is assumed */
             double m_dot_accreted_by_star3_from_wind_of_star1 = -(1.0-inner_accretion_efficiency_wind_star1_to_star2)*outer_accretion_efficiency_wind_star1_to_star3*wind_mass_loss_rate_star1;
             double m_dot_accreted_by_star3_from_wind_of_star2 = -(1.0-inner_accretion_efficiency_wind_star2_to_star1)*outer_accretion_efficiency_wind_star2_to_star3*wind_mass_loss_rate_star2;
-            
+
             spin_angular_frequency3_dot_accretion_from_companions += spin_angular_frequency_dot_accretion_from_companion(moment_of_inertia_star3, m_dot_accreted_by_star3_from_wind_of_star1, spin_angular_frequency1, R1);
             spin_angular_frequency3_dot_accretion_from_companions += spin_angular_frequency_dot_accretion_from_companion(moment_of_inertia_star3, m_dot_accreted_by_star3_from_wind_of_star2, spin_angular_frequency2, R2);
-            
+
         }
     }
-    
+
     double spin_angular_frequency3_dot = spin_angular_frequency3_dot_tides + spin_angular_frequency3_dot_magnetic_braking + spin_angular_frequency3_dot_moment_of_inertia_plus_wind_changes + spin_angular_frequency3_dot_accretion_from_companions;
 	Ith(ydot,12) = spin_angular_frequency3_dot;
-    
+
 //#ifdef VERBOSE
 //    if (fabs(spin_angular_frequency3_dot) > 1.0e4)
 //    {
@@ -1045,7 +1281,7 @@ double spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes(double spi
 //        printf("threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero %g %g \n",spin_angular_frequency,threshold_value_of_spin_angular_frequency_for_setting_spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes_zero);
         spin_angular_frequency_dot = 0.0;
     }
-    
+
     return spin_angular_frequency_dot;
 }
 
@@ -1053,11 +1289,11 @@ double spin_angular_frequency_dot_moment_of_inertia_plus_wind_changes(double spi
 double spin_angular_frequency_dot_accretion_from_companion(double moment_of_inertia, double m_dot_accretion, double companion_spin_angular_frequency, double companion_radius)
 {
     double spin_angular_momentum_wind_accretion_efficiency_companion_to_primary = 1.0; /* working assumption */
-    
+
     return companion_spin_angular_frequency*c_2div3*spin_angular_momentum_wind_accretion_efficiency_companion_to_primary*m_dot_accretion*companion_radius*companion_radius/moment_of_inertia;
 }
 
-/* effect of mass variations on orbit */
+/* effect of mass variations on orbit - circular mass transfer case */
 double f_a_dot_mass_variations(double m_donor, double m_donor_dot, double m_accretor, double a, double beta, double gamma)
 {
     /* Lectore notes on binary evolution by Onno Pols -- chapter 7 Eq. 7.14 */
@@ -1094,15 +1330,15 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
     bool check_for_outer_collision = data->check_for_outer_collision;
     bool check_for_inner_RLOF = data->check_for_inner_RLOF;
     bool check_for_outer_RLOF = data->check_for_outer_RLOF;
-    
-    
+
+
     /* addition Jan 2017 */
     bool check_for_semisecular_regime = data->check_for_semisecular_regime;
 
     double m1 = data->m1;
-    double m2 = data->m2;				
-    double m3 = data->m3;		
-    
+    double m2 = data->m2;
+    double m3 = data->m3;
+
     double R1 = data->R1;
     double R2 = data->R2;
     double R3 = data->R3;
@@ -1114,17 +1350,17 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
 
     double rp_in = a_in*(1.0 - e_in);
     double rp_out = a_out*(1.0 - e_out);
-    
+
     int roche_radius_specification = data->roche_radius_specification;
     int stability_limit_specification = data->stability_limit_specification;
-    
+
     if (check_for_dynamical_stability == TRUE)
     {
         /*	check for dynamical stability */
         double itot = acos(Ith(yev,9));
         double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot,stability_limit_specification);
         gout[0] = a_out/a_in - a_out_div_a_in_crit;///1.5;
-        printf("dyn stab %g %g %g %g \n",a_out, a_in, a_out_div_a_in_crit, gout[0]);        
+        printf("dyn stab %g %g %g %g \n",a_out, a_in, a_out_div_a_in_crit, gout[0]);
     }
 
     if (check_for_inner_collision == TRUE)
@@ -1132,9 +1368,9 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         /*	check for collision at periastron (inner binary)	*/
         gout[1] = rp_in - (R1 + R2);
         printf("collision %g %g %g %g %g\n",a_in, rp_in, R1, R2, gout[1]);
-        
+
     }
-    
+
     if (check_for_outer_collision == TRUE)
     {
         /*	check for "collision" at periastron (outer binary)	*/
@@ -1142,7 +1378,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         double ra_in = a_in*(1.0 + e_in);
         gout[2] = rp_out - (R3 + ra_in);
     }
-    
+
     if (check_for_inner_RLOF == TRUE)
     {
         double spin_angular_frequency1 = Ith(yev,10);
@@ -1150,7 +1386,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         double spin_angular_frequency_inner_orbit_periapse = sqrt( CONST_G*(m1+m2)*(1.0+e_in)/(rp_in*rp_in*rp_in) );
         double f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse;
         double f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse;
-        
+
         double roche_radius_pericenter_inner_star1 = roche_radius(rp_in, m1/m2, e_in, f1, roche_radius_specification);
         gout[3] = R1 - roche_radius_pericenter_inner_star1;
         printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
@@ -1159,21 +1395,21 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
 
         gout[4] = R2 - roche_radius_pericenter_inner_star2;
         printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
-        
+
     }
     if (check_for_outer_RLOF == TRUE)
     {
 
         double spin_angular_frequency3 = Ith(yev,12);
-        double spin_angular_frequency_outer_orbit_periapse = sqrt( CONST_G*(m1+m2+m3)*(1.0+e_out)/(rp_out*rp_out*rp_out) );        
+        double spin_angular_frequency_outer_orbit_periapse = sqrt( CONST_G*(m1+m2+m3)*(1.0+e_out)/(rp_out*rp_out*rp_out) );
         double f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse;
-        
+
         double roche_radius_pericenter_outer_star3 = roche_radius(rp_out, m3/(m1+m2), e_out, f3, roche_radius_specification);
         gout[5] = R3 - roche_radius_pericenter_outer_star3;
-    }            
-    
-    
-    
+    }
+
+
+
     /* addition Jan/Feb 2017 */
     if (check_for_semisecular_regime == TRUE)
     {
@@ -1186,7 +1422,7 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
 //            printf("sil2 %g %g %g \n",t_dif,t, global_time_step);
 
     }
-   
+
 	return 0;
 }
 
@@ -1194,7 +1430,7 @@ double a_out_div_a_in_semisecular_regime(double m1, double m2, double m3, double
 {
     /* also used in interface.py */
     /* 2014ApJ...781...45A Eq. (18) */
-            
+
     double a_out_div_a_in_crit = (1.0/(1.0-e_out))*pow( check_for_semisecular_regime_parameter*5.0*M_PI*(m3/(m1+m2))*(1.0/sqrt(1.0-e_in)), 1.0/3.0);
     return a_out_div_a_in_crit;
 }
@@ -1207,13 +1443,13 @@ double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, doubl
     else if (stability_limit_specification == 2){
         return a_out_div_a_in_dynamical_stability_petrovich_15(m1,m2,m3,e_in,e_out,a_in,a_out);}
     else if (stability_limit_specification == 3){
-        return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);}        
+        return a_out_div_a_in_dynamical_stability_holman_stype_98(m1,m2,m3,e_out);}
     else if (stability_limit_specification == 4){
-        return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);}         
+        return a_out_div_a_in_dynamical_stability_holman_ptype_98(m1,m2,m3,e_in);}
     else if (stability_limit_specification == 5){
-        return a_out_div_a_in_dynamical_stability_vynatheya(m1,m2,m3,e_in,e_out,itot);}         
+        return a_out_div_a_in_dynamical_stability_vynatheya(m1,m2,m3,e_in,e_out,itot);}
     else if (stability_limit_specification == 6){
-        return a_out_div_a_in_dynamical_stability_tory(m1,m2,m3,e_in,e_out,itot);}         
+        return a_out_div_a_in_dynamical_stability_tory(m1,m2,m3,e_in,e_out,itot);}
     else {
         return a_out_div_a_in_dynamical_stability_mardling_aarseth_01(m1,m2,m3,e_out,itot);}
 
@@ -1221,13 +1457,13 @@ double a_out_div_a_in_dynamical_stability(double m1, double m2, double m3, doubl
 
 double a_out_div_a_in_dynamical_stability_mardling_aarseth_01(double m1, double m2, double m3, double e_out, double itot)
 {
-    /* Mardling & Aarseth criterion (2001MNRAS.321..398M) 
+    /* Mardling & Aarseth criterion (2001MNRAS.321..398M)
      * including the `ad hoc' inclination factor
      * itot is assumed to be in radians! */
-     
+
     double q_out = m3/(m1+m2);
     double a_out_div_a_in_crit = (1.0/(1.0-e_out))*2.8*pow( (1.0+q_out)*(1.0+e_out)/sqrt(1.0-e_out),c_2div5)*(1.0 - 0.3*itot/M_PI);
-    
+
     return a_out_div_a_in_crit;
 }
 
@@ -1235,34 +1471,34 @@ double a_out_div_a_in_dynamical_stability_mardling_aarseth_01(double m1, double 
 
 double a_out_div_a_in_dynamical_stability_petrovich_15_simple(double e_in,  double e_out)
 {
-    /* Petrovich criterion (2015ApJ...808..120P) 
-       for star + 2 planets */     
+    /* Petrovich criterion (2015ApJ...808..120P)
+       for star + 2 planets */
 //     printf("Petrovich \n");
 
-    double a_out_div_a_in_crit = 1.83 * (1+e_in)/(1-e_out);        
+    double a_out_div_a_in_crit = 1.83 * (1+e_in)/(1-e_out);
     return a_out_div_a_in_crit;
 }
 
 
 double a_out_div_a_in_dynamical_stability_petrovich_15(double m1, double m2, double m3,double e_in,  double e_out, double a_in,  double a_out)
 {
-    /* Petrovich criterion (2015ApJ...808..120P) 
-       for star + 2 planets */ 
+    /* Petrovich criterion (2015ApJ...808..120P)
+       for star + 2 planets */
 //     printf("Petrovich \n");
 
     double mu_in = min(m1,m2)/max(m1,m2);
     double mu_out = m3/max(m1,m2);
     double max_mu = max(mu_in, mu_out);
-    double a_out_div_a_in_crit = (1+e_in)/(1-e_out) * (2.4*pow(max_mu,1./3.)*pow(a_out/a_in, 0.5)+1.15);        
+    double a_out_div_a_in_crit = (1+e_in)/(1-e_out) * (2.4*pow(max_mu,1./3.)*pow(a_out/a_in, 0.5)+1.15);
     return a_out_div_a_in_crit;
 }
 
 double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, double m3, double e_out)
 {
-    /* Holman criterion ( 1999AJ....117..621H) 
-        for planet orbiting a star (s+p)+s 
+    /* Holman criterion ( 1999AJ....117..621H)
+        for planet orbiting a star (s+p)+s
         updated by Quarles et al. 2020 2020AJ....159...80Q for i=0, 30,45 & 180
-        */     
+        */
      printf("Holman S-type \n");
 
     double mu = m3/(max(m1,m2)+m3);
@@ -1272,10 +1508,10 @@ double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, 
 
 double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, double m3, double e_in)
 {
-    /* Holman criterion ( 1999AJ....117..621H) 
-         for planet orbiting a binary (s+s)+p 
-         updated by Quarles et al. 2018 2018ApJ...856..150Q 
-         */     
+    /* Holman criterion ( 1999AJ....117..621H)
+         for planet orbiting a binary (s+s)+p
+         updated by Quarles et al. 2018 2018ApJ...856..150Q
+         */
      printf("Holman P-type \n");
 
     double mu = min(m1,m2)/(m1+m2);
@@ -1285,7 +1521,7 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
 
 double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double m3, double e_in, double e_out, double itot)
 {
-    /* Vynatheya criterion (2022MNRAS.516.4146V) */     
+    /* Vynatheya criterion (2022MNRAS.516.4146V) */
      printf("Vynatheya \n");
 
     double q_out = m3/(m1+m2);
@@ -1300,7 +1536,7 @@ double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double
 
 double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, double e_in, double e_out, double itot)
 {
-    /* Tory criterion (2022PASA...39...62T) */     
+    /* Tory criterion (2022PASA...39...62T) */
      printf("Tory \n");
 
     double q_out = (m1+m2)/m3;
@@ -1310,7 +1546,7 @@ double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, 
         g = -0.1773*pow(itot,4) + 1.1211*pow(itot,3) -1.9149*itot*itot + 0.5022*itot + 1.6222;
     }
     double logh = -1.*itot*pow(q_out,1.3)/1500;
-    
+
     double a_out_div_a_in_crit = 1./(f*g*pow(10,logh)) / (1-e_out);
     return a_out_div_a_in_crit;
 }
@@ -1318,12 +1554,12 @@ double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, 
 
 
 double roche_radius(double rp, double q, double e, double f, int roche_radius_specification)
-{   
-    
+{
+
     if (roche_radius_specification == 1){ //printf("roche radius of sepinsky \n");
         return roche_radius_pericenter_sepinsky(rp, q, e, f);}
-    else if (roche_radius_specification == 2){ //printf("classical roche radius of eggleton for circular binaries \n");  
-        return roche_radius_pericenter_eggleton(rp/(1.-e), q);} 
+    else if (roche_radius_specification == 2){ //printf("classical roche radius of eggleton for circular binaries \n");
+        return roche_radius_pericenter_eggleton(rp/(1.-e), q);}
     else { //printf("roche radius of eggleton with eccentricity factor \n");
     return roche_radius_pericenter_eggleton(rp, q);}
 
@@ -1333,7 +1569,7 @@ double roche_radius(double rp, double q, double e, double f, int roche_radius_sp
 
 double roche_radius_pericenter_eggleton(double rp, double q)
 {
-    /* 2007ApJ...660.1624S Eqs. (45) */    
+    /* 2007ApJ...660.1624S Eqs. (45) */
     /* q is defined as m_primary/m_secondary */
     double q_pow_one_third = pow(q,c_1div3);
     double q_pow_two_third = q_pow_one_third*q_pow_one_third;
@@ -1415,12 +1651,12 @@ double roche_radius_pericenter_sepinsky(double rp, double q, double e, double f)
             double j_3 = 0.256*(5.5 + exp(-1.33*pow(log_A,2.9)));
 
             ratio = j_0 + j_1*exp(-j_2*pow(log_q,j_3));
-            
+
 //            printf("log_A %g\n",log_A);
 //            printf("1 %g %g %g \n",num_0,den_0,j_0);
-//            printf("2 %g %g %g \n",num_1,den_1,j_1);            
-//            printf("2 %g %g %g \n",den_2,j_2,j_3);            
-//            printf("ratio %g %g %g \n",ratio);            
+//            printf("2 %g %g %g \n",num_1,den_1,j_1);
+//            printf("2 %g %g %g \n",den_2,j_2,j_3);
+//            printf("ratio %g %g %g \n",ratio);
         }
     }
     if (ratio == 0.0)
@@ -1430,6 +1666,6 @@ double roche_radius_pericenter_sepinsky(double rp, double q, double e, double f)
         printf("rp %g q %g e %g f %g\n",rp,q,e,f);
         exit(-1);
     }
-    
+
     return ratio*R_L_pericenter_eggleton;
 }

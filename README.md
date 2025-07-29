@@ -92,6 +92,13 @@ python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 20000 -z 0.001 -T 10
 ```
 assuming AMUSE is loaded in your python. 
 
+To evolve an include eccentric mass transfer, add '--no_stop_at_mass_transfer' flag, e.g. 
+```
+
+python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 20000 -z 0.001 -T 10000 --no_stop_at_mass_transfer
+
+```
+
 ### Input parameters 
 
 The full list of possible input parameters is:

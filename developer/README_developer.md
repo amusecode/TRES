@@ -233,4 +233,26 @@ a star is transferring mass to a:
 
 13) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters. 
 
+14) To model/develop eccentric mass transfer, the following tips may be handy:
+-Current model follows and is tested against the EMT/MSE code by A. Hamers & F. Dosopoulou - 2019
+-TRES.py should be run with a flag --no_stop_at_mass_transfer
+-Most options related to eccentric mass transfer are stored in seculartriple_TPS/src/ODE_system.c
+-When changing these options of the mass transfer code itself, you will need to recompile the secular code by running 'make' from seculartriple_TPS/
+-When trying eccentric mass transfer - one may want to make mass transfer stable by setting q_crit to e.g. 3 (interactions.py, function q_crit())
+-For debugging, testing and understanding individual systems edit TRES_Options.py as follows:
+
+REPORT_DEBUG = True
+REPORT_DT = True
+REPORT_SN_EVOLUTION = False
+REPORT_TRIPLE_EVOLUTION = True
+MAKE_PLOTS = True
+
+REPORT_BINARY_EVOLUTION = True
+REPORT_FUNCTION_NAMES = False
+REPORT_MASS_TRANSFER_STABILITY = True
+
+And in TRES_setup.py, set:
+secular_code.parameters.verbose = True
+
+-Note that circular mass transfer is a sub-type of eccentric mass transfer
 
