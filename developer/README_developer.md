@@ -6,7 +6,7 @@ This document contains the following parts:
 [Installation TRES](#Installation-TRES)
 [TRES development team](#TRES-development-team)
 [Development tips and tricks](#Development-tips-and-tricks)
- 
+
 ## Installation TRES
 For the installation, it is important to know that TRES combines two different codes: a stellar evolution code (default:SeBa) and a dynamical code. The dynamical code is already integrated into TRES and thus doesn't need to be installed separately. The stellar evolution code needs to be installed through the AMUSE framework. We will explain how to do this shortly, but just make sure to satisfy the [AMUSE pre-requisites](https://amuse.readthedocs.io/en/latest/install/howto-install-AMUSE.html) and have installed the necessary python modules beforehand.
 
@@ -58,7 +58,7 @@ git clone https://github.com/amusecode/TRES.git
 Members of the TRES development team are recommended to work on their own fork on github. To set this up:
 
 0) After installing AMUSE and downloading TRES
-1) First create a fork. Can be done easily on the github webinterface and creates the repository "username/TRES", where the username refers to your git account. 
+1) First create a fork. Can be done easily on the github webinterface and creates the repository "username/TRES", where the username refers to your git account.
 
 2) Now we have to set up links to the official TRES repository and the forked one. Clone the forked TRES repository, which will be know as ‘origin’
 ```
@@ -98,7 +98,7 @@ git push origin main
 ```
 6) If so desired, push changes to the official TRES repository
 ```
-git push --set-upstream upstream (branch) 
+git push --set-upstream upstream (branch)
 ```
 
 
@@ -108,75 +108,75 @@ Manage who has access to your fork via github:  "settings -> manage access -> 
 1) TRES makes use of object oriented programming. The structure of the object is as follows:
 ```
 - self contains simulations parameters such as the initial and final time
-- self.triple contains general parameters such as the time, the ID number 
-- self.triple can have 1 or 2 children. Each child can have 1 or 2 children. 
+- self.triple contains general parameters such as the time, the ID number
+- self.triple can have 1 or 2 children. Each child can have 1 or 2 children.
 - a child is either a star with parameters such as mass or radius, or a binary system with parameters such as semimajoraxis and eccentricity.
-- By default TRES starts the simulations with the structure below. 
+- By default TRES starts the simulations with the structure below.
 
 
-           Default triple 
+           Default triple
 ==============================================
-|                  self                      |                 
-|                   |                        | 
-|               self.triple                  |                 
-|                |      |                    | 
-|                |   self.triple.child1      |         
-|         self.triple.child2                 | 
-|              |      |                      | 
-|              |  self.triple.child2.child1  |  
-| self.triple.child2.child2                  | 
+|                  self                      |
+|                   |                        |
+|               self.triple                  |
+|                |      |                    |
+|                |   self.triple.child1      |
+|         self.triple.child2                 |
+|              |      |                      |
+|              |  self.triple.child2.child1  |
+| self.triple.child2.child2                  |
 ==============================================
 
-where self.triple.child1 is the tertiary star, and self.triple.child2.child1 & self.triple.child2.child2 the inner two stars. self.triple.child 2 itself represents the inner binary, while self.triple the outer binary. 
-If the triple experiences a merger, and reduces to a binary system, the structure becomes: 
+where self.triple.child1 is the tertiary star, and self.triple.child2.child1 & self.triple.child2.child2 the inner two stars. self.triple.child 2 itself represents the inner binary, while self.triple the outer binary.
+If the triple experiences a merger, and reduces to a binary system, the structure becomes:
 
 
                Binary
 ==============================================
-|                self                        |              
-|                  |                         | 
-|              self.triple                   |                
-|               |      |                     | 
-|               |   self.triple.child1       |        
-|        self.triple.child2                  | 
+|                self                        |
+|                  |                         |
+|              self.triple                   |
+|               |      |                     |
+|               |   self.triple.child1       |
+|        self.triple.child2                  |
 ==============================================
 
-where self.triple.child1 and self.triple.child2 are two stars and self.triple represents the binary. 
+where self.triple.child1 and self.triple.child2 are two stars and self.triple represents the binary.
 
 ```
 
 
 
 
-2) To receive more output, there are a number of 'REPORT' statements (REPORT_DEBUG, REPORT_DT, REPORT_SN_EVOLUTION, REPORT_TRIPLE_EVOLUTION) that can be set to True on the top of TRES.py. For the most extensive and generic option choose REPORT_DEBUG. This option will also create pdfs a txt file with output at every global (TRES) timestep, as well as create pdf of the time evolution of many parameters. 
+2) To receive more output, there are a number of 'REPORT' statements (REPORT_DEBUG, REPORT_DT, REPORT_SN_EVOLUTION, REPORT_TRIPLE_EVOLUTION) that can be set to True on the top of TRES.py. For the most extensive and generic option choose REPORT_DEBUG. This option will also create pdfs a txt file with output at every global (TRES) timestep, as well as create pdf of the time evolution of many parameters.
 
-To receive more output from SeBa, do the following: in setup_stellar_code(), comment out self.stellar_code = SeBa() and uncomment self.stellar_code = SeBa(redirection='none'). 
+To receive more output from SeBa, do the following: in setup_stellar_code(), comment out self.stellar_code = SeBa() and uncomment self.stellar_code = SeBa(redirection='none').
 
-To receive more output from the secular code, there are two options. 1) in setup_secular_code(), comment out self.stellar_code = SecularTriple() and uncomment self.stellar_code = SecularTriple(redirection='none'). 2) in setup_secular_code(), set self.secular_code.parameters.verbose to True. 
+To receive more output from the secular code, there are two options. 1) in setup_secular_code(), comment out self.stellar_code = SecularTriple() and uncomment self.stellar_code = SecularTriple(redirection='none'). 2) in setup_secular_code(), set self.secular_code.parameters.verbose to True.
 
 3) To reduce the global (TRES) timestep (aka get more timestamps in the TRES terminal output, see above) set the maximum_time_step on the top of TRES.py
 
 4) To use the detailed gyration radius and apsidal motion constant from SeBa, set GET_GYRATION_RADIUS_FROM_STELLAR_CODE and/or GET_AMC_FROM_STELLAR_CODE to True in TRES_options.py
 
-5) To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr: 
+5) To start back up your simulation of a given triple at a specific time, use the input parameter tinit. For example to start the simulation of the default triple at 2.5Myr:
 
 ```
-amuse TRES.py --initial_time 2.5  
+amuse TRES.py --initial_time 2.5
 ```
-If you use this option, the stellar masses should reflect the masses on the zero-age main-sequence, while the orbital parameters should reflect values at the specified time. 
-For the moment this only works for pre-mass transfer systems. 
+If you use this option, the stellar masses should reflect the masses on the zero-age main-sequence, while the orbital parameters should reflect values at the specified time.
+For the moment this only works for pre-mass transfer systems.
 
-6) To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code to 0, 1, or 2: 
+6) To change the prescription of the Roche lobe, you can set self.secular_code.parameters.roche_radius_specification in setup_secular_code to 0, 1, or 2:
 ```
 0  Roche radius based on Eggleton's formula using the pericenter distance (i.e. including eccentricity factor)  [default]
 1  Roche radius based on Sepinsky. Function of not only eccentricity but also stellar spins
 2  Roche radius based on Eggleton's classical formula. Watch out this is only valid for circularized & synchronised systems
 ```
-7) To change the prescription of the dynamical stability limit, you can set self.secular_code.parameters.stability_limit_specification in setup_secular_code to: 
+7) To change the prescription of the dynamical stability limit, you can set self.secular_code.parameters.stability_limit_specification in setup_secular_code to:
 ```
 0  Stability limit based on Mardling & Aarseth 2001  [default]
 1  Stability limit based on Petrovich et al. 2015 (simple version)
-2  Stability limit based on Petrovich et al. 2015 (extended version) 
+2  Stability limit based on Petrovich et al. 2015 (extended version)
 3  Stability limit based on Holman et al. 1998 for S-type orbits
 4  Stability limit based on Holman et al. 1998 for P-type orbits
 5  Stability limit based on Vynatheya et al. 2022 analytical estimate
@@ -185,11 +185,11 @@ For the moment this only works for pre-mass transfer systems.
 option 0, 5-6 are advised for stellar systems, options 1-4 for planetary systems.
 
 8) To include tertiary tides, you can set
-    secular_code.parameters.include_tertiary_tidal_terms_circ and  
-    secular_code.parameters.include_tertiary_tidal_terms in setup_secular_code. 
-    The prior is for circular systems and is based on Gao et al. 2020, MNRAS, 491, 264G, the general latter option is based on Gao et al. in prep. 
+    secular_code.parameters.include_tertiary_tidal_terms_circ and
+    secular_code.parameters.include_tertiary_tidal_terms in setup_secular_code.
+    The prior is for circular systems and is based on Gao et al. 2020, MNRAS, 491, 264G, the general latter option is based on Gao et al. in prep.
 
-9) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options. 
+9) When you do a production run, you may want to run several simulations at the same time. The output files can be given unique names with the -f parameter, and you can change the starting triple ID number with the -N parameter, such that every triple in the full simulation will have a unique ID. To reduce this data, there are two options.
 Option 1:run the rdc_TRES.py script multiple times. You will, however, get an amuse message for every file reminding you of the proper references. If you pipe the output to a text file, this message is included as well. You can remove them using sed. For example:
 
 ```
@@ -202,15 +202,15 @@ for filename in  TRES_output/*.hdf; do
     done
 done
 ```
-Option 2: run the rdc_TPS.py script. See top of that file for how to run it. 
+Option 2: run the rdc_TPS.py script. See top of that file for how to run it.
 
 10) Running computationally expensive simulations on a computer cluster can save a lot of time. However, clusters work somewhat different than your personal computer. There are two points we'd like to draw your attention to.
 
-For starters, make sure if the pre-required packages for AMUSE are already installed. The easiest way to do this is try installing AMUSE and check where eventual errors occur. Unfortunately, on a cluster you will most likely not have sudo rights, so you'll have to figure out a way to install the missing packages. 
+For starters, make sure if the pre-required packages for AMUSE are already installed. The easiest way to do this is try installing AMUSE and check where eventual errors occur. Unfortunately, on a cluster you will most likely not have sudo rights, so you'll have to figure out a way to install the missing packages.
 
 Second, often clusters work with schedulers like slurm. To run a simulation you must create a bash file that can be sumbitted as a slurm job. The file run_TPS.sh is an example bash script for the helios cluster with additional comments for clarification. If you are using a different cluster or scheduler, change the script accordingly.
 
-11) It is possible to simulate chemically homogenously evolving stars in TRES(!) when using SeBa for the stellar evolution. To do this set the parameter include_CHE to True in TRES and in SeBa - both need to be set to True for it to work. The former can be done through the input parameter include_CHE (e.g. python TRES.py --include_CHE). The latter can be done in SeBa's constants.C in the directory sstar/starclass. To access this file you need to have AMUSE installed in developer mode. When including CHE in TRES, the initial ZAMS stellar spins are set to corotation by default. You can exclude triples where none of the stars experience CHE with the stop_at_no_CHE option (e.g. python TRES.py --stop_at_no_CHE). 
+11) It is possible to simulate chemically homogenously evolving stars in TRES(!) when using SeBa for the stellar evolution. To do this set the parameter include_CHE to True in TRES and in SeBa - both need to be set to True for it to work. The former can be done through the input parameter include_CHE (e.g. python TRES.py --include_CHE). The latter can be done in SeBa's constants.C in the directory sstar/starclass. To access this file you need to have AMUSE installed in developer mode. When including CHE in TRES, the initial ZAMS stellar spins are set to corotation by default. You can exclude triples where none of the stars experience CHE with the stop_at_no_CHE option (e.g. python TRES.py --stop_at_no_CHE).
 
 12) How is the stability of mass transfer determined in TRES? Follow the decision tree:
 ```
@@ -219,18 +219,44 @@ a star is transferring mass to a:
 	- Darwin-Riemann instability   									-> unstable mass transfer
 	- (elif) contact: both stars fill their Roche lobe. In case of:
 		- both donors overflow their outer Roche lobe (OLOF+OLOF) 	->	unstable mass transfer
-		- (elif) both donors are on the main-sequence 				-> 	stable mass transfer (modelled by equalisation the masses 
+		- (elif) both donors are on the main-sequence 				-> 	stable mass transfer (modelled by equalisation the masses
 		   (RLOF+RLOF & RLOF+OLOF)										instantaneously, and changing the orbit accordingly)
-		- (else) (RLOF+RLOF & RLOF+OLOF)							-> unstable mass transfer 
+		- (else) (RLOF+RLOF & RLOF+OLOF)							-> unstable mass transfer
 	- (elif) semi-detached: one star overflows its Roche lobe. In case of:
-		 - M_donor/M_accretor > q_crit    							->   unstable mass transfer 
-		 - (else) M_donor/M_accretor <= q_crit    					->   stable mass transfer 
+		 - M_donor/M_accretor > q_crit    							->   unstable mass transfer
+		 - (else) M_donor/M_accretor <= q_crit    					->   stable mass transfer
 - a binary system  (e.g. a tertiary transferring mass to an inner binary). In case of:
 	- Darwin-Riemann instability   									->   unstable mass transfer
-	- (elif) M_donor/M_binary > q_crit    							->   unstable mass transfer 
-	- (elif) M_donor/M_binary <= q_crit   							->   stable mass transfer  
+	- (elif) M_donor/M_binary > q_crit    							->   unstable mass transfer
+	- (elif) M_donor/M_binary <= q_crit   							->   stable mass transfer
 ```
 
-13) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters. 
+13) To save more parameters in the hdf file, go to save_snapshot() in triple_class and comment out the desired parameters.
 
+14) To model/develop eccentric mass transfer, the following tips may be handy:
+    - Current model follows and is tested against the EMT/MSE code by A. Hamers & F. Dosopoulou - 2019
+    - TRES.py should be run with a flag --no_stop_at_mass_transfer
+    - Additionally, one needs to ensure that self.donor_timescale() is not used as the timestep condition in triple_class.py. Specifically, instead of 'and dt > 0.5*self.donor_timescale()' there should be 'and dt > minimum_time_step'.
+    - Most options related to eccentric mass transfer are stored in seculartriple_TPS/src/ODE_system.c
+    - When changing these options of the mass transfer code itself, you will need to recompile the secular code by running 'make' from seculartriple_TPS/
+    - When trying eccentric mass transfer - one may want to make mass transfer stable by setting q_crit to e.g. 3 (interactions.py, function q_crit())
+    - Note that circular mass transfer is a sub-type of eccentric mass transfer
+    - The triple used for standard tests can be called with 'python TRES.py -M 1.2 -m 0.5 -l 0.6 -E 0.1 -e 0.5 -A 200 -a 2000000 -z 0.001 -T 10000 --no_stop_at_mass_transfer > Output.txt'; additionally stability condition q_crit in interactions.py was set to 10.
+    - For debugging, testing and understanding individual systems edit TRES_Options.py as follows:
+
+    - REPORT_DEBUG = True
+    - REPORT_DT = True
+    - REPORT_SN_EVOLUTION = False
+    - REPORT_TRIPLE_EVOLUTION = True
+    - MAKE_PLOTS = True
+
+    - REPORT_BINARY_EVOLUTION = True
+    - REPORT_FUNCTION_NAMES = False
+    - REPORT_MASS_TRANSFER_STABILITY = True
+
+    - And in TRES_setup.py, set:
+    - secular_code.parameters.verbose = True
+
+    - And finally, in seculartriple_TPS/src/ODE_system.c:
+    - uncomment the diagnostic printout flags
 
