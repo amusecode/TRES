@@ -3,7 +3,7 @@ from amuse.units import units
 
 #--------------------------------------------------------------------------------------------------------------------
 # TRES general settings
-REPORT_USER_WARNINGS = False
+REPORT_USER_WARNINGS = True
 REPORT_DEBUG = False
 REPORT_DT = False
 REPORT_SN_EVOLUTION = False
