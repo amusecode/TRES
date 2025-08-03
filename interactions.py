@@ -1075,7 +1075,8 @@ def perform_stellar_interaction(bs, self):
 def q_crit(self, donor, companion):
     #AB: For eccentric mass transfer, the binary should be (at least assumed to be) stable
     #This can be done by hand here:
-    return 10
+    #return 10
+  
     #following Hurley, Tout, Pols 2002
     if donor.stellar_type in [9]|units.stellar_type:
 #    if donor.stellar_type in [8,9]|units.stellar_type:
