@@ -772,7 +772,7 @@ int fev_delaunay(realtype t, N_Vector yev, N_Vector ydot, void *data_f)
 	}
     else
 	{
-	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides + e_in_dot_mass_transfer_eccentric;
+	    e_in_dot = e_in_dot_newtonian + e_in_dot_GR_1PN_in_out + e_in_dot_GR_25PN_in + e_in_dot_tides + e_in_dot_tertiary_tides + e_in_dot_mass_transfer_eccentric;
     }
 	Ith(ydot,1) = -1.0*pow(10.0,-x)*e_in_dot/log(10.0);
 
