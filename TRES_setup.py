@@ -16,11 +16,11 @@ def make_stars(inner_primary_mass, inner_secondary_mass, outer_mass):
     stars = Particles(3)
     stars.is_star = True
     stars.is_donor = False
-    
+
     if inner_primary_mass < inner_secondary_mass:
         spare = inner_primary_mass
         inner_primary_mass = inner_secondary_mass
-        inner_secondary_mass = spare     
+        inner_secondary_mass = spare
 
     stars[0].mass = inner_primary_mass
     stars[1].mass = inner_secondary_mass
@@ -30,12 +30,12 @@ def make_stars(inner_primary_mass, inner_secondary_mass, outer_mass):
     stars[1].initial_mass = inner_secondary_mass
     stars[2].initial_mass = outer_mass
 
-    return stars 
-     
+    return stars
+
 def make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
         inner_eccentricity, outer_eccentricity,
         inner_argument_of_pericenter, outer_argument_of_pericenter,
-        inner_longitude_of_ascending_node, outer_longitude_of_ascending_node):     
+        inner_longitude_of_ascending_node, outer_longitude_of_ascending_node):
 
     bins = Particles(2)
     bins.is_star = False
@@ -52,7 +52,7 @@ def make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
     bins[0].eccentricity = inner_eccentricity
     bins[0].argument_of_pericenter = inner_argument_of_pericenter
     bins[0].longitude_of_ascending_node = inner_longitude_of_ascending_node
-    
+
     bins[0].mass_transfer_rate = 0.0 | units.MSun/units.yr
     bins[0].accretion_efficiency_mass_transfer = 1.0
     bins[0].accretion_efficiency_wind_child1_to_child2 = 0.0
@@ -62,23 +62,23 @@ def make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
     bins[1].child2 = bins[0]
     bins[1].child1.parent = bins[1]
     bins[1].child2.parent = bins[1]
-    
+
     bins[1].semimajor_axis = outer_semimajor_axis
     bins[1].eccentricity = outer_eccentricity
-    bins[1].argument_of_pericenter = outer_argument_of_pericenter                
+    bins[1].argument_of_pericenter = outer_argument_of_pericenter
     bins[1].longitude_of_ascending_node = outer_longitude_of_ascending_node
-    
-    bins[1].mass_transfer_rate = 0.0 | units.MSun/units.yr        
+
+    bins[1].mass_transfer_rate = 0.0 | units.MSun/units.yr
     bins[1].accretion_efficiency_mass_transfer = 1.0
     bins[1].accretion_efficiency_wind_child1_to_child2 = 0.0
     bins[1].accretion_efficiency_wind_child2_to_child1 = 0.0
 
     # binary evolutionary settings
-    bins[0].specific_AM_loss_mass_transfer = 2.5 
+    bins[0].specific_AM_loss_mass_transfer = 2.5
     bins[1].specific_AM_loss_mass_transfer = 2.5
 
     return bins
-    
+
 def test_initial_parameters(inner_primary_mass, inner_secondary_mass, outer_mass,
         inner_semimajor_axis, outer_semimajor_axis,
         inner_eccentricity, outer_eccentricity,
@@ -86,14 +86,14 @@ def test_initial_parameters(inner_primary_mass, inner_secondary_mass, outer_mass
         inner_argument_of_pericenter, outer_argument_of_pericenter,
         inner_longitude_of_ascending_node):
 
-    if max(inner_primary_mass, outer_mass) > max_mass:  
+    if max(inner_primary_mass, outer_mass) > max_mass:
         print('error: masses not in allowed range')
         print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
         print('should be below:', max_mass)
         print('max_mass settable in TRES_options.py')
         return False, 0,0
-               
-    if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:  
+
+    if min(inner_secondary_mass, outer_mass) <= absolute_min_mass:
         print('error: masses not in allowed range')
         print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
         print('should be at least above:', absolute_min_mass)
@@ -137,23 +137,23 @@ def test_initial_parameters(inner_primary_mass, inner_secondary_mass, outer_mass
     if (inner_longitude_of_ascending_node < -1.*np.pi) or (inner_longitude_of_ascending_node > np.pi):
         print('error: inner longitude of ascending node not in allowed range')
         return False, 0,0
-        
-    return True, inner_eccentricity, outer_eccentricity 
-    
+
+    return True, inner_eccentricity, outer_eccentricity
+
 def make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
             inner_semimajor_axis, outer_semimajor_axis,
             inner_eccentricity, outer_eccentricity,
             relative_inclination,
             inner_argument_of_pericenter, outer_argument_of_pericenter,
             inner_longitude_of_ascending_node):
-            
+
         correct_params, inner_eccentricity, outer_eccentricity = test_initial_parameters(inner_primary_mass, inner_secondary_mass, outer_mass,
             inner_semimajor_axis, outer_semimajor_axis, inner_eccentricity, outer_eccentricity,
             relative_inclination, inner_argument_of_pericenter, outer_argument_of_pericenter,
-            inner_longitude_of_ascending_node)  
-            
+            inner_longitude_of_ascending_node)
+
         outer_longitude_of_ascending_node = inner_longitude_of_ascending_node - np.pi
-                        
+
         stars = make_stars(inner_primary_mass, inner_secondary_mass, outer_mass)
         bins = make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
             inner_eccentricity, outer_eccentricity,
@@ -161,43 +161,43 @@ def make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
             inner_longitude_of_ascending_node, outer_longitude_of_ascending_node)
 
         return stars, bins, correct_params
-    
+
 #-------
 #setup community codes
 
 def setup_stellar_code(stellar_code, stars):
     stellar_code.particles.add_particles(stars)
-        
-    if stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
+
+    if stellar_code.__module__.split(".")[-2]=="mesa_r15140":
         options_mesa(stellar_code)
-        
+
     return stellar_code
 
-                    
+
 def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
     triple_set = triple.as_set()
     triple_time = triple_set.time
     secular_code.triples.add_particles(triple_set)
     secular_code.parameters.verbose = False
-#    secular_code.parameters.verbose = True
-    
-    #needed for initialisation in some circumstances 
+#    secular_code.parameters.verbose = True #AB Set to true when debugging the secular code
+
+    #needed for initialisation in some circumstances
     secular_code.model_time = triple_time
-    
+
     secular_code.parameters.equations_of_motion_specification = 0
     secular_code.parameters.roche_radius_specification = 0
     #0: eccentric eggleton, 1: sepinsky, 2: classical circular eggleton
     secular_code.parameters.stability_limit_specification = 0
     #for stars 0, 5-6, for exoplanets 1-4
-    #0: mardling & aarseth 2001, 1:petrovich et al. 2015 simple, 2:petrovich et al. 2015 
-    #3: holman et al. 98 s-type, 4: holman et al. 98 p-type,  
+    #0: mardling & aarseth 2001, 1:petrovich et al. 2015 simple, 2:petrovich et al. 2015
+    #3: holman et al. 98 s-type, 4: holman et al. 98 p-type,
     #5: vynatheya+ 22
     #6: tory+ 22
 
     secular_code.parameters.ignore_tertiary = False
 
     secular_code.parameters.include_quadrupole_terms = True
-    secular_code.parameters.include_octupole_terms = True        
+    secular_code.parameters.include_octupole_terms = True
     secular_code.parameters.include_inner_wind_terms = True
     secular_code.parameters.include_outer_wind_terms = True
     secular_code.parameters.include_inner_RLOF_terms = True
@@ -211,10 +211,10 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
     secular_code.parameters.include_tertiary_tidal_terms = False
     if (secular_code.parameters.include_tertiary_tidal_terms_circ and secular_code.parameters.include_tertiary_tidal_terms):
         if REPORT_USER_WARNINGS:
-            print('Both circular and eccentric tertiary tides are switched on. Please pick one or the other.' )   
+            print('Both circular and eccentric tertiary tides are switched on. Please pick one or the other.' )
         sys.exit('Both circular and eccentric tertiary tides are switched on. Please pick one or the other.')
 
-    
+
     secular_code.parameters.include_1PN_inner_terms = True
     secular_code.parameters.include_1PN_outer_terms = True
     secular_code.parameters.include_1PN_inner_outer_terms = False ### warning: probably broken
@@ -226,17 +226,17 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
 
     secular_code.parameters.check_for_semisecular_regime = stop_at_semisecular_regime
     secular_code.parameters.check_for_semisecular_regime_at_initialisation = stop_at_semisecular_regime
-    
+
     secular_code.parameters.check_for_inner_collision = True
     secular_code.parameters.check_for_outer_collision = True
 
-    secular_code.parameters.check_for_inner_RLOF = True 
-    secular_code.parameters.check_for_outer_RLOF = True 
-    
+    secular_code.parameters.check_for_inner_RLOF = True
+    secular_code.parameters.check_for_outer_RLOF = True
+
     secular_code.parameters.include_spin_radius_mass_coupling_terms_star1 = True
     secular_code.parameters.include_spin_radius_mass_coupling_terms_star2 = True
     secular_code.parameters.include_spin_radius_mass_coupling_terms_star3 = True
-    
+
      # accuracy of secular code
 #        secular_code.parameters.input_precision = 1.0e-10#1.0e-5
 #        secular_code.parameters.relative_tolerance = 1.0e-10
@@ -249,6 +249,6 @@ def setup_secular_code(triple, secular_code, stop_at_semisecular_regime):
 #    channel_from_secular = secular_code.triples.new_channel_to(triple_set)
 #    channel_to_secular = triple_set.new_channel_to(secular_code.triples)
 
-    return secular_code 
-    
+    return secular_code
+
 #-------
