@@ -31,7 +31,7 @@ from triple_class import Triple_Class
 from TRES_plotting import plot_data_container, plot_function
 from TRES_setup import make_particle_sets, setup_stellar_code
 from TRES_options import REPORT_DEBUG, \
-                         REPORT_TRIPLE_EVOLUTION, \
+                         REPORT_EVOLUTION, \
                          MAKE_PLOTS, \
                          REPORT_USER_WARNINGS
 from interactions import corotating_spin_angular_frequency_binary, \
@@ -253,7 +253,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
 #-----
 
 #-----
-#for running triple.py from the commandline
+#for running TRES.py from the commandline
 def parse_arguments():
     from amuse.units.optparse import OptionParser
     parser = OptionParser()
@@ -458,7 +458,7 @@ if __name__ == '__main__':
 
 
 
-        if REPORT_TRIPLE_EVOLUTION:
+        if REPORT_EVOLUTION:
             print('Simulation has finished succesfully')
 
     print('\nYou have used the TRES triple evolution code. Literature reference:')
