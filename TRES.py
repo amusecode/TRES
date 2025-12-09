@@ -101,12 +101,13 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     outer_argument_of_pericenter = float(outer_argument_of_pericenter)
     inner_longitude_of_ascending_node = float(inner_longitude_of_ascending_node)
 
-    stars, bins, correct_params = make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
-            inner_semimajor_axis, outer_semimajor_axis,
-            inner_eccentricity, outer_eccentricity,
-            relative_inclination,
-            inner_argument_of_pericenter, outer_argument_of_pericenter,
-            inner_longitude_of_ascending_node)
+    stars, bins, correct_params = make_particle_sets(
+        [inner_primary_mass, inner_secondary_mass, outer_mass],
+        [inner_semimajor_axis, outer_semimajor_axis],
+        [inner_eccentricity, outer_eccentricity],
+        [relative_inclination],
+        [inner_argument_of_pericenter, outer_argument_of_pericenter],
+        [inner_longitude_of_ascending_node])
 
     clean_up_stellar_code = False
     clean_up_secular_code = False
@@ -399,12 +400,13 @@ if __name__ == '__main__':
                           precision = 11, prefix = "",
                           separator = " [", suffix = "]")
 
-    stars, bins, correct_params = make_particle_sets(opt["inner_primary_mass"], opt["inner_secondary_mass"], opt["outer_mass"],
-            opt["inner_semimajor_axis"], opt["outer_semimajor_axis"],
-            opt["inner_eccentricity"], opt["outer_eccentricity"],
-            opt["relative_inclination"],
-            opt["inner_argument_of_pericenter"], opt["outer_argument_of_pericenter"],
-            opt["inner_longitude_of_ascending_node"])
+    stars, bins, correct_params = make_particle_sets(
+        [opt["inner_primary_mass"], opt["inner_secondary_mass"], opt["outer_mass"]],
+        [opt["inner_semimajor_axis"], opt["outer_semimajor_axis"]],
+        [opt["inner_eccentricity"], opt["outer_eccentricity"]],
+        [opt["relative_inclination"]],
+        [opt["inner_argument_of_pericenter"], opt["outer_argument_of_pericenter"]],
+        [opt["inner_longitude_of_ascending_node"]])
 
 
     if opt["SE_code"] == 1:

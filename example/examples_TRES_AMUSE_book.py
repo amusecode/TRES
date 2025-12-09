@@ -105,7 +105,7 @@ def example_3():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = TRES.make_particle_sets([M1,M2,M3], [Ain, Aout], [Ein, Eout], [incl], [Gin, Gout], [Oin])
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
@@ -166,7 +166,7 @@ def example_4():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = TRES.make_particle_sets([M1,M2,M3], [Ain, Aout], [Ein, Eout], [incl], [Gin, Gout], [Oin])
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
@@ -247,7 +247,7 @@ def example_5():
     Oin = 0.
     metallicity = 0.02
 
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = TRES.make_particle_sets([M1,M2,M3], [Ain, Aout], [Ein, Eout], [incl], [Gin, Gout], [Oin])
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
@@ -336,7 +336,7 @@ def example_6():
     Oin = 0.
     metallicity = 0.02
         
-    stars, bins, correct_params = TRES.make_particle_sets(M1,M2,M3, Ain, Aout, Ein, Eout, incl, Gin, Gout, Oin)
+    stars, bins, correct_params = TRES.make_particle_sets([M1,M2,M3], [Ain, Aout], [Ein, Eout], [incl], [Gin, Gout], [Oin])
     
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity

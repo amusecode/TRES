@@ -12,144 +12,115 @@ import numpy as np
 
 #-------
 #to initialize the triple object
-def make_stars(inner_primary_mass, inner_secondary_mass, outer_mass):
-    stars = Particles(3)
+def make_stars(mass_list):
+    stars = Particles(len(mass_list))
     stars.is_star = True
     stars.is_donor = False
     
-
-    if max(inner_primary_mass, outer_mass) > max_mass:
+    if max(mass_list) > max_mass:
         print('error: masses not in allowed range')
-        print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
-        print('should be below:', max_mass)
+        print(mass_list, 'should be below:', max_mass)
         print('max_mass settable in TRES_options.py')
         return stars, False
 
-    if min(inner_primary_mass, inner_secondary_mass, outer_mass) <= absolute_min_mass:
+    if min(mass_list) <= absolute_min_mass:
         print('error: masses not in allowed range')
-        print('m1=',inner_primary_mass, 'm2=',inner_secondary_mass, 'm3=',outer_mass)
-        print('should be at least above:', absolute_min_mass)
+        print(mass_list, 'should be at least above:', absolute_min_mass)
         print('absolute_min_mass settable in TRES_options.py')
         print('substellar objects can be included through EXCLUDE_SSO in TRES_options.py')
         return stars, False
 
-    if inner_primary_mass < inner_secondary_mass:
-        spare = inner_primary_mass
-        inner_primary_mass = inner_secondary_mass
-        inner_secondary_mass = spare
+    if mass_list[0] < mass_list[1]:
+        spare = mass_list[0]
+        mass_list[0] = mass_list[1]
+        mass_list[1] = spare
 
-    stars[0].mass = inner_primary_mass
-    stars[1].mass = inner_secondary_mass
-    stars[2].mass = outer_mass
-
-    stars[0].initial_mass = inner_primary_mass
-    stars[1].initial_mass = inner_secondary_mass
-    stars[2].initial_mass = outer_mass
-
+    stars.mass = mass_list
+    stars.initial_mass = mass_list
+    
     return stars, True
 
-def make_bins(stars, inner_semimajor_axis, outer_semimajor_axis,
-        inner_eccentricity, outer_eccentricity,
-        relative_inclination,
-        inner_argument_of_pericenter, outer_argument_of_pericenter,
-        inner_longitude_of_ascending_node, outer_longitude_of_ascending_node):
+def make_bins(stars, semimajor_axis_list,
+        eccentricity_list,
+        relative_inclination_list,
+        argument_of_pericenter_list,
+        longitude_of_ascending_node_list):
 
-    bins = Particles(2)
+    bins = Particles(len(semimajor_axis_list))
     bins.is_star = False
     bins.is_mt_stable = True
     bins.part_dt_mt = 1.
     bins.bin_type = bin_type['unknown'] 
     
-    if inner_semimajor_axis >= outer_semimajor_axis:
-        print('error input parameters, should be:')
-        print('inner_semimajor_axis < outer_semimajor_axis' )
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (inner_semimajor_axis < 0.|units.RSun):
-        print('error: inner separation not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (outer_semimajor_axis < 0.|units.RSun):
-        print('error: outer separation not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-
-    if (inner_eccentricity < 0.) or (inner_eccentricity > 1.):
-        print('error: inner eccentricity not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (outer_eccentricity < 0.) or (outer_eccentricity > 1.):
-        print('error: outer eccentricity not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (inner_eccentricity < minimum_eccentricity):
-        inner_eccentricity = minimum_eccentricity
-    if (outer_eccentricity < minimum_eccentricity):
-        outer_eccentricity = minimum_eccentricity
-
-    if (relative_inclination < 0.) or (relative_inclination > np.pi):
-        print('error: relative inclination not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (inner_argument_of_pericenter < -1.*np.pi) or (inner_argument_of_pericenter > np.pi):
-        print('error: inner argument of pericenter not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (outer_argument_of_pericenter < -1.*np.pi) or (outer_argument_of_pericenter > np.pi):
-        print('error: outer argument of pericenter not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
-    if (inner_longitude_of_ascending_node < -1.*np.pi) or (inner_longitude_of_ascending_node > np.pi):
-        print('error: inner longitude of ascending node not in allowed range')
-        return bins, False, inner_eccentricity, outer_eccentricity
+    
+    if min(semimajor_axis_list) < 0.|units.RSun:
+        print('error: semimajor_axis not in allowed range', semimajor_axis_list)
+        return bins, False, eccentricity_list
+    if (min(eccentricity_list) < 0.) or (max(eccentricity_list) >= 1.):
+        print('error: eccentricity not in allowed range', eccentricity_list)
+        return bins, False, eccentricity_list
+    for i in range(len(eccentricity_list)):
+        if eccentricity_list[i] < minimum_eccentricity:
+            eccentricity_list[i] = minimum_eccentricity
+ 
+    if (min(relative_inclination_list) < 0.) or (max(relative_inclination_list) > np.pi):
+        print('error: relative_inclination not in allowed range', relative_inclination_list)
+        return bins, False, eccentricity_list
+    if (min(argument_of_pericenter_list) < -1.*np.pi) or (max(argument_of_pericenter_list) > np.pi):
+        print('error: argument_of_pericenter not in allowed range', argument_of_pericenter_list)
+        return bins, False, eccentricity_list
+    if (min(longitude_of_ascending_node_list) < -1.*np.pi) or (max(longitude_of_ascending_node_list) > np.pi):
+        print('error: longitude_of_ascending_node not in allowed range', longitude_of_ascending_node_list)
+        return bins, False, eccentricity_list
+      
+    if len(semimajor_axis_list) == 2: 
+        longitude_of_ascending_node_list.append(longitude_of_ascending_node_list[0] - np.pi)
+        if semimajor_axis_list[0] >= semimajor_axis_list[1]: 
+            print('error input parameters, should be:')
+            print('inner_semimajor_axis < outer_semimajor_axis' )
+            return bins, False, eccentricity_list
+    if len(semimajor_axis_list) > 2: 
+        print('quadruples not implemented yet in make_bins')
+        return bins, False, eccentricity_list
         
-
+       
     bins[0].child1 = stars[0]
     bins[0].child2 = stars[1]
-    bins[0].child1.parent = bins[0]
-    bins[0].child2.parent = bins[0]
-
-    bins[0].semimajor_axis = inner_semimajor_axis
-    bins[0].eccentricity = inner_eccentricity
-    bins[0].argument_of_pericenter = inner_argument_of_pericenter
-    bins[0].longitude_of_ascending_node = inner_longitude_of_ascending_node
-
-    bins[0].mass_transfer_rate = 0.0 | units.MSun/units.yr
-    bins[0].accretion_efficiency_mass_transfer = 1.0
-    bins[0].accretion_efficiency_wind_child1_to_child2 = 0.0
-    bins[0].accretion_efficiency_wind_child2_to_child1 = 0.0
-
-    bins[1].child1 = stars[2]
-    bins[1].child2 = bins[0]
-    bins[1].child1.parent = bins[1]
-    bins[1].child2.parent = bins[1]
-
-    bins[1].semimajor_axis = outer_semimajor_axis
-    bins[1].eccentricity = outer_eccentricity
-    bins[1].argument_of_pericenter = outer_argument_of_pericenter
-    bins[1].longitude_of_ascending_node = outer_longitude_of_ascending_node
-
-    bins[1].mass_transfer_rate = 0.0 | units.MSun/units.yr
-    bins[1].accretion_efficiency_mass_transfer = 1.0
-    bins[1].accretion_efficiency_wind_child1_to_child2 = 0.0
-    bins[1].accretion_efficiency_wind_child2_to_child1 = 0.0
-
-    # binary evolutionary settings
-    bins[0].specific_AM_loss_mass_transfer = 2.5
-    bins[1].specific_AM_loss_mass_transfer = 2.5
-
-    return bins, True, inner_eccentricity, outer_eccentricity
-    
-    
-
-def make_particle_sets(inner_primary_mass, inner_secondary_mass, outer_mass,
-            inner_semimajor_axis, outer_semimajor_axis,
-            inner_eccentricity, outer_eccentricity,
-            relative_inclination,
-            inner_argument_of_pericenter, outer_argument_of_pericenter,
-            inner_longitude_of_ascending_node):
-
-        stars, correct_params_mass = make_stars(inner_primary_mass, inner_secondary_mass, outer_mass)
+    if len(bins) > 1: #adjust for quads
+        bins[1].child1 = stars[2]
+        bins[1].child2 = bins[0]
         
-        outer_longitude_of_ascending_node = inner_longitude_of_ascending_node - np.pi
-        bins, correct_params_orbit, inner_eccentricity, outer_eccentricity = make_bins(
-            stars, inner_semimajor_axis, outer_semimajor_axis,
-            inner_eccentricity, outer_eccentricity,
-            relative_inclination,
-            inner_argument_of_pericenter, outer_argument_of_pericenter,
-            inner_longitude_of_ascending_node, outer_longitude_of_ascending_node)
+    for i in range(len(bins)):
+        bins[i].child1.parent = bins[i]
+        bins[i].child2.parent = bins[i]
+        bins[i].semimajor_axis = semimajor_axis_list[i]
+        bins[i].eccentricity = eccentricity_list[i]
+        bins[i].argument_of_pericenter = argument_of_pericenter_list[i]
+        bins[i].longitude_of_ascending_node = longitude_of_ascending_node_list[i]
+
+    
+    bins.mass_transfer_rate = 0.0 | units.MSun/units.yr
+    bins.accretion_efficiency_mass_transfer = 1.0
+    bins.accretion_efficiency_wind_child1_to_child2 = 0.0
+    bins.accretion_efficiency_wind_child2_to_child1 = 0.0
+    # binary evolutionary settings
+    bins.specific_AM_loss_mass_transfer = 2.5
+
+    return bins, True, eccentricity_list
+    
+    
+
+def make_particle_sets(
+        mass_list, semimajor_axis_list, eccentricity_list,  
+        relative_inclination_list, argument_of_pericenter_list, 
+        longitude_of_ascending_node_list):
+
+        stars, correct_params_mass = make_stars(mass_list)
+                
+        bins, correct_params_orbit, eccentricity_list = make_bins(
+            stars, semimajor_axis_list, eccentricity_list,
+            relative_inclination_list,
+            argument_of_pericenter_list, longitude_of_ascending_node_list)
 
         correct_params = True
         if not correct_params_mass or not correct_params_orbit:
