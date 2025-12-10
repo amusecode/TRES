@@ -3015,7 +3015,6 @@ class Triple_Class:
             moi1_array = np.array(moi1_array)
             moi2_array = np.array(moi2_array)
             moi3_array = np.array(moi3_array)
-            RL1, RL2, RL3 = self.secular_code.give_roche_radii(self.triple)
             RL1_array = np.array(RL1_array)
             RL2_array = np.array(RL2_array)
             RL3_array = np.array(RL3_array)
