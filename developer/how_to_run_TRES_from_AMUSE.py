@@ -13,6 +13,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.getcwd()))
 import TRES as TRES
 from seculartriple_TPS.interface import SecularTriple
+import BIN as BIN
 
 #simplest way of running TRES
 def example_1():
@@ -460,19 +461,36 @@ def example_9():
     
 
 def example_10():
-    print('TRES example 10')
-    from amuse.community.sse.interface import SSE
-    tr = TRES.main(stellar_code=SSE())
-    print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+    print('TRES example 10 - SSE')
+    try:
+        from amuse.community.sse.interface import SSE
+        tr = TRES.main(stellar_code=SSE())
+        print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+    except ImportError:
+        SSE = None
 
 
 def example_11():
-    print('TRES example 11')
-#    from amuse.community.mesa.interface import MESA
-    tr = TRES.main(stellar_code=MESA())
-    print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+    print('TRES example 11 - MESA')
+    try:
+        from amuse.community.mesa.interface import MESA
+        tr = TRES.main(stellar_code=MESA())
+        print(tr.triple.eccentricity, tr.triple.child2.eccentricity)
+    except ImportError:
+        Mesa = None
+
+def example_12():
+    print('TRES example 12 - BIN')
+
+    M1 = 1.5|units.MSun
+    M2 = 0.6|units.MSun
+    semi = 150|units.RSun
+    
+    bin = BIN.main(primary_mass = M1, secondary_mass = M2, semimajor_axis = semi)
+    print(bin.triple.semimajor_axis,bin.triple.eccentricity)
 
     
+   
     
 example_1()
 #example_2()
@@ -485,3 +503,4 @@ example_1()
 #example_9()
 #example_10()
 #example_11()
+#example_12()

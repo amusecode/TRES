@@ -1649,32 +1649,47 @@ class SecularTriple(InCodeComponentImplementation):
     def check_for_dynamical_stability(self):
 
         for index_triple, triple in enumerate(self.triples):
-            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
-            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
-            
-            a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in, e_out,triple.relative_inclination, self.parameters.stability_limit_specification)
-            if a_out/a_in <= a_out_div_a_in_dynamical_stability:
-                if self.parameters.verbose == True:
-                    print('SecularTriple -- triple system is dynamically unstable: a_out/a_in = ',a_out/a_in,', whereas for dynamical stability, a_out/a_in should be > ',a_out_div_a_in_dynamical_stability)
-                triple.dynamical_instability = True
-            else:
+#            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
+#            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
+            star_list, bin_list = give_binaries_and_stars(self,triple)
+    
+            if len(star_list) < 3:
                 triple.dynamical_instability = False
+            elif len(star_list) == 3:
+                m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star_list[0],star_list[1],star_list[2],bin_list[0],bin_list[1],triple)
+                a_out_div_a_in_dynamical_stability = self.a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in, e_out,triple.relative_inclination, self.parameters.stability_limit_specification)
+                if a_out/a_in <= a_out_div_a_in_dynamical_stability:
+                    if self.parameters.verbose == True:
+                        print('SecularTriple -- triple system is dynamically unstable: a_out/a_in = ',a_out/a_in,', whereas for dynamical stability, a_out/a_in should be > ',a_out_div_a_in_dynamical_stability)
+                    triple.dynamical_instability = True
+                else:
+                    triple.dynamical_instability = False
+            else:
+                print('error')
+            
 
     def check_for_semisecular_regime(self):
 
         for index_triple, triple in enumerate(self.triples):
-            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
-            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
-            
-            check_for_semisecular_regime_parameter = self.parameters.check_for_semisecular_regime_parameter
-            a_out_div_a_in_semisecular_regime = self.a_out_div_a_in_semisecular_regime(m1,m2,m3,e_in,e_out,check_for_semisecular_regime_parameter)
-            if a_out/a_in <= a_out_div_a_in_semisecular_regime:
-                if self.parameters.verbose == True:
-                    print('SecularTriple -- triple system is within the semisecular regime: a_out/a_in = ',a_out/a_in,'; a_out/a_in for semisecular regime: ',a_out_div_a_in_semisecular_regime)
-                triple.semisecular_regime = True
-            else:
+#            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
+#            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
+            star_list, bin_list = give_binaries_and_stars(self,triple)
+    
+            if len(star_list) < 3:
                 triple.semisecular_regime = False
-                
+            elif len(star_list) == 3:
+                m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star_list[0],star_list[1],star_list[2],bin_list[0],bin_list[1],triple)
+                check_for_semisecular_regime_parameter = self.parameters.check_for_semisecular_regime_parameter
+                a_out_div_a_in_semisecular_regime = self.a_out_div_a_in_semisecular_regime(m1,m2,m3,e_in,e_out,check_for_semisecular_regime_parameter)
+                if a_out/a_in <= a_out_div_a_in_semisecular_regime:
+                    if self.parameters.verbose == True:
+                        print('SecularTriple -- triple system is within the semisecular regime: a_out/a_in = ',a_out/a_in,'; a_out/a_in for semisecular regime: ',a_out_div_a_in_semisecular_regime)
+                    triple.semisecular_regime = True
+                else:
+                    triple.semisecular_regime = False
+            else:
+                print('error')
+                           
 
 
     def evolve_model(self,end_time):
@@ -1691,7 +1706,26 @@ class SecularTriple(InCodeComponentImplementation):
             ### extract data from triple ###
             self.time_step = end_time - self.model_time            
 
-            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
+            star_list, bin_list = give_binaries_and_stars(self,triple)
+            if len(star_list) == 1:
+                continue
+
+            star1 = star_list[0]
+            star2 = star_list[1]
+            inner_binary = bin_list[0]
+                         
+            if len(star_list) == 3:
+                star3 = star_list[2]
+                outer_binary = bin_list[1]
+            elif len(star_list) == 2:
+                star3 = star2
+                outer_binary = bin_list[0].copy()
+                outer_binary.semimajor_axis = 1e100|units.RSun
+                outer_binary.eccentricity = 0
+                
+            else:
+                sys.exit('error in evolve models: quadruple structure')
+            
             args,skip_integration = extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2,star3)
             if skip_integration == True: 
                 continue
@@ -1812,7 +1846,7 @@ class SecularTriple(InCodeComponentImplementation):
             outer_binary.argument_of_pericenter = AP_out
             inner_binary.longitude_of_ascending_node = LAN_in
             outer_binary.longitude_of_ascending_node = LAN_out
-            inner_binary.delta_e_in = delta_e_in
+            outer_binary.delta_e_in = delta_e_in
 
             if self.evolve_further_after_root_was_found == True:
                 original_time_step = self.time_step ### time-step given from triple.py
@@ -1862,28 +1896,51 @@ class SecularTriple(InCodeComponentImplementation):
                 print( 'SecularTriple -- please give triple particle')
             return
 
-        inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
-        m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
-
-        spin_angular_frequency1 = star1.spin_angular_frequency
-        spin_angular_frequency2 = star2.spin_angular_frequency
-        spin_angular_frequency3 = star3.spin_angular_frequency
-
-        rp_in = a_in*(1.0-e_in)
-        rp_out = a_out*(1.0-e_out)
-
-        spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
-        spin_angular_frequency_outer_orbit_periapse = numpy.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
-
-        f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
-        f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse
-        f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse      
-
-        R_L_star1 = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
-        R_L_star2 = self.roche_radius(rp_in,m2/m1,e_in,f2, self.parameters.roche_radius_specification)
-        R_L_star3 = self.roche_radius(rp_out,m3/(m1+m2),e_out,f3, self.parameters.roche_radius_specification)
+        star_list, bin_list = give_binaries_and_stars(self,triple)
+        R_L_list=[]
+        
+        if len(star_list) > 1:        
+            spin_angular_frequency1 = star_list[0].spin_angular_frequency
+            spin_angular_frequency2 = star_list[1].spin_angular_frequency
+            e_in = bin_list[0].eccentricity
+            rp_in = bin_list[0].semimajor_axis*(1.0-e_in)
+            m1 = star_list[0].mass
+            m2 = star_list[1].mass
+            spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+            f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
+            f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse
+            R_L_star1 = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
+            R_L_star2 = self.roche_radius(rp_in,m2/m1,e_in,f2, self.parameters.roche_radius_specification)
+            R_L_list=[R_L_star1, R_L_star2]
+ 
+            if len(star_list) > 2:
+                spin_angular_frequency3 = star_list[2].spin_angular_frequency
+                e_out = bin_list[1].eccentricity
+                rp_out = bin_list[1].semimajor_axis*(1.0-e_out)
+                m3 = star_list[2].mass
+                spin_angular_frequency_outer_orbit_periapse = numpy.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
+                f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse      
+                R_L_star3 = self.roche_radius(rp_out,m3/(m1+m2),e_out,f3, self.parameters.roche_radius_specification)
+                R_L_list=[R_L_star1, R_L_star2, R_L_star3]
+                
+                if len(star_list) > 3:
+                    print('error')
                         
-        return R_L_star1,R_L_star2,R_L_star3
+        return R_L_list
+#        return R_L_star1, R_L_star2, R_L_star3
+
+    def give_roche_radius(self, bin, primary, secondary):
+    
+        e_in = bin.eccentricity
+        rp_in = bin.semimajor_axis*(1.0-e_in)
+        m1 = primary.mass
+        m2 = secondary.mass
+        spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+        spin_angular_frequency1 = primary.spin_angular_frequency
+        f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
+        R_L = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
+           
+        return R_L
 
     def compute_effect_of_SN_on_triple(self,Vkick_1,Vkick_2,Vkick_3,delta_m_1,delta_m_2,delta_m_3,inner_true_anomaly,outer_true_anomaly):
         triples = self.triples
@@ -1895,8 +1952,13 @@ class SecularTriple(InCodeComponentImplementation):
         #################################################
         
         for index_triple, triple in enumerate(triples):
-            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
-            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
+#            inner_binary,outer_binary,star1,star2,star3 = give_binaries_and_stars(self,triple)
+#            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple)
+            star_list, bin_list = give_binaries_and_stars(self,triple)
+            if (len(star_list) < 3) or (len(star_list) > 3):
+                print('')
+#            else:
+            m1,m2,m3,R1,R2,R3,a_in,a_out,e_in,e_out,INCL_in,INCL_out,AP_in,AP_out,LAN_in,LAN_out = give_stellar_masses_radii_and_binary_parameters(self,star_list[0],star_list[1],star_list[2],bin_list[0],bin_list[1],triple)
             
             if self.parameters.verbose == True:
                 print( 'PRE orb',a_in.value_in(units.AU),a_out.value_in(units.AU),e_in,e_out,INCL_in,AP_in,AP_out,LAN_in,LAN_out)
@@ -1942,15 +2004,16 @@ class SecularTriple(InCodeComponentImplementation):
             if self.parameters.verbose == True:
                 print( 'POST orb',a_in_prime.value_in(units.AU),a_out_prime.value_in(units.AU),e_in_prime,e_out_prime,INCL_rel_prime,AP_in_prime,AP_out_prime,LAN_in_prime,LAN_out_prime)
     
-            inner_binary.semimajor_axis = a_in_prime
-            inner_binary.eccentricity = e_in_prime
-            outer_binary.semimajor_axis = a_out_prime
-            outer_binary.eccentricity = e_out_prime
+            bin_list[0].semimajor_axis = a_in_prime
+            bin_list[0].eccentricity = e_in_prime
+            bin_list[0].argument_of_pericenter = AP_in_prime
+            bin_list[0].longitude_of_ascending_node = LAN_in_prime
+            bin_list[1].semimajor_axis = a_out_prime
+            bin_list[1].eccentricity = e_out_prime
+            bin_list[1].argument_of_pericenter = AP_out_prime
+            bin_list[1].longitude_of_ascending_node = LAN_out_prime
             triple.relative_inclination = INCL_rel_prime
-            inner_binary.argument_of_pericenter = AP_in_prime
-            outer_binary.argument_of_pericenter = AP_out_prime
-            inner_binary.longitude_of_ascending_node = LAN_in_prime
-            outer_binary.longitude_of_ascending_node = LAN_out_prime
+            
 
             #return V1_prime,V2_prime,V3_prime,cos_phi1,cos_phi2,R,v_sys,r1dotv1, r1dotvk, v1dotvk, r1dotvsys, v1dotvsys, r2dotv2, r2dotvsys, v2dotvsys, r1dotr2, r1dotv2
             return V1_prime,V2_prime,V3_prime
@@ -2010,20 +2073,42 @@ def print_CVODE_output(self,CVODE_flag):
         print( "SecularTriple -- unrecoverable error occurred during secular integration (CVODE_flag ",str(CVODE_flag),"): ",message)
 
 
-def give_binaries_and_stars(self,triple):
-    ### the 'old' method ###
-#    inner_binary = triple.child1
-#    outer_binary = triple.child2
+def give_binaries_and_stars(self, stellar_system):
 
-    ### the 'new' method -- removes the superflous 'triple' layer ###
-    inner_binary = triple.child2
-    outer_binary = triple
+    if stellar_system.is_star:
+        stars_list = [stellar_system]
+        bin_list = []
+    elif stellar_system.child1.is_star and stellar_system.child2.is_star:     
+        stars_list = [stellar_system.child1, stellar_system.child2]
+        bin_list = [stellar_system]
+        
+    elif stellar_system.child1.is_star and not stellar_system.child2.is_star:     
+        if stellar_system.child2.child1.is_star and stellar_system.child2.child2.is_star: 
+            stars_list = [stellar_system.child2.child1, stellar_system.child2.child2, stellar_system.child1]
+            bin_list = [stellar_system.child2, stellar_system]
+        else:
+            print('error')
 
-    star1 = inner_binary.child1
-    star2 = inner_binary.child2
-    star3 = outer_binary.child1    
+    elif stellar_system.child2.is_star and not stellar_system.child1.is_star:     
+        if stellar_system.child1.child1.is_star and stellar_system.child1.child2.is_star: 
+            stars_list = [stellar_system.child1.child1, stellar_system.child1.child2, stellar_system.child2]
+            bin_list = [stellar_system.child1, stellar_system]
+        else:
+            print('error')
 
-    return inner_binary,outer_binary,star1,star2,star3
+    elif not stellar_system.child2.is_star and not stellar_system.child1.is_star:     
+        print('error')
+
+    return stars_list, bin_list 
+    
+#    inner_binary = triple.child2
+#    outer_binary = triple
+#
+#    star1 = inner_binary.child1
+#    star2 = inner_binary.child2
+#    star3 = outer_binary.child1    
+#
+#    return inner_binary,outer_binary,star1,star2,star3
 
 def give_stellar_masses_radii_and_binary_parameters(self,star1,star2,star3,inner_binary,outer_binary,triple=None):
     
@@ -2066,7 +2151,12 @@ def extract_data_and_give_args(self,triple,inner_binary,outer_binary,star1,star2
     ### a root is found corresponding to the Roche lobe no longer being filled.
     ### However, in the latter case, if initially R>RL and is_donor = False, then RLOF is not taken into account during the remaining integration.
     self.take_into_account_RLOF_after_no_longer_filling_Roche_lobe = True
-    RL1,RL2,RL3 = self.give_roche_radii(triple)
+    RL1 = self.give_roche_radius(inner_binary, star1,star2)
+    RL2 = self.give_roche_radius(inner_binary, star2,star1)
+    star4 = star2.copy()
+    star4.mass = star1.mass + star2.mass
+    RL3 = self.give_roche_radius(outer_binary, star3,star4)
+    
     if (R1>=RL1 and star1.is_donor == False):
         if self.parameters.verbose == True:
             print( 'SecularTriple -- warning: R1>=RL1 at initialisation while star1.is_donor = False; effects of mass transfer on the orbit will not be taken into account.')

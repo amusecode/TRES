@@ -81,6 +81,7 @@ def make_bins(stars, semimajor_axis_list,
             return bins, False, eccentricity_list
     if len(semimajor_axis_list) > 2: 
         print('quadruples not implemented yet in make_bins')
+        #last element is outer orbit - class
         return bins, False, eccentricity_list
         
        

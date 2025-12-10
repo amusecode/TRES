@@ -1,6 +1,3 @@
-# to do
-# minus sign in mean anomaly
-
 ## Triple:      Triple evolution
 ##              computes the evolution of a given triple
 ##              given any initial conditions (M, m, l, A, a, E, e, i, G, g, O, o, T, z).
@@ -27,7 +24,7 @@ except ImportError:
 from seculartriple_TPS.interface import SecularTriple
 
 
-from triple_class import Triple_Class
+from stellarsystem_class import StellarSystem_Class
 from TRES_plotting import plot_data_container, plot_function
 from TRES_setup import make_particle_sets, setup_stellar_code
 from TRES_options import REPORT_DEBUG, \
@@ -38,36 +35,6 @@ from interactions import corotating_spin_angular_frequency_binary, \
                         lang_spin_angular_frequency, \
                         break_up_angular_frequency, \
                         criticial_angular_frequency_CHE
-
-
-def initialize_triple_class(stars, bins, correct_params,
-                            stellar_code, secular_code, relative_inclination = 80.0*np.pi/180.0,
-                            metallicity = 0.02, tend = 5.0 |units.Myr, tinit = 0.0|units.Myr,
-                            number = 0, maximum_radius_change_factor = 0.005,
-                            stop_at_mass_transfer = True, stop_at_init_mass_transfer = True, stop_at_outer_mass_transfer = True,
-                            stop_at_stable_mass_transfer = True, stop_at_eccentric_stable_mass_transfer = True,
-                            stop_at_unstable_mass_transfer = False, stop_at_eccentric_unstable_mass_transfer = False, which_common_envelope = 2,
-                            stop_at_no_CHE = False, include_CHE = False,
-                            stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True,
-                            stop_at_dynamical_instability = True, stop_at_semisecular_regime = False,
-                            stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
-                            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = ""):
-
-    triple = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
-                          relative_inclination, tend, tinit,
-                          number, maximum_radius_change_factor,
-                          stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-                          stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                          stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                          stop_at_no_CHE, include_CHE,
-                          stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision,
-                          stop_at_dynamical_instability, stop_at_semisecular_regime,
-                          stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-                          stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
-    triple.stellar_code.parameters.metallicity = metallicity
-
-    return triple
-
 
 #-----
 #for running TRES.py from other routines
@@ -132,7 +99,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
         clean_up_secular_code = True
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
+    triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code,
             relative_inclination, tend, tinit,
             number, maximum_radius_change_factor,
             stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
@@ -212,7 +179,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
     bins.longitude_of_ascending_node[1] = float(bins.longitude_of_ascending_node[1])
     relative_inclination = float(relative_inclination)
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
+    triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code,
                                        relative_inclination, tend, tinit,
                                        number, maximum_radius_change_factor,
                                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
@@ -423,7 +390,7 @@ if __name__ == '__main__':
     secular_code = SecularTriple(redirection='none')
 #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
 
-    triple_class_object = Triple_Class(stars, bins, correct_params, stellar_code, secular_code,
+    triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code,
             opt["relative_inclination"], opt["tend"], opt["tinit"],
             opt["number"], opt["maximum_radius_change_factor"],
             opt["stop_at_mass_transfer"], opt["stop_at_init_mass_transfer"], opt["stop_at_outer_mass_transfer"],
