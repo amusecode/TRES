@@ -882,7 +882,7 @@ class Triple_Class:
         else:
             t1 = self.get_min_stellar_evolution_timescale_of_system(stellar_system.child1)
             t2 = self.get_min_stellar_evolution_timescale_of_system(stellar_system.child2)
-            return max(t1, t2)
+            return min(t1, t2)
 
     def check_RLOF(self):
         if self.triple.is_star:
