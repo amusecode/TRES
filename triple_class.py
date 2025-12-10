@@ -2927,8 +2927,8 @@ class Triple_Class:
 
                     self.triple.child2.semimajor_axis = previous_semimajor_axis_in
                     self.triple.child2.eccentricity = previous_eccentricity_in
-                    self.triple.child2.previous_argument_of_pericenter_in = previous_argument_of_pericenter_in
-                    self.triple.child2.previous_longitude_of_ascending_node_in = previous_longitude_of_ascending_node_in
+                    self.triple.child2.argument_of_pericenter = previous_argument_of_pericenter_in
+                    self.triple.child2.longitude_of_ascending_node = previous_longitude_of_ascending_node_in
                     self.triple.child2.child1.spin_angular_frequency = previous_spin1
                     self.triple.child2.child2.spin_angular_frequency = previous_spin2
                     continue
