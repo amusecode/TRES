@@ -128,6 +128,53 @@ def make_particle_sets(
             correct_params = False
 
         return stars, bins, correct_params
+        
+def make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_change_factor,  
+        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+        stop_at_no_CHE, include_CHE,
+        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+        stop_at_dynamical_instability, stop_at_semisecular_regime, 
+        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+        
+        args = {
+            "relative_inclination" :                        relative_inclination, 
+            "tend" :                                        tend, 
+            "tinit" :                                       tinit, 
+            "number" :                                      number, 
+            "maximum_radius_change_factor" :                maximum_radius_change_factor,  
+            "stop_at_mass_transfer" :                       stop_at_mass_transfer, 
+            "stop_at_init_mass_transfer" :                  stop_at_init_mass_transfer, 
+            "stop_at_outer_mass_transfer" :                 stop_at_outer_mass_transfer,
+            "stop_at_stable_mass_transfer" :                stop_at_stable_mass_transfer, 
+            "stop_at_eccentric_stable_mass_transfer" :      stop_at_eccentric_stable_mass_transfer,
+            "stop_at_unstable_mass_transfer" :              stop_at_unstable_mass_transfer, 
+            "stop_at_eccentric_unstable_mass_transfer" :    stop_at_eccentric_unstable_mass_transfer, 
+            "which_common_envelope" :                       which_common_envelope,
+            "stop_at_no_CHE" :                              stop_at_no_CHE, 
+            "include_CHE" :                                 include_CHE,
+            "stop_at_merger" :                              stop_at_merger, 
+            "stop_at_disintegrated" :                       stop_at_disintegrated, 
+            "stop_at_inner_collision" :                     stop_at_inner_collision, 
+            "stop_at_outer_collision" :                     stop_at_outer_collision, 
+            "stop_at_dynamical_instability" :               stop_at_dynamical_instability, 
+            "stop_at_semisecular_regime" :                  stop_at_semisecular_regime, 
+            "stop_at_SN" :                                  stop_at_SN, 
+            "SN_kick_distr" :                               SN_kick_distr, 
+            "impulse_kick_for_black_holes" :                impulse_kick_for_black_holes, 
+            "fallback_kick_for_black_holes" :               fallback_kick_for_black_holes,
+            "stop_at_CPU_time" :                            stop_at_CPU_time, 
+            "max_CPU_time" :                                max_CPU_time, 
+            "file_name" :                                   file_name,           
+            "file_type" :                                   file_type, 
+            "dir_plots" :                                   dir_plots,            
+        }
+        
+        return args
+        
+        
 
 #-------
 #setup community codes

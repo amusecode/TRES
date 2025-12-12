@@ -26,7 +26,7 @@ from seculartriple_TPS.interface import SecularTriple
 
 from stellarsystem_class import StellarSystem_Class
 from TRES_plotting import plot_data_container, plot_function
-from TRES_setup import make_particle_sets, setup_stellar_code
+from TRES_setup import make_particle_sets, setup_stellar_code, make_dic_args
 from TRES_options import REPORT_DEBUG, \
                          REPORT_EVOLUTION, \
                          MAKE_PLOTS, \
@@ -69,6 +69,15 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
     stop_at_dynamical_instability = True
     stop_at_semisecular_regime = True
     stop_at_inner_collision = stop_at_collision
+    args = make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_change_factor,  
+        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+        stop_at_no_CHE, include_CHE,
+        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+        stop_at_dynamical_instability, stop_at_semisecular_regime, 
+        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
     stars, bin, correct_params = make_particle_sets(
         [primary_mass, secondary_mass], 
@@ -99,17 +108,7 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
         clean_up_secular_code = True
         
 
-    bin_class_object = StellarSystem_Class(stars, bin, correct_params, stellar_code, secular_code,
-            relative_inclination, tend, tinit,
-            number, maximum_radius_change_factor,
-            stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-            stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-            stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-            stop_at_no_CHE, include_CHE,
-            stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision,
-            stop_at_dynamical_instability, stop_at_semisecular_regime,
-            stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-            stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)            
+    bin_class_object = StellarSystem_Class(stars, bin, correct_params, stellar_code, secular_code, args)            
     bin_class_object.secular_code.parameters.ignore_tertiary == True
     bin_class_object.secular_code.parameters.check_for_dynamical_stability = False
     bin_class_object.secular_code.parameters.check_for_outer_collision = False
@@ -177,18 +176,17 @@ def main_developer(stars, bin, correct_params, stellar_code, secular_code,
     stop_at_dynamical_instability = True
     stop_at_semisecular_regime = True
     stop_at_inner_collision = stop_at_collision
+    args = make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_change_factor,  
+        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
+        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
+        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
+        stop_at_no_CHE, include_CHE,
+        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
+        stop_at_dynamical_instability, stop_at_semisecular_regime, 
+        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
 
-    bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code,
-                                       relative_inclination, tend, tinit,
-                                       number, maximum_radius_change_factor,  
-                                       stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-                                       stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                                       stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                                       stop_at_no_CHE, include_CHE,
-                                       stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-                                       stop_at_dynamical_instability, stop_at_semisecular_regime, 
-                                       stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-                                       stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+    bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
     bin_class_object.secular_code.parameters.ignore_tertiary == True    
     bin_class_object.secular_code.parameters.check_for_dynamical_stability = False
     bin_class_object.secular_code.parameters.check_for_outer_collision = False
@@ -328,7 +326,7 @@ def parse_arguments():
 
 
 if __name__ == '__main__':
-    opt = parse_arguments()
+    args = parse_arguments()
 
     set_printing_strategy("custom", 
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
@@ -336,47 +334,36 @@ if __name__ == '__main__':
                           separator = " [", suffix = "]")
 
     #redundant parameters for binaries
-    opt["relative_inclination"] = 0.
-    opt["stop_at_outer_mass_transfer"] = True
-    opt["stop_at_outer_collision"] = True
-    opt["stop_at_dynamical_instability"] = True
-    opt["stop_at_semisecular_regime"] = True
+    args["relative_inclination"] = 0.
+    args["stop_at_outer_mass_transfer"] = True
+    args["stop_at_outer_collision"] = True
+    args["stop_at_dynamical_instability"] = True
+    args["stop_at_semisecular_regime"] = True
 
     stars, bins, correct_params = make_particle_sets(
-        [opt["primary_mass"], opt["secondary_mass"]],
-        [opt["semimajor_axis"]],
-        [opt["eccentricity"]],
-        [opt["relative_inclination"]],
-        [opt["argument_of_pericenter"]],
-        [opt["longitude_of_ascending_node"]])
+        [args["primary_mass"], args["secondary_mass"]],
+        [args["semimajor_axis"]],
+        [args["eccentricity"]],
+        [args["relative_inclination"]],
+        [args["argument_of_pericenter"]],
+        [args["longitude_of_ascending_node"]])
 
 
-    if opt["SE_code"] == 1:
+    if args["SE_code"] == 1:
         stellar_code = SSE()
-    elif opt["SE_code"] == 2:
+    elif args["SE_code"] == 2:
         stellar_code = Mesa()
     else:
         stellar_code = SeBa()    
 #        stellar_code = SeBa(redirection='none')
 #        stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_BIN.txt')
-    stellar_code.parameters.metallicity = opt["metallicity"]
+    stellar_code.parameters.metallicity = args["metallicity"]
 
     secular_code = SecularTriple()
 #    secular_code = SecularTriple(redirection='none')
 #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
 
-
-    bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code,
-            opt["relative_inclination"], opt["tend"], opt["tinit"],
-            opt["number"], opt["maximum_radius_change_factor"],
-            opt["stop_at_mass_transfer"], opt["stop_at_init_mass_transfer"], opt["stop_at_outer_mass_transfer"],
-            opt["stop_at_stable_mass_transfer"], opt["stop_at_eccentric_stable_mass_transfer"],
-            opt["stop_at_unstable_mass_transfer"], opt["stop_at_eccentric_unstable_mass_transfer"], opt["which_common_envelope"],
-            opt["stop_at_no_CHE"], opt["include_CHE"],
-            opt["stop_at_merger"], opt["stop_at_disintegrated"], opt["stop_at_inner_collision"], opt["stop_at_outer_collision"],
-            opt["stop_at_dynamical_instability"], opt["stop_at_semisecular_regime"],
-            opt["stop_at_SN"], opt["SN_kick_distr"], opt["impulse_kick_for_black_holes"], opt["fallback_kick_for_black_holes"],
-            opt["stop_at_CPU_time"], opt["max_CPU_time"], opt["file_name"], opt["file_type"], opt["dir_plots"])
+    bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
     bin_class_object.secular_code.parameters.ignore_tertiary == True
     bin_class_object.secular_code.parameters.check_for_dynamical_stability = False
     bin_class_object.secular_code.parameters.check_for_outer_collision = False
@@ -390,13 +377,13 @@ if __name__ == '__main__':
     elif bin_class_object.mass_transfer_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. There is mass transfer in the given bin at initialization.')
-    elif opt["stop_at_no_CHE"] == True and bin_class_object.CHE_at_initialisation == False:
+    elif args["stop_at_no_CHE"] == True and bin_class_object.CHE_at_initialisation == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. No chemically homogeneous evolution at initialization')
     else:    
-        bin_class_object.evolve_model(opt["tend"])
+        bin_class_object.evolve_model(args["tend"])
         if REPORT_DEBUG or MAKE_PLOTS:
-            plot_function(bin_class_object, opt['dir_plots'])
+            plot_function(bin_class_object, args['dir_plots'])
             bin_class_object.print_stellar_system()
 
 
