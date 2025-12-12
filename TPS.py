@@ -196,62 +196,51 @@ def beta_distr_SSOs(lower, upper, mass):    # (Bowler et al. 2020)
 class Generate_initial_triple:
     #-------
     #setup stellar system
-    def __init__(self, inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_max, inner_secondary_mass_min, 
-                        outer_mass_min, outer_mass_max,
-                        inner_mass_ratio_max, inner_mass_ratio_min, 
-                        outer_mass_ratio_max, outer_mass_ratio_min, 
-                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
-                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
-                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
-                        inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
-                        incl_max, incl_min,
-                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
-                        inner_loan_max, inner_loan_min, 
-                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
-                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
-                        inner_aop_distr, outer_aop_distr, inner_loan_distr):
+    def __init__(self, args):
                         
-                        if inner_primary_mass_distr == 5:
+                        if args["inner_primary_mass_distr"] == 5:
                             mass_convergence = False
                             while mass_convergence == False:
-                                mass_convergence = self.generate_mass_and_semi_eggleton(inner_primary_mass_max, inner_primary_mass_min,        
-                                inner_secondary_mass_min,outer_mass_min, outer_mass_max,
-                                inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min)                            
+                                mass_convergence = self.generate_mass_and_semi_eggleton(args["inner_primary_mass_max"], args["inner_primary_mass_min"],        
+                                args["inner_secondary_mass_min"], args["outer_mass_min"], args["outer_mass_max"],
+                                args["inner_semi_max"], args["inner_semi_min"], args["outer_semi_max"], args["outer_semi_min"])                            
     
                             #Does not use boolean inner/outer _semi_latus_rectum_ min/max
-                            self.inner_ecc = self.generate_ecc_1d(inner_ecc_max, inner_ecc_min, inner_ecc_distr, self.inner_secondary_mass)
-                            self.outer_ecc = self.generate_ecc_1d(outer_ecc_max, outer_ecc_min, outer_ecc_distr, self.outer_mass)
+                            self.inner_ecc = self.generate_ecc_1d(args["inner_ecc_max"], args["inner_ecc_min"], args["inner_ecc_distr"], self.inner_secondary_mass)
+                            self.outer_ecc = self.generate_ecc_1d(args["outer_ecc_max"], args["outer_ecc_min"], args["outer_ecc_distr"], self.outer_mass)
                                 
 
                         else:    
-                            self.generate_mass(inner_primary_mass_max, inner_primary_mass_min, 
-                                inner_secondary_mass_max,inner_secondary_mass_min,outer_mass_min,outer_mass_max,
-                                inner_mass_ratio_max, inner_mass_ratio_min,
-                                outer_mass_ratio_max, outer_mass_ratio_min, 
-                                inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr)
+                            self.generate_mass(args["inner_primary_mass_max"], args["inner_primary_mass_min"], 
+                                args["inner_secondary_mass_max"], args["inner_secondary_mass_min"],
+                                args["outer_mass_min"], args["outer_mass_max"],
+                                args["inner_mass_ratio_max"], args["inner_mass_ratio_min"],
+                                args["outer_mass_ratio_max"], args["outer_mass_ratio_min"], 
+                                args["inner_primary_mass_distr"], args["inner_mass_ratio_distr"], 
+                                args["outer_mass_ratio_distr"])
                                 
 
                             orbit_convergence = False
                             while orbit_convergence == False:
-                                orbit_convergence =  self.generate_semi_and_ecc(inner_semi_max, inner_semi_min, 
-                                    outer_semi_max, outer_semi_min,
-                                    inner_semi_distr,  outer_semi_distr,
-                                    inner_semi_latus_rectum_min, outer_semi_latus_rectum_min, 
-                                    inner_semi_latus_rectum_max, outer_semi_latus_rectum_max, 
-                                    inner_ecc_max, inner_ecc_min, 
-                                    outer_ecc_max, outer_ecc_min,
-                                    inner_ecc_distr, outer_ecc_distr, 
+                                orbit_convergence =  self.generate_semi_and_ecc(
+                                    args["inner_semi_max"], args["inner_semi_min"], 
+                                    args["outer_semi_max"], args["outer_semi_min"],
+                                    args["inner_semi_distr"],  args["outer_semi_distr"],
+                                    args["inner_semi_latus_rectum_min"], args["outer_semi_latus_rectum_min"], 
+                                    args["inner_semi_latus_rectum_max"], args["outer_semi_latus_rectum_max"], 
+                                    args["inner_ecc_max"], args["inner_ecc_min"], 
+                                    args["outer_ecc_max"], args["outer_ecc_min"],
+                                    args["inner_ecc_distr"], args["outer_ecc_distr"], 
                                     self.inner_secondary_mass, self.outer_mass)
 
 
-                        self.generate_incl(incl_max, incl_min, incl_distr)
+                        self.generate_incl(args["incl_max"], args["incl_min"], args["incl_distr"])
 
-                        self.generate_aop(inner_aop_max, inner_aop_min, 
-                            outer_aop_max, outer_aop_min,
-                            inner_aop_distr, outer_aop_distr)
+                        self.generate_aop(args["inner_aop_max"], args["inner_aop_min"], 
+                            args["outer_aop_max"], args["outer_aop_min"],
+                            args["inner_aop_distr"], args["outer_aop_distr"])
 
-                        self.generate_loan(inner_loan_max, inner_loan_min, inner_loan_distr)
+                        self.generate_loan(args["inner_loan_max"], args["inner_loan_min"], args["inner_loan_distr"])
 
     #-------                        
     def generate_mass(self, inner_primary_mass_max, inner_primary_mass_min, 
@@ -756,29 +745,7 @@ class Generate_initial_triple:
 
 #-------
 
-def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_mass_max, 
-                        inner_secondary_mass_min,outer_mass_min,outer_mass_max,
-                        inner_mass_ratio_max, inner_mass_ratio_min, 
-                        outer_mass_ratio_max, outer_mass_ratio_min, 
-                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
-                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
-                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
-                        inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
-                        incl_max, incl_min,
-                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
-                        inner_loan_max, inner_loan_min, 
-                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
-                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
-                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                                                                      
-                        metallicity, tend, number, initial_number, seed,
-                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE, include_circ,
-                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+def evolve_model(args):
 
 
     i_n = 0
@@ -786,21 +753,8 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
     nr_iss = 0 #number of systems that is in the semisecular regime at initialisation
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
-    while i_n < number:
-        triple_system = Generate_initial_triple(inner_primary_mass_max, inner_primary_mass_min, 
-                    inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max,
-                    inner_mass_ratio_max, inner_mass_ratio_min, 
-                    outer_mass_ratio_max, outer_mass_ratio_min, 
-                    inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
-                    inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
-                    inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
-                    inner_ecc_max, inner_ecc_min, outer_ecc_max, outer_ecc_min, 
-                    incl_max, incl_min,
-                    inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
-                    inner_loan_max, inner_loan_min, 
-                    inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
-                    inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
-                    inner_aop_distr, outer_aop_distr, inner_loan_distr)
+    while i_n < args["number"]:
+        triple_system = Generate_initial_triple(args)
                 
         if REPORT_TPS:
            triple_system.print_triple()
@@ -816,7 +770,7 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                     print('non-star secondary & tertiary included: ', triple_system.inner_secondary_mass, triple_system.outer_mass)
                 continue
 
-        number_of_system = initial_number + i_n
+        number_of_system = args["initial_number"] + i_n
         if REPORT_TPS:
             print('number of system = ', number_of_system)
 
@@ -830,23 +784,34 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                 outer_semimajor_axis = triple_system.outer_semi, 
                 inner_eccentricity = triple_system.inner_ecc, 
                 outer_eccentricity = triple_system.outer_ecc,
-                relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
-                stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
-                stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
-                stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
-                stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
-                stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
-                stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
-                stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
-                stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
-                impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
-                fallback_kick_for_black_holes = fallback_kick_for_black_holes,
-                which_common_envelope = which_common_envelope,
-                stop_at_CPU_time = stop_at_CPU_time,
-                max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots, secular_code = secular_code)
+                relative_inclination = triple_system.incl, 
+                metallicity = args["metallicity"], 
+                tend = args["tend"], 
+                number = number_of_system,                     
+                stop_at_mass_transfer = args["stop_at_mass_transfer"], 
+                stop_at_init_mass_transfer = args["stop_at_init_mass_transfer"],
+                stop_at_outer_mass_transfer = args["stop_at_outer_mass_transfer"], 
+                stop_at_stable_mass_transfer = args["stop_at_stable_mass_transfer"], 
+                stop_at_eccentric_stable_mass_transfer = args["stop_at_eccentric_stable_mass_transfer"], 
+                stop_at_unstable_mass_transfer = args["stop_at_unstable_mass_transfer"], 
+                stop_at_eccentric_unstable_mass_transfer = args["stop_at_eccentric_unstable_mass_transfer"], 
+                stop_at_merger = args["stop_at_merger"], 
+                stop_at_disintegrated = args["stop_at_disintegrated"],
+                stop_at_inner_collision = args["stop_at_inner_collision"], 
+                stop_at_outer_collision = args["stop_at_outer_collision"],
+                stop_at_dynamical_instability = args["stop_at_dynamical_instability"], 
+                stop_at_semisecular_regime = args["stop_at_semisecular_regime"],  
+                stop_at_SN = args["stop_at_SN"], 
+                SN_kick_distr = args["SN_kick_distr"], 
+                impulse_kick_for_black_holes = args["impulse_kick_for_black_holes"], 
+                fallback_kick_for_black_holes = args["fallback_kick_for_black_holes"],
+                which_common_envelope = args["which_common_envelope"],
+                stop_at_CPU_time = args["stop_at_CPU_time"],
+                max_CPU_time = args["max_CPU_time"], 
+                file_name = args["file_name"], 
+                file_type = args["file_type"], 
+                dir_plots = args["dir_plots"], 
+                secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -859,18 +824,18 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
         elif tr.mass_transfer_at_initialisation == True:
            if tr.has_tertiary_donor():
                 nr_imt +=1
-           elif include_CHE:
+           elif args["include_CHE"]:
                 nr_imt +=1
                 # todo reset so that no olof
            else: 
                 nr_imt += 1  
                 
-                if include_circ:
+                if args["include_circ"]:
                     i_ecc = 0
                     max_nr_tries_ecc = 10
                     while(i_ecc < max_nr_tries_ecc and tr.mass_transfer_at_initialisation):
                         i_ecc += 1
-                        new_ecc = triple_system.generate_ecc_1d(triple_system.inner_ecc, inner_ecc_min, inner_ecc_distr, triple_system.inner_secondary_mass)
+                        new_ecc = triple_system.generate_ecc_1d(triple_system.inner_ecc, args["inner_ecc_min"], args["inner_ecc_distr"], triple_system.inner_secondary_mass)
                         #resetting semi-major axis creates too many short orbit systems - for now only eccentricity is reset
 #                            tr.triple.child2.semimajor_axis *= (1- tr.triple.child2.eccentricity**2)/(1-new_ecc**2) 
 #                            triple_system.inner_semi = tr.triple.child2.semimajor_axis
@@ -889,23 +854,34 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
                                         outer_semimajor_axis = triple_system.outer_semi, 
                                         inner_eccentricity = triple_system.inner_ecc, 
                                         outer_eccentricity = triple_system.outer_ecc,  
-                                        relative_inclination = triple_system.incl, metallicity = metallicity, tend = tend, number = number_of_system,                     
-                                        stop_at_mass_transfer = stop_at_mass_transfer, stop_at_init_mass_transfer = stop_at_init_mass_transfer,
-                                        stop_at_outer_mass_transfer = stop_at_outer_mass_transfer, 
-                                        stop_at_stable_mass_transfer = stop_at_stable_mass_transfer, 
-                                        stop_at_eccentric_stable_mass_transfer = stop_at_eccentric_stable_mass_transfer, 
-                                        stop_at_unstable_mass_transfer = stop_at_unstable_mass_transfer, 
-                                        stop_at_eccentric_unstable_mass_transfer = stop_at_eccentric_unstable_mass_transfer, 
-                                        stop_at_merger = stop_at_merger, stop_at_disintegrated = stop_at_disintegrated,
-                                        stop_at_inner_collision = stop_at_inner_collision, stop_at_outer_collision = stop_at_outer_collision,
-                                        stop_at_dynamical_instability = stop_at_dynamical_instability, 
-                                        stop_at_semisecular_regime = stop_at_semisecular_regime,  
-                                        stop_at_SN = stop_at_SN, SN_kick_distr = SN_kick_distr, 
-                                        impulse_kick_for_black_holes = impulse_kick_for_black_holes, 
-                                        fallback_kick_for_black_holes = fallback_kick_for_black_holes,
-                                        which_common_envelope = which_common_envelope,
-                                        stop_at_CPU_time = stop_at_CPU_time,
-                                        max_CPU_time = max_CPU_time, file_name = file_name, file_type = file_type, dir_plots = dir_plots, secular_code = secular_code)
+                                        relative_inclination = triple_system.incl, 
+                                        metallicity = args["metallicity"], 
+                                        tend = args["tend"], 
+                                        number = number_of_system,                     
+                                        stop_at_mass_transfer = args["stop_at_mass_transfer"], 
+                                        stop_at_init_mass_transfer = args["stop_at_init_mass_transfer"],
+                                        stop_at_outer_mass_transfer = args["stop_at_outer_mass_transfer"], 
+                                        stop_at_stable_mass_transfer = args["stop_at_stable_mass_transfer"], 
+                                        stop_at_eccentric_stable_mass_transfer = args["stop_at_eccentric_stable_mass_transfer"], 
+                                        stop_at_unstable_mass_transfer = args["stop_at_unstable_mass_transfer"], 
+                                        stop_at_eccentric_unstable_mass_transfer = args["stop_at_eccentric_unstable_mass_transfer"], 
+                                        stop_at_merger = args["stop_at_merger"], 
+                                        stop_at_disintegrated = args["stop_at_disintegrated"],
+                                        stop_at_inner_collision = args["stop_at_inner_collision"], 
+                                        stop_at_outer_collision = args["stop_at_outer_collision"],
+                                        stop_at_dynamical_instability = args["stop_at_dynamical_instability"], 
+                                        stop_at_semisecular_regime = args["stop_at_semisecular_regime"],  
+                                        stop_at_SN = args["stop_at_SN"], 
+                                        SN_kick_distr = args["SN_kick_distr"], 
+                                        impulse_kick_for_black_holes = args["impulse_kick_for_black_holes"], 
+                                        fallback_kick_for_black_holes = args["fallback_kick_for_black_holes"],
+                                        which_common_envelope = args["which_common_envelope"],
+                                        stop_at_CPU_time = args["stop_at_CPU_time"],
+                                        max_CPU_time = args["max_CPU_time"], 
+                                        file_name = args["file_name"], 
+                                        file_type = args["file_type"], 
+                                        dir_plots = args["dir_plots"], 
+                                        secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -917,195 +893,193 @@ def evolve_model(inner_primary_mass_max, inner_primary_mass_min,inner_secondary_
     secular_code.stop()
 
 
-def print_distr(inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
-                        inner_mass_ratio_max, inner_mass_ratio_min, 
-                        outer_mass_ratio_max, outer_mass_ratio_min, 
-                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
-                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
-                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
-                        inner_ecc_max, inner_ecc_min,  outer_ecc_max, outer_ecc_min, 
-                        incl_max, incl_min,
-                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
-                        inner_loan_max, inner_loan_min, 
-                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
-                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
-                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
-                        metallicity, tend, number, initial_number, seed,
-                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE, include_circ,
-                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+def print_distr(args):
 
     print('Based on the following distributions:')        
-    print('Primary mass: \t\t',                   inner_primary_mass_distr, ' ',lib_inner_primary_mass_distr[inner_primary_mass_distr] )        
-    print('Inner mass ratio: \t',               inner_mass_ratio_distr, ' ',lib_inner_mass_ratio_distr[inner_mass_ratio_distr] )        
-    print('Outer mass ratio: \t',               outer_mass_ratio_distr, ' ',lib_outer_mass_ratio_distr[outer_mass_ratio_distr] )        
-    print('Inner semi-major axis: \t',          inner_semi_distr, ' ',lib_inner_semi_distr[inner_semi_distr] )        
-    print('Outer semi-major axis: \t',          outer_semi_distr, ' ',lib_outer_semi_distr[outer_semi_distr] )        
-    print('Inner eccentricity: \t',             inner_ecc_distr, ' ',lib_inner_ecc_distr[inner_ecc_distr] )        
-    print('Outer eccentricity: \t',             outer_ecc_distr, ' ',lib_outer_ecc_distr[outer_ecc_distr] )        
-    print('Inclination: \t\t',                  incl_distr, ' ',lib_incl_distr[incl_distr] )        
-    print('Inner aop: \t\t',                    inner_aop_distr, ' ',lib_inner_aop_distr[inner_aop_distr] )        
-    print('Outer aop: \t\t',                    outer_aop_distr, ' ',lib_outer_aop_distr[outer_aop_distr] )        
-    print('Inner loan: \t\t',                   inner_loan_distr, ' ',lib_inner_loan_distr[inner_loan_distr] )        
-    print('Common envelope model: \t',          which_common_envelope, ' ', lib_CE[which_common_envelope])
-    print('SN kick distr: \t\t',                SN_kick_distr, ' ', lib_SN_kick_distr[SN_kick_distr])
-    print('Metallicity: \t\t',                  '-', ' ', metallicity.value_in(units.none))
+    print('Primary mass: \t\t',                 args["inner_primary_mass_distr"], ' ',lib_inner_primary_mass_distr[args["inner_primary_mass_distr"]] )        
+    print('Inner mass ratio: \t',               args["inner_mass_ratio_distr"], ' ',lib_inner_mass_ratio_distr[args["inner_mass_ratio_distr"]] )        
+    print('Outer mass ratio: \t',               args["outer_mass_ratio_distr"], ' ',lib_outer_mass_ratio_distr[args["outer_mass_ratio_distr"]] )        
+    print('Inner semi-major axis: \t',          args["inner_semi_distr"], ' ',lib_inner_semi_distr[args["inner_semi_distr"]] )        
+    print('Outer semi-major axis: \t',          args["outer_semi_distr"], ' ',lib_outer_semi_distr[args["outer_semi_distr"]] )        
+    print('Inner eccentricity: \t',             args["inner_ecc_distr"], ' ',lib_inner_ecc_distr[args["inner_ecc_distr"]] )        
+    print('Outer eccentricity: \t',             args["outer_ecc_distr"], ' ',lib_outer_ecc_distr[args["outer_ecc_distr"]] )        
+    print('Inclination: \t\t',                  args["incl_distr"], ' ',lib_incl_distr[args["incl_distr"]] )        
+    print('Inner aop: \t\t',                    args["inner_aop_distr"], ' ',lib_inner_aop_distr[args["inner_aop_distr"]] )        
+    print('Outer aop: \t\t',                    args["outer_aop_distr"], ' ',lib_outer_aop_distr[args["outer_aop_distr"]] )        
+    print('Inner loan: \t\t',                   args["inner_loan_distr"], ' ',lib_inner_loan_distr[args["inner_loan_distr"]] )        
+    print('Common envelope model: \t',          args["which_common_envelope"], ' ', lib_CE[args["which_common_envelope"]])
+    print('SN kick distr: \t\t',                args["SN_kick_distr"], ' ', lib_SN_kick_distr[args["SN_kick_distr"]])
+    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"].value_in(units.none))
     print('\n')
 
 
     print('Based on the following assumptions:')
-    print('Include CHE: \t\t',                  include_CHE) 
-    print('Include circularisation during pre-MS: \t\t',                  include_circ) 
+    print('Include CHE: \t\t',                  args["include_CHE"]) 
+    print('Include circularisation during pre-MS: \t\t',                  args["include_circ"]) 
     print('\n')
         
     print('Based on the following stopping conditions:')
-    print(stop_at_mass_transfer, '\t Stop at mass transfer')
-    print(stop_at_init_mass_transfer, '\t Stop at mass transfer initially')
-    print(stop_at_outer_mass_transfer, '\t Stop at outer mass transfer')
-    print(stop_at_stable_mass_transfer, '\t Stop at stable mass transfer')
-    print(stop_at_eccentric_stable_mass_transfer, '\t Stop at eccentric stable mass transfer')
-    print(stop_at_unstable_mass_transfer, '\t Stop at unstable mass transfer')
-    print(stop_at_eccentric_unstable_mass_transfer, '\t Stop at eccentric unstable mass transfer')
-    print(stop_at_no_CHE, '\t Stop if no chemically homogeneous evolution')
-    print(stop_at_merger, '\t Stop at merger')
-    print(stop_at_disintegrated, '\t Stop at disintegration')
-    print(stop_at_inner_collision, '\t Stop at collision in inner binary')
-    print(stop_at_outer_collision, '\t Stop at collision with outer star')
-    print(stop_at_dynamical_instability, '\t Stop at dynamical instability')
-    print(stop_at_semisecular_regime, '\t Stop at semisecular regime')
-    print(stop_at_CPU_time, '\t Stop at maximum CPU time')
+    print(args["stop_at_mass_transfer"], '\t Stop at mass transfer')
+    print(args["stop_at_init_mass_transfer"], '\t Stop at mass transfer initially')
+    print(args["stop_at_outer_mass_transfer"], '\t Stop at outer mass transfer')
+    print(args["stop_at_stable_mass_transfer"], '\t Stop at stable mass transfer')
+    print(args["stop_at_eccentric_stable_mass_transfer"], '\t Stop at eccentric stable mass transfer')
+    print(args["stop_at_unstable_mass_transfer"], '\t Stop at unstable mass transfer')
+    print(args["stop_at_eccentric_unstable_mass_transfer"], '\t Stop at eccentric unstable mass transfer')
+    print(args["stop_at_no_CHE"], '\t Stop if no chemically homogeneous evolution')
+    print(args["stop_at_merger"], '\t Stop at merger')
+    print(args["stop_at_disintegrated"], '\t Stop at disintegration')
+    print(args["stop_at_inner_collision"], '\t Stop at collision in inner binary')
+    print(args["stop_at_outer_collision"], '\t Stop at collision with outer star')
+    print(args["stop_at_dynamical_instability"], '\t Stop at dynamical instability')
+    print(args["stop_at_semisecular_regime"], '\t Stop at semisecular regime')
+    print(args["stop_at_CPU_time"], '\t Stop at maximum CPU time')
     print('\n')
 
 
-def test_initial_parameters(inner_primary_mass_max, inner_primary_mass_min, 
-                        inner_secondary_mass_max, inner_secondary_mass_min, outer_mass_min, outer_mass_max, 
-                        inner_mass_ratio_max, inner_mass_ratio_min, 
-                        outer_mass_ratio_max, outer_mass_ratio_min, 
-                        inner_semi_max, inner_semi_min, outer_semi_max, outer_semi_min, 
-                        inner_semi_latus_rectum_min, outer_semi_latus_rectum_min,
-                        inner_semi_latus_rectum_max, outer_semi_latus_rectum_max,
-                        inner_ecc_max, inner_ecc_min,  outer_ecc_max, outer_ecc_min, 
-                        incl_max, incl_min,
-                        inner_aop_max, inner_aop_min, outer_aop_max, outer_aop_min,
-                        inner_loan_max, inner_loan_min, 
-                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
-                        inner_semi_distr,  outer_semi_distr, inner_ecc_distr, outer_ecc_distr, incl_distr,
-                        inner_aop_distr, outer_aop_distr, inner_loan_distr,                    
-                        metallicity, tend, number, initial_number, seed,
-                        stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
-                        stop_at_stable_mass_transfer, stop_at_eccentric_stable_mass_transfer,
-                        stop_at_unstable_mass_transfer, stop_at_eccentric_unstable_mass_transfer, which_common_envelope,
-                        stop_at_no_CHE, include_CHE, include_circ,
-                        stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
-                        stop_at_dynamical_instability, stop_at_semisecular_regime,  
-                        stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes,fallback_kick_for_black_holes,
-                        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+def test_initial_parameters(args):
 
-    if (inner_primary_mass_min < min_mass) or (inner_primary_mass_max > absolute_max_mass):
+    if (args["inner_primary_mass_min"] < min_mass) or (args["inner_primary_mass_max"] > absolute_max_mass):
         sys.exit("'error: inner primary mass not in allowed range [', min_mass, ',', absolute_max_mass, ']'. min_mass and absolute_max_mass settable in TRES_options.py")
                 
-    if (inner_secondary_mass_max > absolute_max_mass) :
+    if (args["inner_secondary_mass_max"] > absolute_max_mass) :
         sys.exit("'error: inner secondary mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
     
-    if (outer_mass_max > absolute_max_mass) :
+    if (args["outer_mass_max"] > absolute_max_mass) :
         sys.exit("'error: outer mass not in allowed range [ < ', absolute_max_mass, ']'. absolute_max_mass settable in TRES_options.py")
     
-    if (inner_secondary_mass_min < absolute_min_mass) :
+    if (args["inner_secondary_mass_min"] < absolute_min_mass) :
          sys.exit("'error: inner secondary mass not in allowed range [ >', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
-    if (outer_mass_min < absolute_min_mass)  :
+    if (args["outer_mass_min"] < absolute_min_mass)  :
          sys.exit("'error: outer mass not in allowed range [>', absolute_min_mass, ']'. absolute_min_mass settable in TRES_options.py")
     
-    if (inner_primary_mass_max < inner_primary_mass_min):
+    if (args["inner_primary_mass_max"] < args["inner_primary_mass_min"]):
         sys.exit('error: maximum inner primary mass smaller than minimum in primary mass')
 
-    if (inner_secondary_mass_max < inner_secondary_mass_min):
+    if (args["inner_secondary_mass_max"] < args["inner_secondary_mass_min"]):
         sys.exit('error: maximum inner secondary mass smaller than minimum in secondary mass')
 
-    if (outer_mass_max < outer_mass_min):
+    if (args["outer_mass_max"] < args["outer_mass_min"]):
         sys.exit('error: maximum outer mass smaller than minimum in outer mass')
 
 
-    if (inner_mass_ratio_min < 0.) or (inner_mass_ratio_max > 1.):
+    if (args["inner_mass_ratio_min"] < 0.) or (args["inner_mass_ratio_max"] > 1.):
         sys.exit('error: inner mass ratio not in allowed range')
         
-    if (inner_mass_ratio_max < inner_mass_ratio_min):
+    if (args["inner_mass_ratio_max"] < args["inner_mass_ratio_min"]):
         sys.exit('error: maximum inner mass ratio smaller than minimum mass ratio')
 
 
-    if (outer_mass_ratio_min < 0.) or (outer_mass_ratio_max > 1.):
+    if (args["outer_mass_ratio_min"] < 0.) or (args["outer_mass_ratio_max"] > 1.):
         sys.exit('error: outer mass ratio not in allowed range')
         
-    if (outer_mass_ratio_max < outer_mass_ratio_min):
+    if (args["outer_mass_ratio_max"] < args["outer_mass_ratio_min"]):
         sys.exit('error: maximum outer mass ratio smaller than minimum mass ratio')
        
 
-    if (inner_semi_min < 0.5|units.RSun):
+    if (args["inner_semi_min"] < 0.5|units.RSun):
         sys.exit('error: inner separation not in allowed range >5 RSun')
 
-    if (outer_semi_min < 0.5|units.RSun):
+    if (args["outer_semi_min"] < 0.5|units.RSun):
         sys.exit('error: outer separation not in allowed range >5 RSun')
         
-    if (inner_semi_max < inner_semi_min):
+    if (args["inner_semi_max"] < args["inner_semi_min"]):
         sys.exit('error: maximum inner separation smaller than minimum in separation')
 
-    if (outer_semi_max < outer_semi_min):
+    if (args["outer_semi_max"] < args["outer_semi_min"]):
         sys.exit('error: maximum outer separation smaller than minimum outer separation')
         
-    if (inner_semi_min > outer_semi_max):
+    if (args["inner_semi_min"] > args["outer_semi_max"]):
         sys.exit('error: maximum outer separation smaller than minimum inner separation - no overlap for inner and outer orbit')
         
 
-    if (inner_ecc_min < 0.) or (inner_ecc_max > 1.):
+    if (args["inner_ecc_min"] < 0.) or (args["inner_ecc_max"] > 1.):
         sys.exit('error: inner eccentricity not in allowed range [0,1]')
 
-    if (outer_ecc_min < 0.) or (outer_ecc_max > 1.):
+    if (args["outer_ecc_min"] < 0.) or (args["outer_ecc_max"] > 1.):
         sys.exit('error: outer eccentricity not in allowed range [0,1]')
 
-    if (inner_ecc_max < inner_ecc_min):
+    if (args["inner_ecc_max"] < args["inner_ecc_min"]):
         sys.exit('error: maximum inner eccentricity smaller than minimum ecc')
 
-    if (outer_ecc_max < outer_ecc_min):
+    if (args["outer_ecc_max"] < args["outer_ecc_min"]):
         sys.exit('error: maximum outer eccentricity smaller than minimum ecc')
 
 
-    if (incl_min < 0.) or (incl_max > np.pi):
+    if (args["incl_min"] < 0.) or (args["incl_max"] > np.pi):
         sys.exit('error: relative inclination not in allowed range [0, pi]')
 
-    if (incl_max < incl_min):
+    if (args["incl_max"] < args["incl_min"]):
         sys.exit('error: maximum relative inclination smaller than minimum relative inclination')
 
 
 
-    if (inner_aop_min < -np.pi) or (inner_aop_max > np.pi):
+    if (args["inner_aop_min"] < -np.pi) or (args["inner_aop_max"] > np.pi):
         sys.exit('error: inner argument of pericenter not in allowed range [-pi,pi]')
 
-    if (outer_aop_min < -np.pi) or (outer_aop_max > np.pi):
+    if (args["outer_aop_min"] < -np.pi) or (args["outer_aop_max"] > np.pi):
         sys.exit('error: outer argument of pericenter not in allowed range [-pi,pi]')
 
-    if (inner_aop_max < inner_aop_min):
+    if (args["inner_aop_max"] < args["inner_aop_min"]):
         sys.exit('error: maximum inner argument of pericenter smaller than minimum argument of pericenter')
 
-    if (outer_aop_max < outer_aop_min):
+    if (args["outer_aop_max"] < args["outer_aop_min"]):
         sys.exit('error: maximum outer argument of pericenter smaller than minimum argument of pericenter')
 
 
-    if (inner_loan_min < -1*np.pi) or (inner_loan_max > np.pi):
+    if (args["inner_loan_min"] < -1*np.pi) or (args["inner_loan_max"] > np.pi):
         sys.exit('error: inner longitude of ascending node not in allowed range [-pi,pi]')
 
-    if (inner_loan_max < inner_loan_min):
+    if (args["inner_loan_max"] < args["inner_loan_min"]):
         sys.exit('error: maximum inner longitude of ascending node smaller than minimum argument of pericenter')
 
-    if (number < 1):
+    if (args["number"] < 1):
         sys.exit('Requested number of systems < 1')
 
-    if (initial_number < 0):
-        sys.exit('Initial number of system < 0')
+    if (args["initial_number"] < 0):
+        sys.exit('Initial number of system < 0')            
+    
+    
+    
+    if (args["inner_primary_mass_distr"] > len(lib_inner_primary_mass_distr)) or (args["inner_primary_mass_distr"] < 0): 
+        sys.exit('error: invalid primary mass distribution chosen') 
+        
+    if (args["inner_mass_ratio_distr"] > len(lib_inner_mass_ratio_distr)) or (args["inner_mass_ratio_distr"] < 0): 
+        sys.exit('error: invalid inner mass ratio distribution chosen')
+        
+    if (args["outer_mass_ratio_distr"] > len(lib_outer_mass_ratio_distr)) or (args["outer_mass_ratio_distr"] < 0):  
+        sys.exit('error: invalid outer mass ratio distribution chosen')
+        
+    if (args["inner_semi_distr"] > len(lib_inner_semi_distr)) or (args["inner_semi_distr"] < 0):  
+        sys.exit('error: invalid inner semimajor axis distribution chosen')
+        
+    if (args["outer_semi_distr"] > len(lib_outer_semi_distr)) or (args["outer_semi_distr"] < 0): 
+        sys.exit('error: invalid outer semimajor axis distribution chosen')
+        
+    if (args["inner_ecc_distr"] > len(lib_inner_ecc_distr)) or (args["inner_ecc_distr"] < 0): 
+        sys.exit('error: invalid inner eccentricity distribution chosen')
+        
+    if (args["outer_ecc_distr"] > len(lib_outer_ecc_distr)) or (args["outer_ecc_distr"] < 0):  
+        sys.exit('error: invalid outer eccentricity distribution chosen')
+        
+    if (args["incl_distr"] >  len(lib_incl_distr)) or (args["incl_distr"] < 0): 
+        sys.exit('error: invalid inclination distribution chosen')
+        
+    if (args["inner_aop_distr"] > len(lib_inner_aop_distr)) or (args["inner_aop_distr"] < 0):  
+        sys.exit('error: invalid inner argument of pericenter distribution chosen')
+        
+    if (args["outer_aop_distr"] > len(lib_outer_aop_distr)) or (args["outer_aop_distr"] < 0):  
+        sys.exit('error: invalid outer argument of pericenter distribution chosen')
+        
+    if (args["inner_loan_distr"] > len(lib_inner_loan_distr)) or (args["inner_loan_distr"] < 0): 
+        sys.exit('error: invalid inner longitude of ascending node distribution chosen')
+        
+    if (args["SN_kick_distr"] >len(lib_SN_kick_distr)) or (args["SN_kick_distr"] < 0): 
+        sys.exit('error: invalid SN kick distribution chosen')
+        
+    if (args["which_common_envelope"] > len(lib_CE)) or (args["which_common_envelope"] < 0): 
+        sys.exit('error: invalid common envelope style chosen')
+        
 
 
 def parse_arguments():
@@ -1321,15 +1295,15 @@ def parse_arguments():
 
 
 if __name__ == '__main__':
-    options = parse_arguments()
+    args = parse_arguments()
     set_printing_strategy("custom", 
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
                           precision = 11, prefix = "", 
                           separator = " [", suffix = "]")
 
-    test_initial_parameters(**options)
-    print_distr(**options)
-    evolve_model(**options)
+    test_initial_parameters(args)
+    print_distr(args)
+    evolve_model(args)
     
 #    stellar_code.stop()
 #    secular_code.stop()
