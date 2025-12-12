@@ -1362,14 +1362,14 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
         double itot = acos(Ith(yev,9));
         double a_out_div_a_in_crit = a_out_div_a_in_dynamical_stability(m1,m2,m3,a_in,a_out,e_in,e_out,itot,stability_limit_specification);
         gout[0] = a_out/a_in - a_out_div_a_in_crit;///1.5;
-        printf("dyn stab %g %g %g %g \n",a_out, a_in, a_out_div_a_in_crit, gout[0]);
+        //printf("dyn stab %g %g %g %g \n",a_out, a_in, a_out_div_a_in_crit, gout[0]);
     }
 
     if (check_for_inner_collision == TRUE)
     {
         /*	check for collision at periastron (inner binary)	*/
         gout[1] = rp_in - (R1 + R2);
-        printf("collision %g %g %g %g %g\n",a_in, rp_in, R1, R2, gout[1]);
+        //printf("collision %g %g %g %g %g\n",a_in, rp_in, R1, R2, gout[1]);
 
     }
 
@@ -1391,12 +1391,12 @@ int froot_delaunay(realtype t, N_Vector yev, realtype *gout, void *data_f)
 
         double roche_radius_pericenter_inner_star1 = roche_radius(rp_in, m1/m2, e_in, f1, roche_radius_specification);
         gout[3] = R1 - roche_radius_pericenter_inner_star1;
-        printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
+        //printf("RLOF %g %g %g \n",R1, roche_radius_pericenter_inner_star1, gout[3]);
 
         double roche_radius_pericenter_inner_star2 = roche_radius(rp_in, m2/m1, e_in, f2, roche_radius_specification);
 
         gout[4] = R2 - roche_radius_pericenter_inner_star2;
-        printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
+        //printf("RLOF2 %g %g %g \n",R2, roche_radius_pericenter_inner_star2, gout[4]);
 
     }
     if (check_for_outer_RLOF == TRUE)
@@ -1501,7 +1501,7 @@ double a_out_div_a_in_dynamical_stability_holman_stype_98(double m1, double m2, 
         for planet orbiting a star (s+p)+s
         updated by Quarles et al. 2020 2020AJ....159...80Q for i=0, 30,45 & 180
         */
-     printf("Holman S-type \n");
+     //printf("Holman S-type \n");
 
     double mu = m3/(max(m1,m2)+m3);
     double a_out_div_a_in_crit = 1./(0.464-0.38*mu-0.631*e_out+0.586*mu*e_out+0.15*e_out*e_out-0.198*mu*e_out*e_out);
@@ -1514,7 +1514,7 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
          for planet orbiting a binary (s+s)+p
          updated by Quarles et al. 2018 2018ApJ...856..150Q
          */
-     printf("Holman P-type \n");
+    // printf("Holman P-type \n");
 
     double mu = min(m1,m2)/(m1+m2);
     double a_out_div_a_in_crit = 1.6+5.1*e_in-2.22*e_in*e_in+4.12*mu-4.27*e_in*mu-5.09*mu*mu+4.61*e_in*e_in*mu*mu;
@@ -1524,7 +1524,7 @@ double a_out_div_a_in_dynamical_stability_holman_ptype_98(double m1, double m2, 
 double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double m3, double e_in, double e_out, double itot)
 {
     /* Vynatheya criterion (2022MNRAS.516.4146V) */
-     printf("Vynatheya \n");
+     //printf("Vynatheya \n");
 
     double q_out = m3/(m1+m2);
     double cositot = cos(itot);
@@ -1539,7 +1539,7 @@ double a_out_div_a_in_dynamical_stability_vynatheya(double m1, double m2, double
 double a_out_div_a_in_dynamical_stability_tory(double m1, double m2, double m3, double e_in, double e_out, double itot)
 {
     /* Tory criterion (2022PASA...39...62T) */
-     printf("Tory \n");
+     //printf("Tory \n");
 
     double q_out = (m1+m2)/m3;
     double f = pow(10, -0.6+0.04*q_out) * pow(q_out, 0.32+0.1*q_out);

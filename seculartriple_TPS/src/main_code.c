@@ -387,7 +387,7 @@ int evolve(
     
 	if (flag_s == CV_SUCCESS) // successfully integrated for global time-step
 	{         
-	   printf("succes %d %d \n",flag_s, CV_SUCCESS);
+	   //printf("succes %d %d \n",flag_s, CV_SUCCESS);
 
 		*CVODE_flag = 0;
         *root_finding_flag = 0;        
