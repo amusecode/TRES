@@ -62,8 +62,8 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
                           separator = " [", suffix = "]")
 
     #set seed if specified, otherwise random
-    if args["seed"]>=0:
-        np.random.seed(args["seed"]) 
+    if seed>=0:
+        np.random.seed(seed) 
 
     inner_eccentricity = float(inner_eccentricity)
     outer_eccentricity = float(outer_eccentricity)
@@ -111,7 +111,7 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
         stop_at_dynamical_instability, stop_at_semisecular_regime, 
         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots, seed)
     triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
 
 
@@ -175,8 +175,8 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
                           separator = " [", suffix = "]")
 
     #set seed if specified, otherwise random
-    if args["seed"]>=0:
-        np.random.seed(args["seed"]) 
+    if seed >= 0:
+        np.random.seed(seed) 
 
     bins.eccentricity[0] = float(bins.eccentricity[0])
     bins.eccentricity[1] = float(bins.eccentricity[1])
@@ -194,7 +194,7 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
         stop_at_dynamical_instability, stop_at_semisecular_regime, 
         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots, seed)
     triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
 
     if triple_class_object.correct_params == False:
