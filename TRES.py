@@ -53,13 +53,17 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True,
             stop_at_dynamical_instability = True, stop_at_semisecular_regime = False,
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
-            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = "",
+            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = "", seed = -1,
             stellar_code=None, secular_code=None):
 
     set_printing_strategy("custom",
                           preferred_units = [units.MSun, units.RSun, units.Myr],
                           precision = 11, prefix = "",
                           separator = " [", suffix = "]")
+
+    #set seed if specified, otherwise random
+    if args["seed"]>=0:
+        np.random.seed(args["seed"]) 
 
     inner_eccentricity = float(inner_eccentricity)
     outer_eccentricity = float(outer_eccentricity)
@@ -162,13 +166,17 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_inner_collision = True, stop_at_outer_collision = True,
             stop_at_dynamical_instability = True, stop_at_semisecular_regime = False,
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
-            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = ""):
+            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "TRES.hdf", file_type = "hdf5", dir_plots = "", seed = -1):
 
 
     set_printing_strategy("custom",
                           preferred_units = [units.MSun, units.RSun, units.Myr],
                           precision = 11, prefix = "",
                           separator = " [", suffix = "]")
+
+    #set seed if specified, otherwise random
+    if args["seed"]>=0:
+        np.random.seed(args["seed"]) 
 
     bins.eccentricity[0] = float(bins.eccentricity[0])
     bins.eccentricity[1] = float(bins.eccentricity[1])
@@ -273,6 +281,8 @@ def parse_arguments():
                       help="initial time [%default] %unit")
     parser.add_option("-N", dest="number", type="int", default = 0,
                       help="number ID of system [%default]")
+    parser.add_option("-s", dest="seed", type="int", default = -1,
+                      help="seed (int) [%default]")
     parser.add_option("-r", dest="maximum_radius_change_factor", type="float", default = 0.01,
                       help="maximum_radius_change_factor [%default] %unit")
 
@@ -363,6 +373,10 @@ if __name__ == '__main__':
                           preferred_units = [units.MSun, units.RSun, units.Myr],
                           precision = 11, prefix = "",
                           separator = " [", suffix = "]")
+
+    #set seed if specified, otherwise random
+    if args["seed"]>=0:
+        np.random.seed(args["seed"]) 
 
     stars, bins, correct_params = make_particle_sets(
         [args["inner_primary_mass"], args["inner_secondary_mass"], args["outer_mass"]],

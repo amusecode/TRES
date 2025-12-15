@@ -121,7 +121,7 @@ Depreciated (yet still functioning) parameters are given in {}.
 -Z      {-z}      metallicity                             default = 0.02 (Solar)
 -t, -T            end time                                in Myr
 -N, -n            integer number asigned to the triple    default = 0
-
+-s                integer number to specify seed          default = -1 (random seed)
 
 -f                name of output file                     default = TRES
 -F                type of output file (hdf5/txt)          default = hdf5
@@ -296,7 +296,7 @@ Depreciated (yet still functioning) parameters are given in {}.
 -Z              {-z}         metallicity of stars  [0.02 (Solar)]
 -n                           number of triples to be simulated  [1]
 -N                           number of initial triple  [0]
-
+-s                           integer number to specify seed [-1 (random seed)]
 
 --SN_kick_distr   supernova kick distribution   default = 10
         options:

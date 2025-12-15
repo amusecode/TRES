@@ -119,11 +119,6 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 }
 
 
-         
-#not implemented yet
-##            -s         random seed
-
-
 import TRES as TRES
 from amuse.community.seba.interface import SeBa
 from seculartriple_TPS.interface import SecularTriple
@@ -811,6 +806,7 @@ def evolve_model(args):
                 file_name = args["file_name"], 
                 file_type = args["file_type"], 
                 dir_plots = args["dir_plots"], 
+                seed = args["seed"],
                 secular_code = secular_code)
     
         if tr.correct_params == False:
@@ -881,6 +877,7 @@ def evolve_model(args):
                                         file_name = args["file_name"], 
                                         file_type = args["file_type"], 
                                         dir_plots = args["dir_plots"], 
+                        ß               seed = args["seed"],
                                         secular_code = secular_code)
 
         else:
@@ -914,8 +911,12 @@ def print_distr(args):
 
 
     print('Based on the following assumptions:')
-    print('Include CHE: \t\t',                  args["include_CHE"]) 
+    print('Include CHE: \t\t',                                            args["include_CHE"]) 
     print('Include circularisation during pre-MS: \t\t',                  args["include_circ"]) 
+    if args["seed"]>=0: 
+        print('Using seed: \t\t',                                         args["include_circ"]) 
+    else:
+        print('Using random seed)
     print('\n')
         
     print('Based on the following stopping conditions:')
@@ -1219,9 +1220,8 @@ def parse_arguments():
                       help="total number of systems to be simulated [%default]")
     parser.add_option("-N", dest="initial_number", type="int", default = 0,
                       help="number ID of first system [%default]")
-    parser.add_option("-s", unit=units.none, 
-                      dest="seed", type="float", default = 0.|units.none,
-                      help="seed [%default] %unit")
+    parser.add_option("-s",  dest="seed", type="int", default = -1,
+                      help="seed (int) [%default]")
 #    int actual_seed = srandinter(input_seed);
 
     parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
@@ -1300,6 +1300,10 @@ if __name__ == '__main__':
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
                           precision = 11, prefix = "", 
                           separator = " [", suffix = "]")
+
+    #set seed if specified, otherwise random
+    if args["seed"]>=0:
+        np.random.seed(args["seed"]) 
 
     test_initial_parameters(args)
     print_distr(args)
