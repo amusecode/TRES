@@ -137,7 +137,7 @@ def make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_chan
         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
         stop_at_dynamical_instability, stop_at_semisecular_regime, 
         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots):
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots, seed):
         
         args = {
             "relative_inclination" :                        relative_inclination, 
@@ -169,7 +169,8 @@ def make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_chan
             "max_CPU_time" :                                max_CPU_time, 
             "file_name" :                                   file_name,           
             "file_type" :                                   file_type, 
-            "dir_plots" :                                   dir_plots,            
+            "dir_plots" :                                   dir_plots,  
+            "seed" :                                        seed,        
         }
         
         return args
