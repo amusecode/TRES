@@ -60,8 +60,8 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
                           separator = " [", suffix = "]")
 
     #set seed if specified, otherwise random
-    if args["seed"]>=0:
-        np.random.seed(args["seed"]) 
+    if seed>=0:
+        np.random.seed(seed) 
 
     eccentricity = float(eccentricity)
     argument_of_pericenter = float(argument_of_pericenter)
@@ -81,7 +81,7 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
         stop_at_dynamical_instability, stop_at_semisecular_regime, 
         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots, seed)
 
     stars, bin, correct_params = make_particle_sets(
         [primary_mass, secondary_mass], 
@@ -169,8 +169,8 @@ def main_developer(stars, bin, correct_params, stellar_code, secular_code,
                           separator = " [", suffix = "]")
 
     #set seed if specified, otherwise random
-    if args["seed"]>=0:
-        np.random.seed(args["seed"]) 
+    if seed>=0:
+        np.random.seed(seed) 
 
     bin.eccentricity = float(bin.eccentricity)
     bin.argument_of_pericenter = float(bin.argument_of_pericenter)
@@ -191,7 +191,7 @@ def main_developer(stars, bin, correct_params, stellar_code, secular_code,
         stop_at_merger, stop_at_disintegrated, stop_at_inner_collision, stop_at_outer_collision, 
         stop_at_dynamical_instability, stop_at_semisecular_regime, 
         stop_at_SN, SN_kick_distr, impulse_kick_for_black_holes, fallback_kick_for_black_holes,
-        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots)
+        stop_at_CPU_time, max_CPU_time, file_name, file_type, dir_plots, seed)
 
     bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
     bin_class_object.secular_code.parameters.ignore_tertiary == True    
@@ -257,7 +257,7 @@ def parse_arguments():
                       help="initial time [%default] %unit")
     parser.add_option("-N", dest="number", type="int", default = 0,
                       help="number ID of system [%default]")
-    parser.add_option("-s", dest="seed", type=int", default = -1,
+    parser.add_option("-s", dest="seed", type="int", default = -1,
                       help="seed (int) [%default]")
     parser.add_option("-r", dest="maximum_radius_change_factor", type="float", default = 0.01,
                       help="maximum_radius_change_factor [%default] %unit")
