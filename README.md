@@ -291,6 +291,13 @@ Depreciated (yet still functioning) parameters are given in {}.
         0: "Circular niform distribution",
         1: "Constant longitude of ascending nodes", #default
         (outer longitude of ascending nodes = inner - pi)
+--tf    {--tf_style, --triple_fraction_style}   style of triple fraction 
+        0: "Constant", #default
+        1: "Linear", # Linear - 10% at 1MSun, 75% at 10MSun
+        2: "Log-linear", # Log-linear -> 10% at 1MSun, 75% at 10MSun
+
+
+
 
 -T or -t                     binary end time. [13500 Myr]
 -Z              {-z}         metallicity of stars  [0.02 (Solar)]

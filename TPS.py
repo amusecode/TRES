@@ -84,6 +84,10 @@ lib_outer_aop_distr = {0: "Uniform distribution", #default
 ##            --O_distr  inner longitude of ascending node option: 
 lib_inner_loan_distr = {0: "Circular niform distribution", 
                  1: "Constant longitude of ascending nodes",} #default
+lib_triple_fraction_style = {0: "Constant", #default
+                 1: "Linear",
+                 2: "Log-linear",
+                 }
 ##            -T or -t   binary end time. [13500 Myr]
 ##            -z         metallicity of stars  [0.02 Solar] 
 ##            -n         total number of systems to be simulated.  [1]
@@ -212,7 +216,7 @@ class Generate_initial_triple:
                                 args["inner_mass_ratio_max"], args["inner_mass_ratio_min"],
                                 args["outer_mass_ratio_max"], args["outer_mass_ratio_min"], 
                                 args["inner_primary_mass_distr"], args["inner_mass_ratio_distr"], 
-                                args["outer_mass_ratio_distr"])
+                                args["outer_mass_ratio_distr"], args["triple_fraction_style"])
                                 
 
                             orbit_convergence = False
@@ -238,35 +242,58 @@ class Generate_initial_triple:
                         self.generate_loan(args["inner_loan_max"], args["inner_loan_min"], args["inner_loan_distr"])
 
     #-------                        
+    def triple_fraction(self, primary_mass, triple_fraction_style):
+        if REPORT_TPS:
+            print('triple fraction')
+
+        if triple_fraction_style == 1: #Linear 10% at 1MSun, 75% at 10MSun
+            tf = max(0, min(1, 6.5/90*primary_mass.value_in(units.MSun)+2.5/90)) 
+        elif triple_fraction_style == 2: #Log-linear 10% at 1MSun, 75% at 10MSun
+            tf = max(0, min(1, 0.65*np.log10(primary_mass.value_in(units.MSun))+0.1)) 
+        else: #Uniform distribution 
+             tf = 1
+      
+        return tf
+        
+                                             
     def generate_mass(self, inner_primary_mass_max, inner_primary_mass_min, 
                         inner_secondary_mass_max,inner_secondary_mass_min,outer_mass_min, outer_mass_max,
                         inner_mass_ratio_max, inner_mass_ratio_min,
                         outer_mass_ratio_max, outer_mass_ratio_min,  
-                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr):
+                        inner_primary_mass_distr, inner_mass_ratio_distr, outer_mass_ratio_distr,
+                        triple_fraction_style):
         if REPORT_TPS:
             print('generate_mass')
 
         if inner_primary_mass_max == inner_primary_mass_min:
             self.inner_primary_mass = inner_primary_mass_min
         else:
-            if inner_primary_mass_distr == 1: #Scalo 1986
-                self.inner_primary_mass= new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
-                while self.inner_primary_mass < inner_primary_mass_min:
-                        self.inner_primary_mass = new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
-            elif inner_primary_mass_distr == 2:#Miller & Scale 1979
-                self.inner_primary_mass= new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
-                while self.inner_primary_mass < inner_primary_mass_min:
-                        self.inner_primary_mass = new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
-            elif inner_primary_mass_distr == 3: #Salpeter with slope 2.35
-                self.inner_primary_mass= new_salpeter_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
-            elif inner_primary_mass_distr == 4: # Flat in log space
-                self.inner_primary_mass= new_flat_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
-            elif inner_primary_mass_distr == 5: # Eggleton 2009, 399, 1471, Salpeter-like with turnover at low masses
-                self.inner_primary_mass= eggleton_mass_distr(inner_primary_mass_min, inner_primary_mass_max)
-            elif inner_primary_mass_distr == 6: #Salpeter with slope 2.3 -> Kroupa for M>0.5
-                self.inner_primary_mass = powerlaw_distr(inner_primary_mass_min, inner_primary_mass_max, -2.3)
-            else: #Kroupa 2001
-                self.inner_primary_mass = new_kroupa_mass_distribution(1, mass_min = inner_primary_mass_min, mass_max = inner_primary_mass_max)[0]
+            GO = False
+            while GO == False: 
+                if inner_primary_mass_distr == 1: #Scalo 1986
+                    self.inner_primary_mass= new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                    while self.inner_primary_mass < inner_primary_mass_min:
+                            self.inner_primary_mass = new_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                elif inner_primary_mass_distr == 2:#Miller & Scale 1979
+                    self.inner_primary_mass= new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                    while self.inner_primary_mass < inner_primary_mass_min:
+                            self.inner_primary_mass = new_miller_scalo_mass_distribution(1, inner_primary_mass_max)[0]
+                elif inner_primary_mass_distr == 3: #Salpeter with slope 2.35
+                    self.inner_primary_mass= new_salpeter_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
+                elif inner_primary_mass_distr == 4: # Flat in log space
+                    self.inner_primary_mass= new_flat_mass_distribution(1, inner_primary_mass_min, inner_primary_mass_max)[0]
+                elif inner_primary_mass_distr == 5: # Eggleton 2009, 399, 1471, Salpeter-like with turnover at low masses
+                    self.inner_primary_mass= eggleton_mass_distr(inner_primary_mass_min, inner_primary_mass_max)
+                elif inner_primary_mass_distr == 6: #Salpeter with slope 2.3 -> Kroupa for M>0.5
+                    self.inner_primary_mass = powerlaw_distr(inner_primary_mass_min, inner_primary_mass_max, -2.3)
+                else: #Kroupa 2001
+                    self.inner_primary_mass = new_kroupa_mass_distribution(1, mass_min = inner_primary_mass_min, mass_max = inner_primary_mass_max)[0]
+
+                tf = self.triple_fraction(m1, triple_fraction_style)
+                x = np.random.uniform(0, 1)
+                if x < tf:
+                    GO = True
+                print(x, tf, m1, GO)
 
 
         if inner_mass_ratio_max == inner_mass_ratio_min:
@@ -719,7 +746,7 @@ class Generate_initial_triple:
 #-------
         
 #-------
-    def print_triple(self):
+    def print_stellar_system(self):
         print('\nTriple - ')
         print('m =', self.inner_primary_mass, self.inner_secondary_mass, self.outer_mass)
         print('a =', self.inner_semi, self.outer_semi)
@@ -728,7 +755,7 @@ class Generate_initial_triple:
         print('g =', self.inner_aop, self.outer_aop)
         print('o =', self.inner_loan, self.inner_loan -np.pi)
 
-    def print_triple_short(self):
+    def print_stellar_system_short(self):
         print( self.inner_primary_mass.value_in(units.MSun), self.inner_secondary_mass.value_in(units.MSun), self.outer_mass.value_in(units.MSun), end=" ")
         print( self.inner_semi.value_in(units.RSun), self.outer_semi.value_in(units.RSun), end=" ")
         print( self.inner_ecc, self.outer_ecc, end=" ")
@@ -752,7 +779,7 @@ def evolve_model(args):
         triple_system = Generate_initial_triple(args)
                 
         if REPORT_TPS:
-           triple_system.print_triple()
+           triple_system.print_stellar_system()
 
         if (min_mass > triple_system.inner_primary_mass):
             if REPORT_TPS:
@@ -836,7 +863,7 @@ def evolve_model(args):
 #                            tr.triple.child2.semimajor_axis *= (1- tr.triple.child2.eccentricity**2)/(1-new_ecc**2) 
 #                            triple_system.inner_semi = tr.triple.child2.semimajor_axis
                         triple_system.inner_ecc = new_ecc
-                        tr.triple.child2.eccentricity = new_ecc
+                        tr.triple.child2.eccentricity = new_ecc #quad
                         tr.check_RLOF()
                         if not tr.has_donor():
                             i_ecc = max_nr_tries_ecc+1
@@ -904,6 +931,7 @@ def print_distr(args):
     print('Inner aop: \t\t',                    args["inner_aop_distr"], ' ',lib_inner_aop_distr[args["inner_aop_distr"]] )        
     print('Outer aop: \t\t',                    args["outer_aop_distr"], ' ',lib_outer_aop_distr[args["outer_aop_distr"]] )        
     print('Inner loan: \t\t',                   args["inner_loan_distr"], ' ',lib_inner_loan_distr[args["inner_loan_distr"]] )        
+    print('Triple fraction: \t\t',              args["triple_fraction_style"], ' ',lib_triple_fraction_style[args["triple_fraction_style"]] )        
     print('Common envelope model: \t',          args["which_common_envelope"], ' ', lib_CE[args["which_common_envelope"]])
     print('SN kick distr: \t\t',                args["SN_kick_distr"], ' ', lib_SN_kick_distr[args["SN_kick_distr"]])
     print('Metallicity: \t\t',                  '-', ' ', args["metallicity"].value_in(units.none))
@@ -914,7 +942,7 @@ def print_distr(args):
     print('Include CHE: \t\t',                                            args["include_CHE"]) 
     print('Include circularisation during pre-MS: \t\t',                  args["include_circ"]) 
     if args["seed"]>=0: 
-        print('Using seed: \t\t',                                         args["include_circ"]) 
+        print('Using seed: \t\t',                                         args["seed"]) 
     else:
         print('Using random seed)
     print('\n')
@@ -1075,6 +1103,9 @@ def test_initial_parameters(args):
     if (args["inner_loan_distr"] > len(lib_inner_loan_distr)) or (args["inner_loan_distr"] < 0): 
         sys.exit('error: invalid inner longitude of ascending node distribution chosen')
         
+    if (args["triple_fraction_style"] > len(lib_triple_fraction_style)) or (args["triple_fraction_style"] < 0): 
+        sys.exit('error: invalid triple fraction style chosen')
+
     if (args["SN_kick_distr"] >len(lib_SN_kick_distr)) or (args["SN_kick_distr"] < 0): 
         sys.exit('error: invalid SN kick distribution chosen')
         
@@ -1208,6 +1239,10 @@ def parse_arguments():
                       help="maximum of inner longitude of ascending node [rad] [%default]")
     parser.add_option("--O_distr",  "--Oin_distr",dest="inner_loan_distr", type="int", default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
+ 
+    parser.add_option("--tf",  "--tf_style", "--triple_fraction_style",
+                      dest="triple_fraction_style", type="int", default = 0,
+                      help="style of triple fraction [Constant]")
 
 
     parser.add_option("-z", "-Z",unit=units.none, 
