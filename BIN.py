@@ -52,17 +52,15 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_collision = True, 
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True, 
             stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "BIN.hdf", file_type = "hdf5", dir_plots = "", seed = -1,
-            stellar_code=None, secular_code=None):
+            stellar_code=None, secular_code=None, **kwargs):
 
     set_printing_strategy("custom", 
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
                           precision = 11, prefix = "", 
                           separator = " [", suffix = "]")
-
     #set seed if specified, otherwise random
     if seed>=0:
         np.random.seed(seed) 
-
     eccentricity = float(eccentricity)
     argument_of_pericenter = float(argument_of_pericenter)
     longitude_of_ascending_node = float(longitude_of_ascending_node)
@@ -161,7 +159,7 @@ def main_developer(stars, bin, correct_params, stellar_code, secular_code,
             stop_at_no_CHE = False, include_CHE = False, 
             stop_at_merger = True, stop_at_disintegrated = True, stop_at_collision = True,
             stop_at_SN = False, SN_kick_distr = 2, impulse_kick_for_black_holes = True, fallback_kick_for_black_holes = True,
-            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "BIN.hdf", file_type = "hdf5", dir_plots = "", seed = -1):
+            stop_at_CPU_time = False, max_CPU_time = 3600.0, file_name = "BIN.hdf", file_type = "hdf5", dir_plots = "", seed = -1, **kwargs):
 
     set_printing_strategy("custom", 
                           preferred_units = [units.MSun, units.RSun, units.Myr], 
