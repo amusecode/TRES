@@ -5,6 +5,7 @@ from amuse.support.console import set_printing_strategy
 import numpy as np
 import io
 import sys
+import argparse
     
 minimum_time_step = 1.e-9 |units.Myr
 
@@ -324,50 +325,50 @@ inner_bin_type, outer_bin_type, inner_bin_type_string, outer_bin_type_string, tr
 
 
 def parse_arguments():
-    from amuse.units.optparse import OptionParser
-    parser = OptionParser()
-    parser.add_option("-f", dest="file_name_root", default = "TRES",
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("-f", dest="file_name_root", type =str, default = "TRES",
                       help="file name [%default]")                      
-    parser.add_option("-F", dest="output_file", type ="string", default = 'screen',
+    parser.add_argument("-F", dest="output_file", type =str, default = 'screen',
                       help="output file[%default]")
-    parser.add_option("-S", dest="print_style", type="int", default = 2,
+    parser.add_argument("-S", dest="print_style", type=int, default = 2,
                       help="print style [%default]") 
-    parser.add_option("--save_every_snapshot", dest="save_every_snapshot", action="store_true", default = False, 
+    parser.add_argument("--save_every_snapshot", dest="save_every_snapshot", action="store_true", default = False, 
                       help="save every snapshot for specified triple [%default]")
-    parser.add_option("--print_init", dest="print_init", action="store_true", default = False, 
+    parser.add_argument("--print_init", dest="print_init", action="store_true", default = False, 
                       help="print initial conditions for re running [%default]")
-    parser.add_option("-l", dest="line_number", type="int", default = 0,
+    parser.add_argument("-l", dest="line_number", type=int, default = 0,
                       help="line number for printing initial conditions [%default]") #will only do something when print_init = True
 
     #returns first instance where desired star_type, bin_type & triple_type is reached 
-    parser.add_option("--st1", dest="inner_primary_star_type", type="int", default = -1,
+    parser.add_argument("--st1", dest="inner_primary_star_type", type=int, default = -1,
                       help="desired stellar type of inner binary primary star (int) [%default]") 
-    parser.add_option("--st2", dest="inner_secondary_star_type", type="int", default = -1,
+    parser.add_argument("--st2", dest="inner_secondary_star_type", type=int, default = -1,
                       help="desired stellar type of inner binary secondary star (int) [%default]") 
-    parser.add_option("--st3", dest="outer_star_type", type="int", default = -1,
+    parser.add_argument("--st3", dest="outer_star_type", type=int, default = -1,
                       help="desired stellar type of tertiary star (int) [%default]") 
-    parser.add_option("--st1str", dest="inner_primary_star_type_string", default = "all",
+    parser.add_argument("--st1str", dest="inner_primary_star_type_string", type=str, default = "all",
                       help="desired stellar type of inner binary primary star (int) [%default]") 
-    parser.add_option("--st2str", dest="inner_secondary_star_type_string", default = "all",
+    parser.add_argument("--st2str", dest="inner_secondary_star_type_string", type=str, default = "all",
                       help="desired stellar type of inner binary secondary star (int) [%default]") 
-    parser.add_option("--st3str", dest="outer_star_type_string", default = "all",
+    parser.add_argument("--st3str", dest="outer_star_type_string", type=str, default = "all",
                       help="desired stellar type of tertiary star [%default]") 
-    parser.add_option("--btin", dest="inner_bin_type", type="int", default = -1,
+    parser.add_argument("--btin", dest="inner_bin_type", type=int, default = -1,
                       help="desired binary type of inner binary (int) [%default]") 
-    parser.add_option("--btout", dest="outer_bin_type", type="int", default = -1,
+    parser.add_argument("--btout", dest="outer_bin_type", type=int, default = -1,
                       help="desired binary type of outer binary (int) [%default]") 
-    parser.add_option("--btinstr", dest="inner_bin_type_string", default = "all",
+    parser.add_argument("--btinstr", dest="inner_bin_type_string", type=str, default = "all",
                       help="desired binary type of inner binary (string) [%default]")                      
-    parser.add_option("--btoutstr", dest="outer_bin_type_string", default = "all",
+    parser.add_argument("--btoutstr", dest="outer_bin_type_string", type=str, default = "all",
                       help="desired binary type of outer binary (string) [%default]")                      
-    parser.add_option("--trt", dest="triple_type", type="int", default = -1,
+    parser.add_argument("--trt", dest="triple_type", type=int, default = -1,
                       help="desired triple type (int) [%default]") 
-    parser.add_option("--trtstr", dest="triple_type_string", default = "all",
+    parser.add_argument("--trtstr", dest="triple_type_string", type=str, default = "all",
                       help="desired triple type [%default]")                      
 
-                      
-    options, args = parser.parse_args()
-    return options.__dict__
+    args = parser.parse_args()
+    return args.__dict__
 
 
 if __name__ == '__main__':

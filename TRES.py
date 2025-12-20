@@ -4,6 +4,7 @@
 
 import sys
 import numpy as np
+import argparse
 # from interactions import *
 # from tidal_friction_constant import *
 from amuse.units import units
@@ -230,110 +231,111 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
 #-----
 #for running TRES.py from the commandline
 def parse_arguments():
-    from amuse.units.optparse import OptionParser
-    parser = OptionParser()
-    parser.add_option("-M", "--M1", unit=units.MSun,
-                      dest="inner_primary_mass", type="float", default = 1.3|units.MSun,
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        
+    parser.add_argument("-M", "--M1", type=units.MSun,
+                      dest="inner_primary_mass", default = 1.3|units.MSun,
                       help="inner primary mass [%default]")
-    parser.add_option("-m", "--M2", unit=units.MSun,
-                      dest="inner_secondary_mass", type="float", default = 0.5|units.MSun,
+    parser.add_argument("-m", "--M2", type=units.MSun,
+                      dest="inner_secondary_mass", default = 0.5|units.MSun,
                       help="inner secondary mass [%default]")
-    parser.add_option("-l", "--M3", unit=units.MSun,
-                      dest="outer_mass", type="float", default = 0.5|units.MSun,
+    parser.add_argument("-l", "--M3", type=units.MSun,
+                      dest="outer_mass", default = 0.5|units.MSun,
                       help="outer mass [%default]")
 
-    parser.add_option("-A", "--Ain",  unit=units.RSun,
-                      dest="inner_semimajor_axis", type="float",
+    parser.add_argument("-A", "--Ain",  type=units.RSun,
+                      dest="inner_semimajor_axis", 
                       default = 200.0 |units.RSun,
                       help="inner semi major axis [%default]")
-    parser.add_option("-a", "--Aout",unit=units.RSun,
-                      dest="outer_semimajor_axis", type="float",
+    parser.add_argument("-a", "--Aout",type=units.RSun,
+                      dest="outer_semimajor_axis", 
                       default = 20000.0 |units.RSun,
                       help="outer semi major axis [%default]")
-    parser.add_option("-E", "--Ein",
-                      dest="inner_eccentricity", type="float", default = 0.1,
+    parser.add_argument("-E", "--Ein",
+                      dest="inner_eccentricity", type=float, default = 0.1,
                       help="inner eccentricity [%default]")
-    parser.add_option("-e", "--Eout",
-                      dest="outer_eccentricity", type="float", default = 0.5,
+    parser.add_argument("-e", "--Eout",
+                      dest="outer_eccentricity", type=float, default = 0.5,
                       help="outer eccentricity [%default]")
-    parser.add_option("-i","-I",
-                      dest="relative_inclination", type="float", default = 80.0*np.pi/180.0,
+    parser.add_argument("-i","-I",
+                      dest="relative_inclination", type=float, default = 80.0*np.pi/180.0,
                       help="relative inclination [rad] [%default]")
-    parser.add_option("-G", "--Gin",
-                      dest="inner_argument_of_pericenter", type="float", default = 0.1,
+    parser.add_argument("-G", "--Gin",
+                      dest="inner_argument_of_pericenter", type=float, default = 0.1,
                       help="inner argument of pericenter [rad] [%default]")
-    parser.add_option("-g","--Gout",
-                      dest="outer_argument_of_pericenter", type="float", default = 0.5,
+    parser.add_argument("-g","--Gout",
+                      dest="outer_argument_of_pericenter", type=float, default = 0.5,
                       help="outer argument of pericenter [rad] [%default]")
-    parser.add_option("-O", "--Oin",
-                      dest="inner_longitude_of_ascending_node", type="float", default = 0.0,
+    parser.add_argument("-O", "--Oin",
+                      dest="inner_longitude_of_ascending_node", type=float, default = 0.0,
                       help="inner longitude of ascending node [rad] [%default]")
 ##             outer longitude of ascending nodes = inner - pi
-#    parser.add_option("-o",
-#                      dest="outer_longitude_of_ascending_node", type="float", default = 0.0,
+#    parser.add_argument("-o",
+#                      dest="outer_longitude_of_ascending_node", type=float, default = 0.0,
 #                      help="outer longitude of ascending node [rad] [%default]")
 
-    parser.add_option("-z", "-Z", dest="metallicity", type="float", default = 0.02,
-                      help="metallicity [%default] %unit")
-    parser.add_option("-t", "-T", unit=units.Myr,
-                      dest="tend", type="float", default = 5.0 |units.Myr,
+    parser.add_argument("-z", "-Z", dest="metallicity", type=float, default = 0.02,
+                      help="metallicity [%default]")
+    parser.add_argument("-t", "-T", type=units.Myr,
+                      dest="tend", default = 5.0 |units.Myr,
                       help="end time [%default] %unit")
-    parser.add_option("--initial_time", unit=units.Myr,
-                      dest="tinit", type="float", default = 0.0 |units.Myr,
+    parser.add_argument("--initial_time", type=units.Myr,
+                      dest="tinit", default = 0.0 |units.Myr,
                       help="initial time [%default] %unit")
-    parser.add_option("-N", dest="number", type="int", default = 0,
+    parser.add_argument("-N", dest="number", type=int, default = 0,
                       help="number ID of system [%default]")
-    parser.add_option("-s", dest="seed", type="int", default = -1,
+    parser.add_argument("-s", dest="seed", type=int, default = -1,
                       help="seed (int) [%default]")
-    parser.add_option("-r", dest="maximum_radius_change_factor", type="float", default = 0.01,
+    parser.add_argument("-r", dest="maximum_radius_change_factor", type=float, default = 0.01,
                       help="maximum_radius_change_factor [%default] %unit")
 
-#    parser.add_option("--tidal", dest="tidal_terms", action="store_false", default = True,
+#    parser.add_argument("--tidal", dest="tidal_terms", action="store_false", default = True,
 #                      help="tidal terms included [%default] %unit")
 
-    parser.add_option("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
                       help="stop at mass transfer [%default] %unit")
-    parser.add_option("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
                       help="stop if initially mass transfer[%default] %unit")
-    parser.add_option("--no_stop_at_outer_mass_transfer", dest="stop_at_outer_mass_transfer", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_outer_mass_transfer", dest="stop_at_outer_mass_transfer", action="store_false", default = True,
                       help="stop at triple mass transfer [%default] %unit")
 
 #   if stop_at_mass_transfer is False, the following 4 stopping conditions can be used to further specify.
 #   if stop_at_mass_transfer is True, the following 4 are ignored.
-    parser.add_option("--stop_at_stable_mass_transfer", dest="stop_at_stable_mass_transfer", action="store_true", default = False,
+    parser.add_argument("--stop_at_stable_mass_transfer", dest="stop_at_stable_mass_transfer", action="store_true", default = False,
                       help="stop at stable mass transfer [%default] %unit")
-    parser.add_option("--stop_at_eccentric_stable_mass_transfer", dest="stop_at_eccentric_stable_mass_transfer", action="store_true",
+    parser.add_argument("--stop_at_eccentric_stable_mass_transfer", dest="stop_at_eccentric_stable_mass_transfer", action="store_true",
                     default = False, help="stop at eccentric stable mass transfer [%default] %unit")
     #unstable mass transfer leads to common-envelope evolution
-    parser.add_option("--stop_at_unstable_mass_transfer", dest="stop_at_unstable_mass_transfer", action="store_true",
+    parser.add_argument("--stop_at_unstable_mass_transfer", dest="stop_at_unstable_mass_transfer", action="store_true",
                     default = False, help="stop at unstable mass transfer [%default] %unit")
-    parser.add_option("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer",
+    parser.add_argument("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer",
                     action="store_true", default = False, help="stop at eccentric unstable mass transfer [%default] %unit")
     #0  alpha-ce + alpha-dce
     #1  gamma-ce + alpha-dce
     #2  seba style; combination of gamma-ce, alpha-ce & alpha-dce
-    parser.add_option("--CE", dest="which_common_envelope",  type="int", default = 2,
+    parser.add_argument("--CE", dest="which_common_envelope",  type=int, default = 2,
                       help="which common envelope modeling [%default]")
 
-    parser.add_option("--stop_at_no_CHE", dest="stop_at_no_CHE",
+    parser.add_argument("--stop_at_no_CHE", dest="stop_at_no_CHE",
                     action="store_true", default = False, help="stop if no chemically homogeneous evolution [%default] %unit")
-    parser.add_option("--include_CHE", dest="include_CHE",
+    parser.add_argument("--include_CHE", dest="include_CHE",
                     action="store_true", default = False, help="include chemically homogeneous evolution in the stellar evolution [%default] %unit")
 
-    parser.add_option("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True,
                       help="stop at merger [%default] %unit")
-    parser.add_option("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
                       help="stop at disintegrated [%default] %unit")
-    parser.add_option("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
+    parser.add_argument("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
                       help="stop at collision in inner binary[%default] %unit")
-    parser.add_option("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
+    parser.add_argument("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
                       help="stop at collision in outer binary[%default] %unit")
-    parser.add_option("--no_stop_at_dynamical_instability", dest="stop_at_dynamical_instability", action="store_false", default = True,
+    parser.add_argument("--no_stop_at_dynamical_instability", dest="stop_at_dynamical_instability", action="store_false", default = True,
                       help="stop at dynamical instability [%default] %unit")
-    parser.add_option("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
+    parser.add_argument("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
                       help="stop at semisecular regime [%default] %unit")
 
-    parser.add_option("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
+    parser.add_argument("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
                       help="stop at supernova [%default] %unit")
     #0  No kick
     #1  Hobbs, Lorimer, Lyne & Kramer 2005, 360, 974
@@ -341,31 +343,31 @@ def parse_arguments():
     #3  Hansen & Phinney 1997, 291, 569
     #4  Paczynski 1990, 348, 485
     #5  Verbunt, Igoshev & Cator, 2017, 608, 57
-    parser.add_option("--SN_kick_distr", dest="SN_kick_distr",  type="int", default = 5,
+    parser.add_argument("--SN_kick_distr", dest="SN_kick_distr",  type=int, default = 5,
                       help="which supernova kick distribution [%default]")
-    parser.add_option("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
+    parser.add_argument("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick by mass -> impulse kick [%default]")
-    parser.add_option("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
+    parser.add_argument("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
                       help="do not rescale the BH SN kick with fallback  [%default]")
 
 
-    parser.add_option("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
+    parser.add_argument("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
                       help="stop at CPU time [%default] %unit")
-    parser.add_option("--max_CPU_time", dest="max_CPU_time", type="float", default = 3600.0,
+    parser.add_argument("--max_CPU_time", dest="max_CPU_time", type=float, default = 3600.0,
                       help="max CPU time [%default] %unit")
 
-    parser.add_option("--stellar_evolution_code", dest="SE_code",  type="int", default = 0,
+    parser.add_argument("--stellar_evolution_code", dest="SE_code",  type=int, default = 0,
                       help="which stellar evolution [%default]")
 
-    parser.add_option("-f", dest="file_name", type ="string", default = "TRES.hdf",#"TRES.txt"
+    parser.add_argument("-f", dest="file_name", type =str, default = "TRES.hdf",#"TRES.txt"
                       help="file name[%default]")
-    parser.add_option("-F", dest="file_type", type ="string", default = "hdf5",#"txt"
+    parser.add_argument("-F", dest="file_type", type =str, default = "hdf5",#"txt"
                       help="file type[%default]")
-    parser.add_option("--dir_plots", dest="dir_plots", type ="string", default = "",#"txt"
+    parser.add_argument("--dir_plots", dest="dir_plots", type =str, default = "",#"txt"
                       help="directory for plots for debugging mode [%default]")
 
-    options, args = parser.parse_args()
-    return options.__dict__
+    args = parser.parse_args()
+    return args.__dict__
 
 
 if __name__ == '__main__':
