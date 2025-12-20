@@ -383,28 +383,20 @@ Normally TRES adds the evolution history of individual triples in the TRES.hdf f
 
 ## Reducing the TRES output
 
-The python script rdc_TRES_csv.py reduce the TRES hdf output and creates a csv file. The full list of available options is [default]:
+The python script rdc_TRES.py reduce the TRES hdf output. The full list of available options is [default]:
 ```
--f      Root of the name of the input file [TRES]
--P 	Parameter_style [1]
--S      Printing style [0]
--F      Print all snapshots. By default only the first & last lines are printed.
-```
-
-For the parameter style you can choose between:
-```
-0      All parameters
-1	Selected parameters [default]
-2	Parameters can be selected by the user in the function create_snapshot_for_dict
+-f              Root of the name of the input file [TRES]
+-F              Name of the output file  [printing to screen]. CSV files are supported, otherwise plain text is produced separated by a space. 
+-S              Printing style [2]
+--save_every_snapshot      Save all snapshots. By default only the first & last lines are printed.
 ```
 
-You can also print the parameters to the terminal through the printing style option:
+For the printing style you can choose between:
 ```
-0      No printing to screen
-1	Printing to screen
+0   Readable format - recommended for quick checks 
+1	Full dataset - recommended for debugging [default]
+2	TRES standard; selected parameter [default]. Parameters can be adjusted by the user through the 'keys' arrays.
 ```
-
-
 
 You can also select specific types of triples. For these a single extra line is added on the first occasion the requirements are met. Options are:
 ```
@@ -426,41 +418,6 @@ or if you prefer to specify these in string format:
 ```
 
 
-The depreciated script rdc_TRES.py only prints to screen. Here the printing style options are:
-
-Which parameters are printed and in which style can be adjusted to your liking in the function rdc().
-Currently there are 3 options settable on the command line via -S (print_style):
-```
-0      Selected parameters are printed in a human readible way
-1      Full - all possible parameters are printed (sys.exit after first snapshot)
-2      TRES standard - selected parameters
-3      TRES standard - selected parameters, csv format
-```
-
-
-
-For option 2:
-6 lines are printed for every snapshot. The columns represent:
-
-General information on the system:
-```
-Line 1: snapshot number, triple number, time, relative_inclination, dynamical_instability, kozai_type, error_flag_secular, CPU_time
-```
-Orbital information (inner binary | outer binary) :
-```
-Line 2: 'bs:', binary type, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node
-        | binary type, semimajoraxis, eccentricity, argument_of_pericenter, longitude_of_ascending_node
-```
-Stellar information (primary | secondary | tertiary)
-```
-Line 3: 'st:', is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
-        | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
-        | is_donor, stellar_type, mass, spin_angular_frequency, radius, core mass
-```
-
-
-For option 0:
-One line is printed for every snapshot with the parameters in the same order as above (excluding the snapshot number). The units are Solar Mass, Solar radius, Myr.
 
 The stellar types in TRES follow the standard terminology of AMUSE:
 ```
