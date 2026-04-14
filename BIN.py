@@ -22,6 +22,10 @@ try:
     from amuse.community.mesa import Mesa 
 except ImportError:
     Mesa = None
+try:
+    from amuse.community.metisse import Metisse 
+except ImportError:
+    Metisse = None
 from seculartriple_TPS.interface import SecularTriple
 
 
@@ -98,8 +102,10 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
         stellar_code = Sse()
     elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
         stellar_code = Mesa()
+    elif stellar_code.__module__.split(".")[-2]=="metisse":                               
+        stellar_code = Metisse()
     else:
-        print('No valid stellar evolution code selected. Options are SeBa (default), SSE or MESA')
+        print('No valid stellar evolution code selected. Options are SeBa (default), SSE, MESA, or METISSE')
         return bin_class_object # no codes initialized yet #silvia object??
     clean_up_stellar_code = True
 
@@ -366,6 +372,8 @@ if __name__ == '__main__':
         stellar_code = Sse()
     elif args["SE_code"] == 2:
         stellar_code = Mesa()
+    elif args["SE_code"] == 3:
+        stellar_code = Metisse()
     else:
         stellar_code = Seba()    
 #        stellar_code = Seba(redirection='none')
