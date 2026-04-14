@@ -88,7 +88,7 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 #import TRES as TRES 
 import BIN as BIN
-from amuse.community.seba import SeBa
+# from amuse.community.seba import Seba
 from seculartriple_TPS.interface import SecularTriple
 
 secular_code = SecularTriple()
@@ -539,6 +539,15 @@ def evolve_model(args):
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
 
+    if args["SE_code"] == 1:
+        stellar_code = "sse"
+    elif args["SE_code"] == 2:
+        stellar_code = "mesa_r15140"
+    elif args["SE_code"] == 3:
+        stellar_code = "metisse"
+    else:
+        stellar_code = "seba"    
+
     while i_n < args["total_number"]:
         triple_system = Generate_initial_binary(args)
                
@@ -564,7 +573,7 @@ def evolve_model(args):
         #memory of SeBa needs to be cleaned, in particular SeBa time
         #otherwise use evolve_for for particles indivicually -> many calls 
         tr = BIN.main(**(triple_system.__dict__), **args, 
-                number = number_of_system, secular_code = secular_code)
+                number = number_of_system, stellar_code = stellar_code, secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -596,7 +605,7 @@ def evolve_model(args):
                             i_n += 1  
                             nr_imt -= 1
                             tr = BIN.main(**(triple_system.__dict__), **args, 
-                                number = number_of_system, secular_code = secular_code)
+                                number = number_of_system, stellar_code = stellar_code, secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -872,6 +881,8 @@ def parse_arguments():
     parser.add_argument("--max_CPU_time", dest="max_CPU_time", type=float, default = 3600.0,
                       help="max CPU time")
                       
+    parser.add_argument("--stellar_evolution_code", dest="SE_code",  type=int, default = 0,
+                      help="which stellar evolution")
                       
     parser.add_argument("-f", dest="file_name", type =str, default = "TRES.hdf",#"TRES.txt"
                       help="file name")
