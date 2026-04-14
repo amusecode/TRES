@@ -11,15 +11,15 @@ from amuse.units import units
 from amuse.support.console import set_printing_strategy
 
 try:
-    from amuse.community.seba.interface import SeBa 
+    from amuse.community.seba import Seba 
 except ImportError:
-    SeBa = None
+    Seba = None
 try:
-    from amuse.community.sse.interface import SSE 
+    from amuse.community.sse import Sse 
 except ImportError:
-    SSE = None
+    Sse = None
 try:
-    from amuse.community.mesa.interface import Mesa 
+    from amuse.community.mesa import Mesa 
 except ImportError:
     Mesa = None
 from seculartriple_TPS.interface import SecularTriple
@@ -91,11 +91,11 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
     clean_up_secular_code = False
 
     if stellar_code is None or stellar_code.__module__.split(".")[-2]=="seba":
-        stellar_code = SeBa()
-    #    stellar_code = SeBa(redirection='none')
-    #    stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_BIN.txt')
+        stellar_code = Seba()
+    #    stellar_code = Seba(redirection='none')
+    #    stellar_code = Seba(redirection='file', redirect_file='output_SeBa_BIN.txt')
     elif stellar_code.__module__.split(".")[-2]=="sse":                               
-        stellar_code = SSE()
+        stellar_code = Sse()
     elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
         stellar_code = Mesa()
     else:
@@ -363,13 +363,13 @@ if __name__ == '__main__':
 
 
     if args["SE_code"] == 1:
-        stellar_code = SSE()
+        stellar_code = Sse()
     elif args["SE_code"] == 2:
         stellar_code = Mesa()
     else:
-        stellar_code = SeBa()    
-#        stellar_code = SeBa(redirection='none')
-#        stellar_code = SeBa(redirection='file', redirect_file='output_SeBa_BIN.txt')
+        stellar_code = Seba()    
+#        stellar_code = Seba(redirection='none')
+#        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_BIN.txt')
     stellar_code.parameters.metallicity = args["metallicity"]
 
     secular_code = SecularTriple()
