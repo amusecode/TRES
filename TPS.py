@@ -919,125 +919,125 @@ def parse_arguments():
 
     parser.add_argument("--M_min", "--M1_min",type=units.MSun, 
                       dest="inner_primary_mass_min", default = 1.|units.MSun,
-                      help="minimum of inner primary mass [%default]")
+                      help="minimum of inner primary mass")
     parser.add_argument("--M_max", "--M1_max",type=units.MSun, 
                       dest="inner_primary_mass_max", default = absolute_max_mass,
-                      help="maximum of inner primary mass [%default]")
+                      help="maximum of inner primary mass")
     parser.add_argument("--M_distr", "--M1_distr",dest="inner_primary_mass_distr", type=int, default = 0,
                       help="inner primary mass distribution [Kroupa]")
 
     parser.add_argument("--m_min", "--M2_min",type=units.MSun, 
                       dest="inner_secondary_mass_min", default = absolute_min_mass,
-                      help="minimum of inner secondary mass [%default]")
+                      help="minimum of inner secondary mass")
     #only used for inner_mass_ratio_distr == 1:# Kroupa 2001    
     parser.add_argument("--m_max", "--M2_max",type=units.MSun, 
                       dest="inner_secondary_mass_max", default = absolute_max_mass,
-                      help="maximum of inner secondary mass [%default]") 
+                      help="maximum of inner secondary mass") 
     parser.add_argument("--l_min", "--M3_min",type=units.MSun, 
                       dest="outer_mass_min", default = absolute_min_mass,
-                      help="minimum of outer mass [%default]")
+                      help="minimum of outer mass")
     parser.add_argument("--l_max", "--M3_max",type=units.MSun, 
                       dest="outer_mass_max", default = absolute_max_mass,
-                      help="maximum of outer mass [%default]")
+                      help="maximum of outer mass")
                       
     parser.add_argument("--Q_max", "--Qin_max",dest="inner_mass_ratio_max", type=float, default = 1.0,
-                      help="maximum of inner mass ratio [%default]")
+                      help="maximum of inner mass ratio")
     parser.add_argument("--Q_min", "--Qin_min", dest="inner_mass_ratio_min", type=float, default = 0.,
-                      help="minimum of inner mass ratio [%default]")
+                      help="minimum of inner mass ratio")
     parser.add_argument("--Q_distr", "--Qin_distr", dest="inner_mass_ratio_distr", type=int, default = 0,
                       help="inner mass ratio distribution [Flat]")
 
     parser.add_argument("--q_max", "--Qout_max", dest="outer_mass_ratio_max", type=float, default = 1.0,
-                      help="maximum of outer mass ratio [%default]")
+                      help="maximum of outer mass ratio")
     parser.add_argument("--q_min", "--Qout_min", dest="outer_mass_ratio_min", type=float, default = 0.,
-                      help="minimum of outer mass ratio [%default]")
+                      help="minimum of outer mass ratio")
     parser.add_argument("--q_distr", "--Qout_distr", dest="outer_mass_ratio_distr", type=int, default = 0,
                       help="outer mass ratio distribution [Flat]")
 
     parser.add_argument("--A_min", "--Ain_min", type=units.RSun,
                       dest="inner_semi_min", 
                       default = 0.5|units.RSun,
-                      help="minimum of inner semi major axis [%default]")
+                      help="minimum of inner semi major axis")
     parser.add_argument("--A_max",  "--Ain_max",type=units.RSun,
                       dest="inner_semi_max", 
                       default = 5e6|units.RSun,
-                      help="maximum of inner semi major axis [%default]")
+                      help="maximum of inner semi major axis")
     parser.add_argument("--A_distr",  "--Ain_distr",dest="inner_semi_distr", type=int, default = 0,
                       help="inner semimajor axis distribution [logFlat]")
 
     parser.add_argument("--a_min",  "--Aout_min",type=units.RSun,
                       dest="outer_semi_min", 
                       default = 0.5|units.RSun,
-                      help="minimum of outer semi major axis [%default]")
+                      help="minimum of outer semi major axis")
     parser.add_argument("--a_max",  "--Aout_max", type=units.RSun,
                       dest="outer_semi_max", 
                       default = 5e6|units.RSun,
-                      help="maximum of outer semi major axis [%default]")
+                      help="maximum of outer semi major axis")
     parser.add_argument("--a_distr",  "--Aout_distr", dest="outer_semi_distr", type=int, default = 0,
                       help="outer semimajor axis distribution [logFlat]")
 
     parser.add_argument("--Ar_min",  "--Arin_min", dest="inner_semi_latus_rectum_min", action="store_true", default = False, 
-                      help="minimum inner semi latus rectrum  [%default] %unit")
+                      help="minimum inner semi latus rectrum ")
     parser.add_argument("--ar_min",  "--Arout_min",dest="outer_semi_latus_rectum_min", action="store_true", default = False, 
-                      help="minimum outer semi latus rectrum  [%default] %unit")
+                      help="minimum outer semi latus rectrum ")
     parser.add_argument("--Ar_max",  "--Arin_max",dest="inner_semi_latus_rectum_max", action="store_true", default = False, 
-                      help="maximum inner semi latus rectrum  [%default] %unit")
+                      help="maximum inner semi latus rectrum ")
     parser.add_argument("--ar_max",  "--Arout_max",dest="outer_semi_latus_rectum_max", action="store_true", default = False, 
-                      help="maximum outer semi latus rectrum  [%default] %unit")
+                      help="maximum outer semi latus rectrum ")
 
     parser.add_argument("--E_min",  "--Ein_min",
                       dest="inner_ecc_min", type=float, default = 0.,
-                      help="minimum of inner eccentricity [%default]")
+                      help="minimum of inner eccentricity")
     parser.add_argument("--E_max",   "--Ein_max",
                       dest="inner_ecc_max", type=float, default = 0.9,
-                      help="maximum of inner eccentricity [%default]")
+                      help="maximum of inner eccentricity")
     parser.add_argument("--E_distr",   "--Ein_distr", dest="inner_ecc_distr", type=int, default = 0,
                       help="inner eccentricity distribution [Thermal]")
 
     parser.add_argument("--e_min",  "--Eout_min",
                       dest="outer_ecc_min", type=float, default = 0.,
-                      help="minimum of outer eccentricity [%default]")
+                      help="minimum of outer eccentricity")
     parser.add_argument("--e_max",  "--Eout_max",
                       dest="outer_ecc_max", type=float, default = 0.9,
-                      help="maximum of outer eccentricity [%default]")
+                      help="maximum of outer eccentricity")
     parser.add_argument("--e_distr", "--Eout_distr",dest="outer_ecc_distr", type=int, default = 0,
                       help="outer eccentricity distribution [Thermal]")
                       
                       
     parser.add_argument("--i_min, --I_min",
                       dest="incl_min", type=float, default = 0.0,
-                      help="minimum of relative inclination [rad] [%default]")
+                      help="minimum of relative inclination [rad]")
     parser.add_argument("--i_max, --I_max",
                       dest="incl_max", type=float, default = np.pi,
-                      help="maximum of relative inclination [rad] [%default]")
+                      help="maximum of relative inclination [rad]")
     parser.add_argument("--i_distr, --I_distr", dest="incl_distr", type=int, default = 0,
                       help="relative inclination distribution [Circular uniform]")
 
                       
     parser.add_argument("--G_min",  "--Gin_min",
                       dest="inner_aop_min", type=float, default = -np.pi,
-                      help="minimum of inner argument of pericenter [rad] [%default]")
+                      help="minimum of inner argument of pericenter [rad]")
     parser.add_argument("--G_max",  "--Gin_max",
                       dest="inner_aop_max", type=float, default = np.pi,
-                      help="maximum of inner argument of pericenter [rad] [%default]")
+                      help="maximum of inner argument of pericenter [rad]")
     parser.add_argument("--G_distr",   "--Gin_distr",dest="inner_aop_distr", type=int, default = 0,
                       help="inner argument of pericenter distribution [Uniform]")
 
     parser.add_argument("--g_min",  "--Gout_min",
                       dest="outer_aop_min", type=float, default = -np.pi,
-                      help="minimum of outer argument of pericenter [rad] [%default]")
+                      help="minimum of outer argument of pericenter [rad]")
     parser.add_argument("--g_max", "--Gout_max",
                       dest="outer_aop_max", type=float, default = np.pi,
-                      help="maximum of outer argument of pericenter [rad] [%default]")
+                      help="maximum of outer argument of pericenter [rad]")
     parser.add_argument("--g_distr",  "--Gout_distr", dest="outer_aop_distr", type=int, default = 0,
                       help="outer argument of pericenter distribution [Uniform]")
                       
     parser.add_argument("--O_min",  "--Oin_min",
                       dest="inner_loan_min", type=float, default = -np.pi,
-                      help="minimum of inner longitude of ascending node [rad] [%default]")
+                      help="minimum of inner longitude of ascending node [rad]")
     parser.add_argument("--O_max", "--Oin_max",
                       dest="inner_loan_max", type=float, default = np.pi,
-                      help="maximum of inner longitude of ascending node [rad] [%default]")
+                      help="maximum of inner longitude of ascending node [rad]")
     parser.add_argument("--O_distr",  "--Oin_distr",dest="inner_loan_distr", type=int, default = 1,
                       help="inner longitude of ascending node distribution [Constant]")
  
@@ -1048,80 +1048,80 @@ def parse_arguments():
 
     parser.add_argument("-z", "-Z", 
                       dest="metallicity", type=float, default = 0.02,
-                      help="metallicity [%default]")                     
+                      help="metallicity")                     
     parser.add_argument("-t", "-T", type=units.Myr, 
                       dest="tend", default = 13500|units.Myr,
-                      help="end time [%default] %unit")
+                      help="end time")
     parser.add_argument("-n", dest="total_number", type=int, default = 10,
-                      help="total number of systems to be simulated [%default]")
+                      help="total number of systems to be simulated")
     parser.add_argument("-N", dest="initial_number", type=int, default = 0,
-                      help="number ID of first system [%default]")
+                      help="number ID of first system")
     parser.add_argument("-s",  dest="seed", type=int, default = -1,
-                      help="seed (int) [%default]")
+                      help="seed (int)")
 #    int actual_seed = srandinter(input_seed);
 
     parser.add_argument("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,
-                      help="stop at mass transfer [%default] %unit")
+                      help="stop at mass transfer")
     parser.add_argument("--no_stop_at_init_mass_transfer", dest="stop_at_init_mass_transfer", action="store_false", default = True,
-                      help="stop if initially mass transfer[%default] %unit")
+                      help="stop if initially mass transfer")
     parser.add_argument("--no_stop_at_outer_mass_transfer", dest="stop_at_outer_mass_transfer", action="store_false", default = True,
-                      help="stop at outer mass transfer [%default] %unit")
+                      help="stop at outer mass transfer")
 
 #   if stop_at_mass_transfer is False, the following 4 stopping conditions can be used to further specify.
 #   if stop_at_mass_transfer is True, the following 4 are ignored.
     parser.add_argument("--stop_at_stable_mass_transfer", dest="stop_at_stable_mass_transfer", action="store_true", default = False,
-                      help="stop at stable mass transfer [%default] %unit")
+                      help="stop at stable mass transfer")
     parser.add_argument("--stop_at_eccentric_stable_mass_transfer", dest="stop_at_eccentric_stable_mass_transfer", action="store_true",                                               
-                    default = False, help="stop at eccentric stable mass transfer [%default] %unit")
+                    default = False, help="stop at eccentric stable mass transfer")
     #unstable mass transfer leads to common-envelope evolution
     parser.add_argument("--stop_at_unstable_mass_transfer", dest="stop_at_unstable_mass_transfer", action="store_true", 
-                    default = False, help="stop at unstable mass transfer [%default] %unit")
+                    default = False, help="stop at unstable mass transfer")
     parser.add_argument("--stop_at_eccentric_unstable_mass_transfer", dest="stop_at_eccentric_unstable_mass_transfer", 
-                    action="store_true", default = False, help="stop at eccentric unstable mass transfer [%default] %unit")
+                    action="store_true", default = False, help="stop at eccentric unstable mass transfer")
     parser.add_argument("--CE", dest="which_common_envelope",  type=int, default = 2,
-                      help="which common envelope modeling [%default]")                      
+                      help="which common envelope modeling")                      
 
     parser.add_argument("--stop_at_no_CHE",dest="stop_at_no_CHE", action="store_true", default = False,
-                      help="stop if no chemically homogeneous evolution [%default] %unit") 
+                      help="stop if no chemically homogeneous evolution") 
     parser.add_argument("--include_CHE", dest="include_CHE", 
-                    action="store_true", default = False, help="include chemically homogeneous evolution in the stellar evolution [%default] %unit")
+                    action="store_true", default = False, help="include chemically homogeneous evolution in the stellar evolution")
     parser.add_argument("--include_circularisation_during_preMS", dest="include_circ", 
-                    action="store_true", default = False, help="include circularisation during pre-MS [%default] %unit")
+                    action="store_true", default = False, help="include circularisation during pre-MS")
 
     parser.add_argument("--no_stop_at_merger", dest="stop_at_merger", action="store_false", default = True, 
-                      help="stop at merger [%default] %unit")
+                      help="stop at merger")
     parser.add_argument("--no_stop_at_disintegrated", dest="stop_at_disintegrated", action="store_false", default = True,
-                      help="stop at disintegrated [%default] %unit")
+                      help="stop at disintegrated")
     parser.add_argument("--no_stop_at_inner_collision", dest="stop_at_inner_collision", action="store_false",default = True,
-                      help="stop at collision in inner binary[%default] %unit")
+                      help="stop at collision in inner binary")
     parser.add_argument("--no_stop_at_outer_collision", dest="stop_at_outer_collision", action="store_false",default = True,
-                      help="stop at collision in outer binary[%default] %unit")
+                      help="stop at collision in outer binary")
     parser.add_argument("--no_stop_at_dynamical_instability", dest="stop_at_dynamical_instability", action="store_false", default = True,
-                      help="stop at dynamical instability [%default] %unit")
+                      help="stop at dynamical instability")
     parser.add_argument("--stop_at_semisecular_regime", dest="stop_at_semisecular_regime", action="store_true", default = False,
-                      help="stop at semisecular regime [%default] %unit")
+                      help="stop at semisecular regime")
 
     parser.add_argument("--stop_at_SN", dest="stop_at_SN", action="store_true", default = False,
-                      help="stop at supernova [%default] %unit")
+                      help="stop at supernova")
     parser.add_argument("--SN_kick_distr", dest="SN_kick_distr",  type=int, default = 5,
-                      help="which supernova kick distribution [%default]")                      
+                      help="which supernova kick distribution")                      
     parser.add_argument("--no_impulse_kick_for_black_holes", dest="impulse_kick_for_black_holes",  action="store_false", default = True,
-                      help="do not rescale the BH SN kick by mass -> impulse kick [%default]")                      
+                      help="do not rescale the BH SN kick by mass -> impulse kick")                      
     parser.add_argument("--no_fallback_kick_for_black_holes", dest="fallback_kick_for_black_holes",  action="store_false", default = True,
-                      help="do not rescale the BH SN kick with fallback  [%default]")                      
+                      help="do not rescale the BH SN kick with fallback ")                      
 
     parser.add_argument("--stop_at_CPU_time", dest="stop_at_CPU_time", action="store_true", default = False,
-                      help="stop at CPU time [%default] %unit")
+                      help="stop at CPU time")
     parser.add_argument("--max_CPU_time", dest="max_CPU_time", type=float, default = 3600.0,
-                      help="max CPU time [%default] %unit")
+                      help="max CPU time")
                       
                       
     parser.add_argument("-f", dest="file_name", type =str, default = "TRES.hdf",#"TRES.txt"
-                      help="file name[%default]")
+                      help="file name")
     parser.add_argument("-F", dest="file_type", type =str, default = "hdf5",#"txt"
-                      help="file type[%default]")
+                      help="file type")
     parser.add_argument("--dir_plots", dest="dir_plots", type =str, default = "",#"txt"
-                      help="directory for plots for debugging mode [%default]")
+                      help="directory for plots for debugging mode")
 
     args = parser.parse_args()
     return args.__dict__
