@@ -1,8 +1,9 @@
-from interactions import *
-from tidal_friction_constant import *
 
 import sys
 import time
+import numpy as np
+# from math import isnan
+
 from amuse.units import units, constants
 from amuse.datamodel import Particles
 from amuse.io import write_set_to_file
@@ -10,20 +11,8 @@ from amuse.units import quantities
 from scipy.stats import maxwell
 from scipy import optimize
 
-# from math import isnan
-import numpy as np
-
-# from tres_options import REPORT_USER_WARNINGS, \
-#                          GET_GYRATION_RADIUS_FROM_STELLAR_CODE, \
-#                          GET_AMC_FROM_STELLAR_CODE, \
-#                          REPORT_EVOLUTION, \
-#                          REPORT_DEBUG, \
-#                          MAKE_PLOTS, \
-#                          REPORT_DT, \
-#                          kozai_type_factor, \
-#                          maximum_time_step_factor, \
-#                          minimum_time_step
-
+from interactions import *
+from tidal_friction_constant import *
 from TRES_options import *
 from TRES_setup import setup_secular_code, setup_stellar_code
 from TRES_plotting import plot_data_container

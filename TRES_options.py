@@ -50,6 +50,53 @@ maximum_time_step = np.inf|units.Myr
 
 kanonical_neutron_star_mass = 1.4|units.MSun
 fall_back_mass = 41 |units.MSun
+#--------------------------------------------------------------------------------------------------------------------
+#TRES interaction settings
+
+#constants
+numerical_error  = 1.e-6
+small_numerical_error  = 1.e-10
+minimum_eccentricity = 1.e-5
+
+const_common_envelope_efficiency = 4.0 #1.0, 4 for now for easier testing with SeBa
+const_envelope_structure_parameter = 0.5
+const_common_envelope_efficiency_gamma = 1.75
+
+stellar_types_compact_objects = [10,11,12,13,14]|units.stellar_type
+stellar_types_giants = [2,3,4,5,6,8,9]|units.stellar_type
+stellar_types_planetary_objects = [18,19]|units.stellar_type # planets & brown dwarfs
+
+stellar_types_SN_remnants = [13,14,15]|units.stellar_type # remnant types created through a supernova
+stellar_types_remnants = [7,8,9,10,11,12,13,14,15]|units.stellar_type
+stellar_types_dr = [2,4,7,8,9,10,11,12,13,14,15]|units.stellar_type #stars which go through a instantaneous radius change at formation; hertzsprung gap stars (small envelope perturbation) + horizontal branch stars + remnants
+
+#q_crit = 3.
+#q_crit_giants_conv_env = 0.9
+nuclear_efficiency = 0.007 # nuc. energy production eff, Delta E = 0.007 Mc^2
+
+#dictionaries
+bin_type = {
+                'unknown': 'unknown',
+                'merger': 'merger',
+                'disintegrated': 'disintegrated',
+                'dyn_inst': 'dynamical_instability',
+
+                'detached': 'detached',
+                'contact': 'contact',
+                'collision': 'collision',
+                'semisecular': 'semisecular',
+                'rlof': 'rlof',   #only used for stopping conditions
+                'olof' : 'olof',  #only used for stopping conditions
+
+                'stable_mass_transfer': 'stable_mass_transfer',
+                'common_envelope': 'common_envelope',
+                'common_envelope_energy_balance': 'common_envelope_energy_balance',
+                'common_envelope_angular_momentum_balance': 'common_envelope_angular_momentum_balance',
+                'double_common_envelope': 'double_common_envelope',
+
+            }
+
+
 
 #--------------------------------------------------------------------------------------------------------------------
 #TPS general settings
