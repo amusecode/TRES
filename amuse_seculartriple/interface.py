@@ -5,12 +5,13 @@ Designed to work together with TPS
 Adrian Hamers 2015
 """
 
-from amuse.community import *
+from amuse.community import legacy_function
+from amuse.rfi.core import CodeInterface, LegacyFunctionSpecification
+from amuse.support.interface import InCodeComponentImplementation
 from amuse.units import units,constants
-import sys
 
 ### units used internally in the ODE solver ###
-unit_l = units.AU
+unit_l = units.au
 unit_m = units.MSun
 unit_t = 1.0e6*units.yr
 unit_h = unit_m*unit_l**2/unit_t ### angular momentum
@@ -41,7 +42,7 @@ CV_BAD_DKY=-26
 CV_TOO_CLOSE=-27
 
 
-class SecularTripleInterface(CodeInterface):
+class SeculartripleInterface(CodeInterface):
     include_headers = ['src/main_code.h','src/ODE_system.h']
 
     def __init__(self, **options):
@@ -83,9 +84,9 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('moment_of_inertia_dot_star1', dtype='float64', direction=function.IN)
         function.addParameter('moment_of_inertia_dot_star2', dtype='float64', direction=function.IN)
         function.addParameter('moment_of_inertia_dot_star3', dtype='float64', direction=function.IN)
-#        function.addParameter('k_div_T_tides_star1', dtype='float64', direction=function.IN)   
-#        function.addParameter('k_div_T_tides_star2', dtype='float64', direction=function.IN)   
-#        function.addParameter('k_div_T_tides_star3', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star1', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star2', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star3', dtype='float64', direction=function.IN)   
         function.addParameter('a_in', dtype='float64', direction=function.IN)
         function.addParameter('a_out', dtype='float64', direction=function.IN)
         function.addParameter('e_in', dtype='float64', direction=function.IN)
@@ -892,10 +893,10 @@ class SecularTripleInterface(CodeInterface):
 
 
 
-class SecularTriple(InCodeComponentImplementation):
+class Seculartriple(InCodeComponentImplementation):
 
     def __init__(self, **options):
-        InCodeComponentImplementation.__init__(self,  SecularTripleInterface(**options), **options)
+        InCodeComponentImplementation.__init__(self,  SeculartripleInterface(**options), **options)
         self.model_time = 0.0 | units.Myr
         self.evolve_further_after_root_was_found = False ### in some cases, it is desirable to integrate until the given end time, despite the finding of a root
         self.take_into_account_RLOF_after_no_longer_filling_Roche_lobe = True ### this may seem like a strange `feature', but exists for consistency with the stellar/binary evolution code
