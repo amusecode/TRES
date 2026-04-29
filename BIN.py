@@ -22,7 +22,7 @@ try:
     from amuse.community.mesa import Mesa 
 except ImportError:
     Mesa = None
-from seculartriple_TPS.interface import SecularTriple
+from amuse_seculartriple import Seculartriple
 
 
 from stellarsystem_class import StellarSystem_Class
@@ -105,9 +105,9 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
 
     stellar_code.parameters.metallicity = metallicity
     if secular_code is None:
-        secular_code = SecularTriple()
-    #    secular_code = SecularTriple(redirection='none')
-    #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
+        secular_code = Seculartriple()
+    #    secular_code = Seculartriple(redirection='none')
+    #    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
         clean_up_secular_code = True
         
 
@@ -372,9 +372,9 @@ if __name__ == '__main__':
 #        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_BIN.txt')
     stellar_code.parameters.metallicity = args["metallicity"]
 
-    secular_code = SecularTriple()
-#    secular_code = SecularTriple(redirection='none')
-#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
+    secular_code = Seculartriple()
+#    secular_code = Seculartriple(redirection='none')
+#    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
 
     bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
     bin_class_object.secular_code.parameters.ignore_tertiary == True

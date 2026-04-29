@@ -89,9 +89,9 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 #import TRES as TRES 
 import BIN as BIN
 from amuse.community.seba import SeBa
-from seculartriple_TPS.interface import SecularTriple
+from amuse_seculartriple import Seculartriple
 
-secular_code = SecularTriple()
+secular_code = Seculartriple()
 import sys
 import argparse
 from amuse.units import units, constants

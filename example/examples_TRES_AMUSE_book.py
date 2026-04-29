@@ -7,7 +7,7 @@ from amuse.community.seba.interface import SeBa
 import sys, os
 sys.path.append(os.path.dirname(os.getcwd()))
 import TRES as TRES
-from seculartriple_TPS.interface import SecularTriple
+from amuse_seculartriple import Seculartriple
 
 
 bin_type = {    'all': -1,
@@ -110,7 +110,7 @@ def example_3():
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_eccentricity_array = []
     outer_eccentricity_array = []
@@ -171,7 +171,7 @@ def example_4():
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
@@ -252,7 +252,7 @@ def example_5():
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     inner_semimajor_axis_array = np.array([])
     outer_semimajor_axis_array = np.array([])
@@ -341,7 +341,7 @@ def example_6():
     stellar_code = SeBa()
     stellar_code.parameters.metallicity = metallicity
     # stellar_code.particles.add_particles(stars)
-    secular_code = SecularTriple()
+    secular_code = Seculartriple()
     
     #make triple object (evolve for small timestep)
     #needs to be bigger then 1e-4|units.Myr for secular code 
