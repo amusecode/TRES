@@ -5,12 +5,14 @@ Designed to work together with TPS
 Adrian Hamers 2015
 """
 
-from amuse.community import *
+from amuse.community import legacy_function
+from amuse.rfi.core import CodeInterface, LegacyFunctionSpecification
+from amuse.support.interface import InCodeComponentImplementation
 from amuse.units import units,constants
-import sys
+import numpy as np
 
 ### units used internally in the ODE solver ###
-unit_l = units.AU
+unit_l = units.au
 unit_m = units.MSun
 unit_t = 1.0e6*units.yr
 unit_h = unit_m*unit_l**2/unit_t ### angular momentum
@@ -41,11 +43,11 @@ CV_BAD_DKY=-26
 CV_TOO_CLOSE=-27
 
 
-class SecularTripleInterface(CodeInterface):
+class SeculartripleInterface(CodeInterface):
     include_headers = ['src/main_code.h','src/ODE_system.h']
 
     def __init__(self, **options):
-         CodeInterface.__init__(self, **options)
+         CodeInterface.__init__(self, name_of_the_worker='seculartriple_worker', **options)
         
     @legacy_function
     def evolve():
@@ -83,9 +85,9 @@ class SecularTripleInterface(CodeInterface):
         function.addParameter('moment_of_inertia_dot_star1', dtype='float64', direction=function.IN)
         function.addParameter('moment_of_inertia_dot_star2', dtype='float64', direction=function.IN)
         function.addParameter('moment_of_inertia_dot_star3', dtype='float64', direction=function.IN)
-#        function.addParameter('k_div_T_tides_star1', dtype='float64', direction=function.IN)   
-#        function.addParameter('k_div_T_tides_star2', dtype='float64', direction=function.IN)   
-#        function.addParameter('k_div_T_tides_star3', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star1', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star2', dtype='float64', direction=function.IN)   
+        # function.addParameter('k_div_T_tides_star3', dtype='float64', direction=function.IN)   
         function.addParameter('a_in', dtype='float64', direction=function.IN)
         function.addParameter('a_out', dtype='float64', direction=function.IN)
         function.addParameter('e_in', dtype='float64', direction=function.IN)
@@ -892,10 +894,10 @@ class SecularTripleInterface(CodeInterface):
 
 
 
-class SecularTriple(InCodeComponentImplementation):
+class Seculartriple(InCodeComponentImplementation):
 
     def __init__(self, **options):
-        InCodeComponentImplementation.__init__(self,  SecularTripleInterface(**options), **options)
+        InCodeComponentImplementation.__init__(self,  SeculartripleInterface(**options), **options)
         self.model_time = 0.0 | units.Myr
         self.evolve_further_after_root_was_found = False ### in some cases, it is desirable to integrate until the given end time, despite the finding of a root
         self.take_into_account_RLOF_after_no_longer_filling_Roche_lobe = True ### this may seem like a strange `feature', but exists for consistency with the stellar/binary evolution code
@@ -1906,7 +1908,7 @@ class SecularTriple(InCodeComponentImplementation):
             rp_in = bin_list[0].semimajor_axis*(1.0-e_in)
             m1 = star_list[0].mass
             m2 = star_list[1].mass
-            spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+            spin_angular_frequency_inner_orbit_periapse = np.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
             f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
             f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse
             R_L_star1 = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
@@ -1918,7 +1920,7 @@ class SecularTriple(InCodeComponentImplementation):
                 e_out = bin_list[1].eccentricity
                 rp_out = bin_list[1].semimajor_axis*(1.0-e_out)
                 m3 = star_list[2].mass
-                spin_angular_frequency_outer_orbit_periapse = numpy.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
+                spin_angular_frequency_outer_orbit_periapse = np.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
                 f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse      
                 R_L_star3 = self.roche_radius(rp_out,m3/(m1+m2),e_out,f3, self.parameters.roche_radius_specification)
                 R_L_list=[R_L_star1, R_L_star2, R_L_star3]
@@ -1935,7 +1937,7 @@ class SecularTriple(InCodeComponentImplementation):
         rp_in = bin.semimajor_axis*(1.0-e_in)
         m1 = primary.mass
         m2 = secondary.mass
-        spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+        spin_angular_frequency_inner_orbit_periapse = np.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
         spin_angular_frequency1 = primary.spin_angular_frequency
         f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
         R_L = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)

@@ -88,10 +88,12 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 #import TRES as TRES 
 import BIN as BIN
-# from amuse.community.seba import Seba
-from seculartriple_TPS.interface import SecularTriple
 
-secular_code = SecularTriple()
+# from amuse.community.seba import Seba
+# from amuse_seculartriple import Seculartriple
+# secular_code = Seculartriple()
+secular_code = None
+
 import sys
 import argparse
 from amuse.units import units, constants
@@ -539,15 +541,6 @@ def evolve_model(args):
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
 
-    if args["SE_code"] == 1:
-        stellar_code = "sse"
-    elif args["SE_code"] == 2:
-        stellar_code = "mesa_r15140"
-    elif args["SE_code"] == 3:
-        stellar_code = "metisse"
-    else:
-        stellar_code = "seba"    
-
     while i_n < args["total_number"]:
         triple_system = Generate_initial_binary(args)
                
@@ -573,7 +566,7 @@ def evolve_model(args):
         #memory of SeBa needs to be cleaned, in particular SeBa time
         #otherwise use evolve_for for particles indivicually -> many calls 
         tr = BIN.main(**(triple_system.__dict__), **args, 
-                number = number_of_system, stellar_code = stellar_code, secular_code = secular_code)
+                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -605,7 +598,7 @@ def evolve_model(args):
                             i_n += 1  
                             nr_imt -= 1
                             tr = BIN.main(**(triple_system.__dict__), **args, 
-                                number = number_of_system, stellar_code = stellar_code, secular_code = secular_code)
+                                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -614,7 +607,7 @@ def evolve_model(args):
 
     if REPORT_TPS:
       print(total_number, i_n, nr_imt, nr_cp)                              
-    secular_code.stop()
+    # secular_code.stop()
 
 
 def print_distr(args):
@@ -629,7 +622,7 @@ def print_distr(args):
     print('Binary fraction: \t\t',              args["binary_fraction_style"], ' ',lib_binary_fraction_style[args["binary_fraction_style"]] )        
     print('Common envelope model: \t',          args["which_common_envelope"], ' ', lib_CE[args["which_common_envelope"]])
     print('SN kick distr: \t\t',                args["SN_kick_distr"], ' ', lib_SN_kick_distr[args["SN_kick_distr"]])
-    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"].value_in(units.none))
+    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"])
     print('\n')
 
 
@@ -911,6 +904,7 @@ if __name__ == '__main__':
     print_distr(args)
     evolve_model(args)
     
+# stellar codes are started and stopped in BIN.py for memory reasons
 #    stellar_code.stop()
 #    secular_code.stop()
     

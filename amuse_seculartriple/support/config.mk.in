@@ -1,0 +1,10 @@
+# Compilers
+CXX = @CXX@
+
+MPICXX = @MPICXX@
+
+CPU_COUNT = @CPU_COUNT@
+
+# Tools
+AR = @AR@
+RANLIB = @RANLIB@

@@ -24,7 +24,7 @@ try:
     from amuse.community.metisse import Metisse
 except ImportError:
     Metisse = None
-from seculartriple_TPS.interface import SecularTriple
+from amuse_seculartriple import Seculartriple
 
 
 from stellarsystem_class import StellarSystem_Class
@@ -83,30 +83,24 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
         [inner_argument_of_pericenter, outer_argument_of_pericenter],
         [inner_longitude_of_ascending_node])
 
-    clean_up_stellar_code = False
-    clean_up_secular_code = False
-
-    if stellar_code is None or stellar_code.__module__.split(".")[-2]=="seba":
-        stellar_code = Seba()
-    #    stellar_code = Seba(redirection='none')
-    #    stellar_code = Seba(redirection='file', redirect_file='output_SeBa_TRES.txt')
-    elif stellar_code.__module__.split(".")[-2]=="sse":
+    if stellar_code == 1:
         stellar_code = Sse()
-    elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":
+    elif stellar_code == 2:
         stellar_code = Mesa()
-    elif stellar_code.__module__.split(".")[-2]=="metisse":
+    elif stellar_code == 3:
         stellar_code = Metisse()
     else:
-        print('No valid stellar evolution code selected. Options are SeBa (default), SSE, MESA, or METISSE')
-        return triple_class_object # no codes initialized yet
+        stellar_code = Seba()
+#        stellar_code = Seba(redirection='none')
+#        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_TRES.txt')
+    stellar_code.parameters.metallicity = metallicity
     clean_up_stellar_code = True
 
-    stellar_code.parameters.metallicity = metallicity
     if secular_code is None:
-        secular_code = SecularTriple()
-    #    secular_code = SecularTriple(redirection='none')
-    #    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
-        clean_up_secular_code = True
+        secular_code = Seculartriple()
+    #    secular_code = Seculartriple(redirection='none')
+    #    secular_code = Seculartriple(redirection='file', redirect_file='output_Seculartriple_BIN.txt')
+    clean_up_secular_code = True
 
     args = make_dic_args(relative_inclination, tend, tinit, number, maximum_radius_change_factor,  
         stop_at_mass_transfer, stop_at_init_mass_transfer, stop_at_outer_mass_transfer,
@@ -407,9 +401,9 @@ if __name__ == '__main__':
 #        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_TRES.txt')
     stellar_code.parameters.metallicity = args["metallicity"]
 
-#    secular_code = SecularTriple()
-    secular_code = SecularTriple(redirection='none')
-#    secular_code = SecularTriple(redirection='file', redirect_file='output_SecularTriple_TRES.txt')
+    secular_code = Seculartriple()
+    # secular_code = Seculartriple(redirection='none')
+#    secular_code = Seculartriple(redirection='file', redirect_file='output_Seculartriple_TRES.txt')
 
     triple_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
 
