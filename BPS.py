@@ -88,10 +88,12 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 #import TRES as TRES 
 import BIN as BIN
-from amuse.community.seba import SeBa
-from amuse_seculartriple import Seculartriple
 
-secular_code = Seculartriple()
+# from amuse.community.seba import Seba
+# from amuse_seculartriple import Seculartriple
+# secular_code = Seculartriple()
+secular_code = None
+
 import sys
 import argparse
 from amuse.units import units, constants
@@ -564,7 +566,7 @@ def evolve_model(args):
         #memory of SeBa needs to be cleaned, in particular SeBa time
         #otherwise use evolve_for for particles indivicually -> many calls 
         tr = BIN.main(**(triple_system.__dict__), **args, 
-                number = number_of_system, secular_code = secular_code)
+                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -596,7 +598,7 @@ def evolve_model(args):
                             i_n += 1  
                             nr_imt -= 1
                             tr = BIN.main(**(triple_system.__dict__), **args, 
-                                number = number_of_system, secular_code = secular_code)
+                                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -605,7 +607,7 @@ def evolve_model(args):
 
     if REPORT_TPS:
       print(total_number, i_n, nr_imt, nr_cp)                              
-    secular_code.stop()
+    # secular_code.stop()
 
 
 def print_distr(args):
@@ -620,7 +622,7 @@ def print_distr(args):
     print('Binary fraction: \t\t',              args["binary_fraction_style"], ' ',lib_binary_fraction_style[args["binary_fraction_style"]] )        
     print('Common envelope model: \t',          args["which_common_envelope"], ' ', lib_CE[args["which_common_envelope"]])
     print('SN kick distr: \t\t',                args["SN_kick_distr"], ' ', lib_SN_kick_distr[args["SN_kick_distr"]])
-    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"].value_in(units.none))
+    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"])
     print('\n')
 
 
@@ -872,6 +874,8 @@ def parse_arguments():
     parser.add_argument("--max_CPU_time", dest="max_CPU_time", type=float, default = 3600.0,
                       help="max CPU time")
                       
+    parser.add_argument("--stellar_evolution_code", dest="SE_code",  type=int, default = 0,
+                      help="which stellar evolution")
                       
     parser.add_argument("-f", dest="file_name", type =str, default = "TRES.hdf",#"TRES.txt"
                       help="file name")
@@ -900,6 +904,7 @@ if __name__ == '__main__':
     print_distr(args)
     evolve_model(args)
     
+# stellar codes are started and stopped in BIN.py for memory reasons
 #    stellar_code.stop()
 #    secular_code.stop()
     

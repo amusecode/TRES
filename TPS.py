@@ -124,10 +124,11 @@ lib_CE = {  0: "alpha-ce + alpha-dce",
 
 
 import TRES as TRES
-from amuse.community.seba import SeBa
-from amuse_seculartriple import Seculartriple
+# from amuse.community.seba.interface import SeBa
+# from amuse_seculartriple import Seculartriple
+# secular_code = Seculartriple()
+secular_code = None
 
-secular_code = Seculartriple()
 import sys
 import argparse
 from amuse.units import units, constants
@@ -234,7 +235,7 @@ class Generate_initial_triple:
                     args["outer_ecc_max"], args["outer_ecc_min"], args["outer_ecc_distr"], 
                     self.inner_primary_mass+self.inner_secondary_mass, self.outer_mass)
         
-                if args["inner_semi_distr"] == args["outer_semi_distr"] and args["inner_semi_min_orig"] == args["outer_semi_min_orig"] and args["inner_semi_max"] == args["outer_semi_max"] and args["self.outer_semimajor_axis"] < args["self.inner_semimajor_axis"] and args["inner_ecc_distr"] == args["outer_ecc_distr"] and args["inner_ecc_min"] == args["outer_ecc_min"] and args["inner_ecc_max"] == args["outer_ecc_max"]:
+                if args["inner_semi_distr"] == args["outer_semi_distr"] and args["inner_semi_min"] == args["outer_semi_min"] and args["inner_semi_max"] == args["outer_semi_max"] and self.outer_semimajor_axis < self.inner_semimajor_axis and args["inner_ecc_distr"] == args["outer_ecc_distr"] and args["inner_ecc_min"] == args["outer_ecc_min"] and args["inner_ecc_max"] == args["outer_ecc_max"]:
                     swap = self.outer_semimajor_axis
                     self.outer_semimajor_axis = self.inner_semimajor_axis
                     self.inner_semimajor_axis = swap
@@ -641,7 +642,7 @@ def evolve_model(args):
     nr_iss = 0 #number of systems that is in the semisecular regime at initialisation
     nr_imt = 0 #number of systems that has mass transfer at initialisation
     nr_cp = 0 #number of systems with incorrect parameters
-
+    
     while i_n < args["total_number"]:
         triple_system = Generate_initial_triple(args)
                 
@@ -667,7 +668,7 @@ def evolve_model(args):
         #memory of SeBa needs to be cleaned, in particular SeBa time
         #otherwise use evolve_for for particles indivicually -> many calls 
         tr = TRES.main(**(triple_system.__dict__), **args, 
-                number = number_of_system, secular_code = secular_code)
+                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
     
         if tr.correct_params == False:
             if REPORT_TPS:
@@ -704,7 +705,7 @@ def evolve_model(args):
                             nr_imt -= 1
 
                             tr = TRES.main(**(triple_system.__dict__), **args, 
-                                number = number_of_system, secular_code = secular_code)
+                                number = number_of_system, stellar_code = args["SE_code"], secular_code = secular_code)
 
         else:
             i_n += 1            
@@ -713,7 +714,7 @@ def evolve_model(args):
 
     if REPORT_TPS:
       print(total_number, i_n, nr_iss, nr_ids, nr_imt, nr_cp)                              
-    secular_code.stop()
+    # secular_code.stop()
 
 
 def print_distr(args):
@@ -733,7 +734,7 @@ def print_distr(args):
     print('Triple fraction: \t\t',              args["triple_fraction_style"], ' ',lib_triple_fraction_style[args["triple_fraction_style"]] )        
     print('Common envelope model: \t',          args["which_common_envelope"], ' ', lib_CE[args["which_common_envelope"]])
     print('SN kick distr: \t\t',                args["SN_kick_distr"], ' ', lib_SN_kick_distr[args["SN_kick_distr"]])
-    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"].value_in(units.none))
+    print('Metallicity: \t\t',                  '-', ' ', args["metallicity"])
     print('\n')
 
 
@@ -1114,7 +1115,9 @@ def parse_arguments():
                       help="stop at CPU time")
     parser.add_argument("--max_CPU_time", dest="max_CPU_time", type=float, default = 3600.0,
                       help="max CPU time")
-                      
+
+    parser.add_argument("--stellar_evolution_code", dest="SE_code",  type=int, default = 0,
+                      help="which stellar evolution")                      
                       
     parser.add_argument("-f", dest="file_name", type =str, default = "TRES.hdf",#"TRES.txt"
                       help="file name")
@@ -1143,6 +1146,7 @@ if __name__ == '__main__':
     print_distr(args)
     evolve_model(args)
     
+# stellar codes are started and stopped in TRES.py for memory reasons
 #    stellar_code.stop()
 #    secular_code.stop()
     

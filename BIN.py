@@ -22,6 +22,10 @@ try:
     from amuse.community.mesa import Mesa 
 except ImportError:
     Mesa = None
+try:
+    from amuse.community.metisse import Metisse 
+except ImportError:
+    Metisse = None
 from amuse_seculartriple import Seculartriple
 
 
@@ -90,27 +94,25 @@ def main(primary_mass = 1.3|units.MSun, secondary_mass = 0.5|units.MSun,
     clean_up_stellar_code = False
     clean_up_secular_code = False
 
-    if stellar_code is None or stellar_code.__module__.split(".")[-2]=="seba":
-        stellar_code = Seba()
-    #    stellar_code = Seba(redirection='none')
-    #    stellar_code = Seba(redirection='file', redirect_file='output_SeBa_BIN.txt')
-    elif stellar_code.__module__.split(".")[-2]=="sse":                               
+    if stellar_code == 1:
         stellar_code = Sse()
-    elif stellar_code.__module__.split(".")[-2]=="mesa_r15140":                
+    elif stellar_code == 2:
         stellar_code = Mesa()
+    elif stellar_code == 3:
+        stellar_code = Metisse()
     else:
-        print('No valid stellar evolution code selected. Options are SeBa (default), SSE or MESA')
-        return bin_class_object # no codes initialized yet #silvia object??
+        stellar_code = Seba()
+#        stellar_code = Seba(redirection='none')
+#        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_TRES.txt')
+    stellar_code.parameters.metallicity = metallicity
     clean_up_stellar_code = True
 
-    stellar_code.parameters.metallicity = metallicity
-    if secular_code is None:
-        secular_code = Seculartriple()
+    
+    secular_code = Seculartriple()
     #    secular_code = Seculartriple(redirection='none')
-    #    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
-        clean_up_secular_code = True
+    #    secular_code = Seculartriple(redirection='file', redirect_file='output_Seculartriple_BIN.txt')
+    clean_up_secular_code = True
         
-
     bin_class_object = StellarSystem_Class(stars, bin, correct_params, stellar_code, secular_code, args)            
     bin_class_object.secular_code.parameters.ignore_tertiary == True
     bin_class_object.secular_code.parameters.check_for_dynamical_stability = False
@@ -366,6 +368,8 @@ if __name__ == '__main__':
         stellar_code = Sse()
     elif args["SE_code"] == 2:
         stellar_code = Mesa()
+    elif args["SE_code"] == 3:
+        stellar_code = Metisse()
     else:
         stellar_code = Seba()    
 #        stellar_code = Seba(redirection='none')
@@ -374,7 +378,7 @@ if __name__ == '__main__':
 
     secular_code = Seculartriple()
 #    secular_code = Seculartriple(redirection='none')
-#    secular_code = Seculartriple(redirection='file', redirect_file='output_SecularTriple_BIN.txt')
+#    secular_code = Seculartriple(redirection='file', redirect_file='output_Seculartriple_BIN.txt')
 
     bin_class_object = StellarSystem_Class(stars, bins, correct_params, stellar_code, secular_code, args)
     bin_class_object.secular_code.parameters.ignore_tertiary == True
