@@ -9,6 +9,7 @@ from amuse.community import legacy_function
 from amuse.rfi.core import CodeInterface, LegacyFunctionSpecification
 from amuse.support.interface import InCodeComponentImplementation
 from amuse.units import units,constants
+import numpy as np
 
 ### units used internally in the ODE solver ###
 unit_l = units.au
@@ -1907,7 +1908,7 @@ class Seculartriple(InCodeComponentImplementation):
             rp_in = bin_list[0].semimajor_axis*(1.0-e_in)
             m1 = star_list[0].mass
             m2 = star_list[1].mass
-            spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+            spin_angular_frequency_inner_orbit_periapse = np.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
             f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
             f2 = spin_angular_frequency2/spin_angular_frequency_inner_orbit_periapse
             R_L_star1 = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
@@ -1919,7 +1920,7 @@ class Seculartriple(InCodeComponentImplementation):
                 e_out = bin_list[1].eccentricity
                 rp_out = bin_list[1].semimajor_axis*(1.0-e_out)
                 m3 = star_list[2].mass
-                spin_angular_frequency_outer_orbit_periapse = numpy.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
+                spin_angular_frequency_outer_orbit_periapse = np.sqrt( constants.G*(m1+m2+m3)*(1.0+e_out)/(rp_out**3) ) 
                 f3 = spin_angular_frequency3/spin_angular_frequency_outer_orbit_periapse      
                 R_L_star3 = self.roche_radius(rp_out,m3/(m1+m2),e_out,f3, self.parameters.roche_radius_specification)
                 R_L_list=[R_L_star1, R_L_star2, R_L_star3]
@@ -1936,7 +1937,7 @@ class Seculartriple(InCodeComponentImplementation):
         rp_in = bin.semimajor_axis*(1.0-e_in)
         m1 = primary.mass
         m2 = secondary.mass
-        spin_angular_frequency_inner_orbit_periapse = numpy.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
+        spin_angular_frequency_inner_orbit_periapse = np.sqrt( constants.G*(m1+m2)*(1.0+e_in)/(rp_in**3) ) 
         spin_angular_frequency1 = primary.spin_angular_frequency
         f1 = spin_angular_frequency1/spin_angular_frequency_inner_orbit_periapse
         R_L = self.roche_radius(rp_in,m1/m2,e_in,f1, self.parameters.roche_radius_specification)
