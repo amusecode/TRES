@@ -1,1 +1,1 @@
-from amuse.community.seculartriple.interface import Seculartriple
+from .interface import Seculartriple
