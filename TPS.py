@@ -1058,7 +1058,7 @@ def parse_arguments():
     parser.add_argument("-N", dest="initial_number", type=int, default = 0,
                       help="number ID of first system")
     parser.add_argument("-s",  dest="seed", type=int, default = -1,
-                      help="seed (int)")
+                      help="seed")
 #    int actual_seed = srandinter(input_seed);
 
     parser.add_argument("--no_stop_at_mass_transfer", dest="stop_at_mass_transfer", action="store_false", default = True,

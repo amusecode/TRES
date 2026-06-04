@@ -260,7 +260,7 @@ def parse_arguments():
     parser.add_argument("-N", dest="number", type=int, default = 0,
                       help="number ID of system")
     parser.add_argument("-s", dest="seed", type=int, default = -1,
-                      help="seed (int)")
+                      help="seed")
     parser.add_argument("-r", dest="maximum_radius_change_factor", type=float, default = 0.01,
                       help="maximum_radius_change_factor")
 

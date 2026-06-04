@@ -329,43 +329,43 @@ def parse_arguments():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("-f", dest="file_name_root", type =str, default = "TRES",
-                      help="file name [%default]")                      
+                      help="file name")                      
     parser.add_argument("-F", dest="output_file", type =str, default = 'screen',
-                      help="output file[%default]")
+                      help="output file")
     parser.add_argument("-S", dest="print_style", type=int, default = 2,
-                      help="print style [%default]") 
+                      help="print style") 
     parser.add_argument("--save_every_snapshot", dest="save_every_snapshot", action="store_true", default = False, 
-                      help="save every snapshot for specified triple [%default]")
+                      help="save every snapshot for specified triple")
     parser.add_argument("--print_init", dest="print_init", action="store_true", default = False, 
-                      help="print initial conditions for re running [%default]")
+                      help="print initial conditions for re running")
     parser.add_argument("-l", dest="line_number", type=int, default = 0,
-                      help="line number for printing initial conditions [%default]") #will only do something when print_init = True
+                      help="line number for printing initial conditions") #will only do something when print_init = True
 
     #returns first instance where desired star_type, bin_type & triple_type is reached 
     parser.add_argument("--st1", dest="inner_primary_star_type", type=int, default = -1,
-                      help="desired stellar type of inner binary primary star (int) [%default]") 
+                      help="desired stellar type of inner binary primary star") 
     parser.add_argument("--st2", dest="inner_secondary_star_type", type=int, default = -1,
-                      help="desired stellar type of inner binary secondary star (int) [%default]") 
+                      help="desired stellar type of inner binary secondary star") 
     parser.add_argument("--st3", dest="outer_star_type", type=int, default = -1,
-                      help="desired stellar type of tertiary star (int) [%default]") 
+                      help="desired stellar type of tertiary star") 
     parser.add_argument("--st1str", dest="inner_primary_star_type_string", type=str, default = "all",
-                      help="desired stellar type of inner binary primary star (int) [%default]") 
+                      help="desired stellar type of inner binary primary star") 
     parser.add_argument("--st2str", dest="inner_secondary_star_type_string", type=str, default = "all",
-                      help="desired stellar type of inner binary secondary star (int) [%default]") 
+                      help="desired stellar type of inner binary secondary star") 
     parser.add_argument("--st3str", dest="outer_star_type_string", type=str, default = "all",
-                      help="desired stellar type of tertiary star [%default]") 
+                      help="desired stellar type of tertiary star") 
     parser.add_argument("--btin", dest="inner_bin_type", type=int, default = -1,
-                      help="desired binary type of inner binary (int) [%default]") 
+                      help="desired binary type of inner binary") 
     parser.add_argument("--btout", dest="outer_bin_type", type=int, default = -1,
-                      help="desired binary type of outer binary (int) [%default]") 
+                      help="desired binary type of outer binary") 
     parser.add_argument("--btinstr", dest="inner_bin_type_string", type=str, default = "all",
-                      help="desired binary type of inner binary (string) [%default]")                      
+                      help="desired binary type of inner binary")                      
     parser.add_argument("--btoutstr", dest="outer_bin_type_string", type=str, default = "all",
-                      help="desired binary type of outer binary (string) [%default]")                      
+                      help="desired binary type of outer binary")                      
     parser.add_argument("--trt", dest="triple_type", type=int, default = -1,
-                      help="desired triple type (int) [%default]") 
+                      help="desired triple type") 
     parser.add_argument("--trtstr", dest="triple_type_string", type=str, default = "all",
-                      help="desired triple type [%default]")                      
+                      help="desired triple type")                      
 
     args = parser.parse_args()
     return args.__dict__
