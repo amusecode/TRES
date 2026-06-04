@@ -226,6 +226,14 @@ class StellarSystem_Class:
 
     def copy_from_stellar(self):
         #        self.channel_from_stellar.copy()
+        #Silvia
+        # mass1 = self.triple.child1.mass
+#         mass21 = self.triple.child2.child1.mass
+#         mass22 = self.triple.child2.child2.mass
+#         old_age1 = self.triple.child1.age
+#         old_age21 = self.triple.child2.child1.age
+#         old_age22 = self.triple.child2.child2.age
+
         self.channel_from_stellar.copy_attributes(
             [
                 "age",
@@ -237,10 +245,25 @@ class StellarSystem_Class:
                 "convective_envelope_mass",
                 "stellar_type",
                 "luminosity",
-                "wind_mass_loss_rate",
+                # "wind_mass_loss_rate",#Silvia
                 "temperature",
             ]
         )
+        # time_step = self.triple.time - self.previous_time
+#         self.triple.child1.wind_mass_loss_rate = (self.triple.child1.mass - mass1) / time_step
+#         self.triple.child2.child1.wind_mass_loss_rate = (self.triple.child2.child1.mass - mass21) / time_step
+#         self.triple.child2.child2.wind_mass_loss_rate = (self.triple.child2.child2.mass - mass22) / time_step
+#         print(self.triple.time, self.previous_time)
+#         print(mass1, self.triple.child1.mass, self.triple.child1.wind_mass_loss_rate)
+#         print(mass21, self.triple.child2.child1.mass, self.triple.child2.child1.wind_mass_loss_rate)
+#         print(mass22, self.triple.child2.child2.mass, self.triple.child2.child2.wind_mass_loss_rate)
+#
+#         print(old_age1, old_age21, old_age22, self.triple.child1.age, self.triple.child2.child1.age, )
+
+        self.triple.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+        self.triple.child2.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+        self.triple.child2.child2.wind_mass_loss_rate = 0|units.MSun/units.yr
+        
         if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
             self.channel_from_stellar.copy_attributes(["gyration_radius"])
         if GET_AMC_FROM_STELLAR_CODE:
@@ -2903,7 +2926,11 @@ class StellarSystem_Class:
 
                 if self.stellar_code.__module__.split(".")[-2] == "mesa_r15140":
                     print(
-                        "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
+                        "for now, refresh_memory and recall_memory_one_step not available in MESA & interface - only issue for mt"
+                    )
+                elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":#silvia
+                    print(
+                        "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
                     )
                 else:
                     self.stellar_code.particles.refresh_memory()
@@ -2935,6 +2962,11 @@ class StellarSystem_Class:
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
                         successfull_step = True
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":#silvia
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
+                        successfull_step = True
                     else:
                         successfull_step, nr_unsuccessfull, star_unsuccessfull = (
                             self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
@@ -2962,6 +2994,10 @@ class StellarSystem_Class:
                         print(
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":#silvia
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
                     else:
                         self.stellar_code.particles.recall_memory_one_step()
 
@@ -3053,6 +3089,10 @@ class StellarSystem_Class:
                         print(
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":#silvia
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
                     else:
                         self.rewind_to_begin_of_rlof_secular()
 

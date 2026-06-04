@@ -21,7 +21,9 @@ try:
 except ImportError:
     Mesa = None
 try:
-    from amuse.community.metisse import Metisse
+    #Silvia
+    # from amuse.community.metisse import Metisse
+    from amuse_metisse import Metisse
 except ImportError:
     Metisse = None
 from amuse_seculartriple import Seculartriple
@@ -391,15 +393,25 @@ if __name__ == '__main__':
 
     if args["SE_code"] == 1:
         stellar_code = Sse()
+        stellar_code.parameters.metallicity = args["metallicity"]
     elif args["SE_code"] == 2:
         stellar_code = Mesa()
+        stellar_code.parameters.metallicity = args["metallicity"]        
     elif args["SE_code"] == 3:
         stellar_code = Metisse()
+        #Silvia
+        metallicity_dir = "/Users/silviatoonen/Development/TRES-metisse/Metisse-data/Hydrogen"    
+        metallicity_dir_he = "/Users/silviatoonen/Development/TRES-metisse/Metisse-data/Helium"    
+        stellar_code.parameters.metallicity_dir = metallicity_dir
+        stellar_code.parameters.metallicity_dir_he = metallicity_dir_he
+        stellar_code.parameters.wd_mass_scheme = "Modified_mestel"
+        stellar_code.parameters.bhns_mass_scheme = "Belczynski2008"
+        stellar_code.parameters.initial_metallicity = 0.02               
     else:
         stellar_code = Seba()
 #        stellar_code = Seba(redirection='none')
 #        stellar_code = Seba(redirection='file', redirect_file='output_SeBa_TRES.txt')
-    stellar_code.parameters.metallicity = args["metallicity"]
+        stellar_code.parameters.metallicity = args["metallicity"]
 
     secular_code = Seculartriple()
     # secular_code = Seculartriple(redirection='none')
