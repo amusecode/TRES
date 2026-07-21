@@ -85,11 +85,14 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
         [inner_argument_of_pericenter, outer_argument_of_pericenter],
         [inner_longitude_of_ascending_node])
 
+    correct_params_metisse = True
     if stellar_code == 1:
         stellar_code = Sse()
     elif stellar_code == 2:
         stellar_code = Mesa()
     elif stellar_code == 3:
+        if inner_primary_mass <= 0.75|units.MSun or inner_secondary_mass <= 0.75|units.MSun or outer_mass <= 0.75|units.MSun:
+            correct_params_metisse = False
         stellar_code = Metisse()
     else:
         stellar_code = Seba()
@@ -119,7 +122,9 @@ def main(inner_primary_mass = 1.3|units.MSun, inner_secondary_mass = 0.5|units.M
     if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
-        return triple_class_object # no codes initialized yet
+    elif correct_params_metisse == False:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. When using Metisse, the masses of the stars need to be above 0.75MSun.')
     elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
@@ -203,7 +208,6 @@ def main_developer(stars, bins, correct_params, stellar_code, secular_code,
     if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.')
-        return triple_class_object # no codes initialized yet
     elif stop_at_semisecular_regime == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')
@@ -390,7 +394,7 @@ if __name__ == '__main__':
         [args["inner_argument_of_pericenter"], args["outer_argument_of_pericenter"]],
         [args["inner_longitude_of_ascending_node"]])
 
-
+    correct_params_metisse = True
     if args["SE_code"] == 1:
         stellar_code = Sse()
         stellar_code.parameters.metallicity = args["metallicity"]
@@ -398,6 +402,9 @@ if __name__ == '__main__':
         stellar_code = Mesa()
         stellar_code.parameters.metallicity = args["metallicity"]        
     elif args["SE_code"] == 3:
+        if args["inner_primary_mass"] <= 0.75|units.MSun or args["inner_secondary_mass"] <= 0.75|units.MSun or args["outer_mass"] <= 0.75|units.MSun:
+            correct_params_metisse = False
+
         stellar_code = Metisse()
         #Silvia
         metallicity_dir = "/Users/silviatoonen/Development/TRES-metisse/Metisse-data/Hydrogen"    
@@ -406,7 +413,6 @@ if __name__ == '__main__':
         stellar_code.parameters.metallicity_dir_he = metallicity_dir_he
         stellar_code.parameters.wd_mass_scheme = "Modified_mestel"
         stellar_code.parameters.bhns_mass_scheme = "Belczynski2008"
-        stellar_code.parameters.initial_metallicity = 0.02               
     else:
         stellar_code = Seba()
 #        stellar_code = Seba(redirection='none')
@@ -422,8 +428,9 @@ if __name__ == '__main__':
     if triple_class_object.correct_params == False:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The parameters of the given triple are incorrect.' )
-        # no codes initialized yet
-        sys.exit('Choose a different system. The parameters of the given triple are incorrect.')
+    elif correct_params_metisse == False:
+        if REPORT_USER_WARNINGS:
+            print('Choose a different system. When using Metisse, the masses of the stars need to be above 0.75MSun. ')
     elif args['stop_at_semisecular_regime'] == True and triple_class_object.semisecular_regime_at_initialisation == True:
         if REPORT_USER_WARNINGS:
             print('Choose a different system. The given triple is in the semisecular regime at initialization.')

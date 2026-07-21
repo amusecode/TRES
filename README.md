@@ -369,8 +369,9 @@ and use the rdc_TRES.py and rdc_TRES_csv.py to read the output and print it in r
 python TRES.py --M1 1.33 --M2 1.06 --M3 0.0046 --Ain 26.35 --Aout 3012.9 --Ein 0.3 --Eout 0.1 -i 1.7 -T 11000  --no_stop_at_mass_transfer -f 'testRun_2.hdf'
 ```
 
-## TRES with MESA
+## TRES with other stellar evolution codes
 
+Regarding MESA:
 By default TRES uses the stellar evolution code SeBa (Portegies Zwart et al. 1996, Toonen et al. 2012), but other stellar evolution codes, such as SSE or MESA can be used as well.
 To do so, you simply choose your favorite stellar evolution code, see above. 
 
@@ -378,6 +379,9 @@ If you want to change settings within MESA, this can be done in AMUSE through "p
 
 [future]: Note, that when running TRES with MESA, GET_GYRATION_RADIUS_FROM_STELLAR_CODE and GET_AMC_FROM_STELLAR_CODE are set to true by default. These physical quantities are in this case obtained directly from the structure of the star.
 
+
+Regarding METISSE:
+When using Metisse, the mass of the stars need to be above 0.75MSun. 
 
 ## Understanding the TRES output
 
