@@ -225,26 +225,89 @@ class StellarSystem_Class:
     # -------
 
     def copy_from_stellar(self):
-        #        self.channel_from_stellar.copy()
-        self.channel_from_stellar.copy_attributes(
-            [
-                "age",
-                "mass",
-                "core_mass",
-                "radius",
-                "core_radius",
-                "convective_envelope_radius",
-                "convective_envelope_mass",
-                "stellar_type",
-                "luminosity",
-                "wind_mass_loss_rate",
-                "temperature",
-            ]
-        )
+
+
+        #Silvia
+        if self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":
+            self.channel_from_stellar.copy_attributes(
+                [
+                    "age",
+                    "mass",
+                    "core_mass",
+                    "radius",
+                    "core_radius",
+                    "convective_envelope_radius",
+                    "convective_envelope_mass",
+                    "stellar_type",
+                    "luminosity",
+                    #"wind_mass_loss_rate",#Silvia
+                    "temperature",
+                ]
+            )
+
+            if self.triple.time == quantities.zero:  # initialization
+                self.triple.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+                self.triple.child2.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+                self.triple.child2.child2.wind_mass_loss_rate = 0|units.MSun/units.yr
+            else:
+                #silvia check out if this delta m will include mass transfer 
+                time_step = self.triple.time - self.previous_time
+                self.triple.child1.wind_mass_loss_rate = (self.triple.child1.mass-self.triple.child1.previous_mass)/time_step
+                self.triple.child2.child1.wind_mass_loss_rate = (self.triple.child2.child1.mass-self.triple.child2.child1.previous_mass)/time_step
+                self.triple.child2.child2.wind_mass_loss_rate = (self.triple.child2.child2.mass-self.triple.child2.child2.previous_mass)/time_step
+                
+
+        elif self.stellar_code.__module__.split(".")[-2] == "sse":
+            self.channel_from_stellar.copy_attributes(
+                [
+                    "age",
+                    "mass",
+                    "core_mass",
+                    "radius",
+                    "core_radius",
+                    "convective_envelope_radius",
+                    "convective_envelope_mass",
+                    "stellar_type",
+                    "luminosity",
+                    #"wind_mass_loss_rate",#Silvia
+                    "temperature",
+                ]
+            )
+
+            if self.triple.time == quantities.zero:  # initialization
+                self.triple.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+                self.triple.child2.child1.wind_mass_loss_rate = 0|units.MSun/units.yr
+                self.triple.child2.child2.wind_mass_loss_rate = 0|units.MSun/units.yr
+            else:
+                #silvia check out if this delta m will include mass transfer 
+                time_step = self.triple.time - self.previous_time
+                self.triple.child1.wind_mass_loss_rate = (self.triple.child1.mass-self.triple.child1.previous_mass)/time_step
+                self.triple.child2.child1.wind_mass_loss_rate = (self.triple.child2.child1.mass-self.triple.child2.child1.previous_mass)/time_step
+                self.triple.child2.child2.wind_mass_loss_rate = (self.triple.child2.child2.mass-self.triple.child2.child2.previous_mass)/time_step
+
+        else:
+            self.channel_from_stellar.copy_attributes(
+                [
+                    "age",
+                    "mass",
+                    "core_mass",
+                    "radius",
+                    "core_radius",
+                    "convective_envelope_radius",
+                    "convective_envelope_mass",
+                    "stellar_type",
+                    "luminosity",
+                    "wind_mass_loss_rate",
+                    "temperature",
+                ]
+            )
+            
+            
         if GET_GYRATION_RADIUS_FROM_STELLAR_CODE:
             self.channel_from_stellar.copy_attributes(["gyration_radius"])
         if GET_AMC_FROM_STELLAR_CODE:
             self.channel_from_stellar.copy_attributes(["apsidal_motion_constant"])
+
 
     # -------
 
@@ -1213,9 +1276,9 @@ class StellarSystem_Class:
             print(
                 star.wind_mass_loss_rate,
             )
-            print(
-                star.spin_angular_frequency,
-            )
+            # print(
+            #     star.spin_angular_frequency,
+            # )
             print(star.is_donor)
             print("\t")
         else:
@@ -1475,7 +1538,7 @@ class StellarSystem_Class:
                 )
 
             if REPORT_DT:
-                print("Dt_radius_change_star = ", dt)
+                print("Dt_radius_change_star = ", dt, self.maximum_radius_change_factor, stellar_system.radius, stellar_system.previous_radius, stellar_system.time_derivative_of_radius)
             return dt
         else:
             dt1 = self.determine_time_step_radius_change(stellar_system.child1)
@@ -2903,7 +2966,11 @@ class StellarSystem_Class:
 
                 if self.stellar_code.__module__.split(".")[-2] == "mesa_r15140":
                     print(
-                        "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
+                        "for now, refresh_memory and recall_memory_one_step not available in MESA & interface - only issue for mt"
+                    )
+                elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":
+                    print(
+                        "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
                     )
                 else:
                     self.stellar_code.particles.refresh_memory()
@@ -2935,6 +3002,11 @@ class StellarSystem_Class:
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
                         successfull_step = True
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
+                        successfull_step = True
                     else:
                         successfull_step, nr_unsuccessfull, star_unsuccessfull = (
                             self.recall_memory_one_step_stellar(nr_unsuccessfull, star_unsuccessfull)
@@ -2962,6 +3034,10 @@ class StellarSystem_Class:
                         print(
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
                     else:
                         self.stellar_code.particles.recall_memory_one_step()
 
@@ -3053,6 +3129,10 @@ class StellarSystem_Class:
                         print(
                             "for now, refresh_memory and recall_memory_one_step not available in MESA interface - only issue for mt"
                         )
+                    elif self.stellar_code.__module__.split(".")[-2] == "amuse_metisse":
+                        print(
+                            "for now, refresh_memory and recall_memory_one_step not available in METISSE & interface - only issue for mt"
+                            )
                     else:
                         self.rewind_to_begin_of_rlof_secular()
 
