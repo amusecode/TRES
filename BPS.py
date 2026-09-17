@@ -111,7 +111,8 @@ from amuse.ic.flatimf import new_flat_mass_distribution
 from TRES_options import REPORT_TPS, \
                          REPORT_USER_WARNINGS_TPS, \
                          EXCLUDE_SSO, \
-                         precision,  min_mass, absolute_min_mass, absolute_max_mass                         
+                         precision,  min_mass, absolute_min_mass, absolute_max_mass
+
 
 def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
@@ -532,6 +533,7 @@ class Generate_initial_binary:
         print( self.longitude_of_ascending_node, end=" ")
         
 #-------    
+
 #-------
 
 def evolve_model(args):
@@ -592,7 +594,7 @@ def evolve_model(args):
 #                            triple_system.semimajor_axis = tr.triple.child2.semimajor_axis
                         triple_system.eccentricity = new_ecc
                         tr.triple.eccentricity = new_ecc #quad
-                        tr.check_RLOF()
+                        tr.check_RLOF_simpel(tr.triple)
                         if not tr.has_donor():
                             i_ecc = max_nr_tries_ecc+1
                             i_n += 1  

@@ -32,7 +32,7 @@ lib_inner_semi_distr = {0: "Log Uniform distribution", #default
                    3: "Lognormal mu = 10^3.5d, sigma = 2.3",
                    4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
                    5: "Sana et al. 2012",
-                   6: "flat distribution",
+                   6: "Uniform distribution",
                    7: "Galicher et al. 2016 powerlaw (a^-0.61)",} #appropriate for planets
 ##            --a_max    upper limit for the outer semi-major axis [5e6 RSun]
 ##            --a_min    lower limit for the outer semi-major axis [5 RSun]
@@ -43,7 +43,7 @@ lib_outer_semi_distr = {0: "Log Uniform distribution", #default
                    3: "Lognormal mu = 10^3.5d, sigma = 2.3",
                    4: "Rizzuto Lognormal mu = 10^0.95 AU, sigma = 1.35",
                    5: "Sana et al. 2012",
-                   6: "flat distribution",
+                   6: "Uniform distribution",
                    7: "Galicher et al. 2016 powerlaw (a^-0.61)",} #appropriate for planets
 ##            --E_max    upper limit for the inner eccentricity [0.9]
 ##            --E_min    lower limit for the inner eccentricity [0.]
@@ -146,7 +146,8 @@ from amuse.ic.flatimf import new_flat_mass_distribution
 from TRES_options import REPORT_TPS, \
                          REPORT_USER_WARNINGS_TPS, \
                          EXCLUDE_SSO, \
-                         precision,  min_mass, absolute_min_mass, absolute_max_mass                         
+                         precision,  min_mass, absolute_min_mass, absolute_max_mass
+
 
 def flat_distr(lower, upper):
     return np.random.uniform(lower, upper)
@@ -698,7 +699,7 @@ def evolve_model(args):
 #                            triple_system.inner_semimajor_axis = tr.triple.child2.semimajor_axis
                         triple_system.inner_eccentricity = new_ecc
                         tr.triple.child2.eccentricity = new_ecc #quad
-                        tr.check_RLOF()
+                        tr.check_RLOF_simpel(tr.triple.child2)
                         if not tr.has_donor():
                             i_ecc = max_nr_tries_ecc+1
                             i_n += 1  

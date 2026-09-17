@@ -1112,6 +1112,30 @@ class StellarSystem_Class:
         else:
             sys.exit("check_RLOF: structure stellar system unknown")
 
+
+
+    def check_RLOF_simpel(self, bin):
+
+        Rl1 = bin.semimajor_axis * roche_radius_dimensionless(bin.child1.mass, bin.child2.mass)    
+        Rl2 = bin.semimajor_axis * roche_radius_dimensionless(bin.child2.mass, bin.child1.mass)    
+    
+        bin.child1.is_donor = False
+        bin.child2.is_donor = False
+
+        if bin.child1.radius >= Rl1 - (1.0 * small_numerical_error | units.RSun):
+            bin.child1.is_donor = True
+        if bin.child2.radius >= Rl2 - (1.0 * small_numerical_error | units.RSun):
+            bin.child2.is_donor = True
+
+        print("Roche lobe radii:", Rl1, Rl2, bin.semimajor_axis)
+        print("Stellar radii:",
+             bin.child1.radius,
+             bin.child2.radius)
+        print(bin.child1.is_donor, bin.child2.is_donor)
+
+
+
+
     def check_OLOF(self):
         if self.triple.is_star:
             return
